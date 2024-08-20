@@ -1,5 +1,4 @@
-import logo from './logo.svg';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Qr from './component/Qr';
 import Home from './component/Home';
 import './App.css';
