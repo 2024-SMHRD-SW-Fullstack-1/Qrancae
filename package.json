@@ -1,0 +1,36 @@
+{
+  "name": "qrancae-root",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "start:frontend": "npm start --workspace apps/frontend",
+    "start:mobile": "npm start --workspace apps/mobile",
+    "start:backend": "cd apps/backend && ./mvnw spring-boot:run",
+    "test": "npm run test --workspace=apps/*",
+    "lint": "eslint 'apps/**/*.{js,ts,jsx,tsx}'",
+    "format": "prettier --write 'apps/**/*.{js,ts,jsx,tsx,json,css,md}'"
+  },
+  "keywords": [
+    "qrancae",
+    "monorepo"
+  ],
+  "author": "Qrancae Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2024-SMHRD-SW-Fullstack-1/Qrancae.git"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-define-config": "^2.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3"
+  }
+}
