@@ -31,7 +31,11 @@ const Footer = () => {
         </div>
         <div>
           Distributed by
-          <a target="_blank" href="https://themewagon.com/">
+          <a
+            target="_blank"
+            href="https://themewagon.com/"
+            rel="noopener noreferrer"
+          >
             ThemeWagon
           </a>
           .
