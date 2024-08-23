@@ -33,35 +33,26 @@ const Qr = () => {
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <h4 className="card-title">케이블 목록</h4>
                     <div className="cable-btns">
-                      <a
-                        href="#"
-                        className="btn btn-label-primary btn-round btn-sm"
-                      >
+                      <label className="btn btn-label-primary btn-round btn-sm">
                         <span className="btn-label">
                           <i className="fas fa-times"></i>
                         </span>
-                        삭제
-                      </a>
+                        선택 삭제
+                      </label>
                       <Link to="/qr/add">
-                        <a
-                          href="#"
-                          className="btn btn-label-primary btn-round btn-sm"
-                        >
+                        <label className="btn btn-label-primary btn-round btn-sm">
                           <span className="btn-label">
                             <i className="fas fa-plus"></i>
                           </span>
-                          추가
-                        </a>
+                          케이블 추가
+                        </label>
                       </Link>
-                      <a
-                        href="#"
-                        className="btn btn-label-primary btn-round btn-sm"
-                      >
+                      <label className="btn btn-label-primary btn-round btn-sm">
                         <span className="btn-label">
                           <i className="fas fa-print"></i>
                         </span>
-                        인쇄
-                      </a>
+                        QR 인쇄
+                      </label>
                     </div>
                   </div>
                   <div className="card-body">
