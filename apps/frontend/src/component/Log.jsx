@@ -5,9 +5,8 @@ import Footer from './Footer';
 import 'datatables.net';
 
 const Log = () => {
-  //datatables id값 바꾸기
   // 번호, 사용자id,이름,케이블,소스랙위치,목적지랙위치,날짜및시간
-  const logList = [
+  const logdata = [
     {
       log_idx: 1,
       user_id: 'hong',
@@ -27,12 +26,21 @@ const Log = () => {
       log_date: '2024-08-21 12:22:35'
     }
   ];
+
+  const tabledata = logdata.map(item => [
+    item.log_idx,
+    item.user_id,
+    item.user_name,
+    item.cable_idx,
+    item.s_rack_location,
+    item.d_rack_location,
+    item.log_date
+  ]);
+
   useEffect(() => {
     // 컴포넌트가 마운트될 때 DataTable을 초기화합니다
     $('#basic-logtables').DataTable({
-      data: [
-        [270, 'kong', '콩길동', '100', 'rack01', 'DataCenter01', '2024-08-21 12:22:35']
-      ],
+      data: tabledata,
       columns: [
         { title: '번호' },
         { title: '사용자ID' },
@@ -82,7 +90,7 @@ const Log = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {logList.map((data, index) =>
+                          {logdata.map((data, index) =>
                             <tr key={index}>
                               <td>{data.log_idx}</td>
                               <td>{data.user_id}</td>
@@ -103,6 +111,7 @@ const Log = () => {
                             <td>24-08-21</td>
                           </tr>
                           <tr>
+
                             <td>002</td>
                             <td>hong</td>
                             <td>홍길동</td>
