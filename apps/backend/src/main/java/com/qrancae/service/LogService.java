@@ -1,6 +1,5 @@
 package com.qrancae.service;
 
-<<<<<<< HEAD
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +22,4 @@ public class LogService {
       
       return results;
    }
-=======
-import org.springframework.stereotype.Service;
-
-@Service
-public class LogService {
->>>>>>> 5618cc1f3cef0b6bd4ec0bd39fea2dc648c97072
-
 }
