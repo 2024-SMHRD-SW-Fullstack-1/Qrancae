@@ -1,48 +1,47 @@
 package com.qrancae.controller;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.qrancae.model.Cable;
+import com.qrancae.model.Qr;
 import com.qrancae.service.CableService;
-
+import com.qrancae.service.QrService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000") // 프론트 주소
 public class QrController {
 	@Autowired
 	private CableService cableService;
+	
+	@Autowired
+	private QrService qrService;
 	
     // 고정 AES 키
     private static final String FIXED_KEY = "qrancae123456789";
@@ -69,54 +68,75 @@ public class QrController {
         byte[] decodedData = Base64.getDecoder().decode(encryptedData);
         return new String(cipher.doFinal(decodedData));
     }
+    
+    @GetMapping("/cablelist")
+    public List<Cable> cablelist() {
+    	System.out.println("cablelist 가져오기");
+    	List<Cable> cablelist = cableService.cablelist();
+    	System.out.println("가져온 cablelist : " + cablelist);
+    	return cablelist;
+    }
 	
 	// QR 코드 등록
-	@PostMapping("/registerQr")
-	public String registerQr(@RequestBody List<Cable> cableList) throws WriterException, JsonProcessingException {
-
-		int idx = cableService.getCableIdx() + 1;
-		System.out.println("케이블 목록 최대 idx : " + idx);
-		
-        // QR 해상도 (크기)
+    @PostMapping("/registerQr")
+    public String registerQr(@RequestBody List<Cable> cableList) throws WriterException, JsonProcessingException {
         int width = 118;
         int height = 118;
         
+        // 고정된 스레드 풀을 생성합니다.
+        ExecutorService executorService = Executors.newFixedThreadPool(4); // 스레드 개수는 필요에 따라 조정
+        
+        // CompletableFuture 리스트 생성
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        
         for(Cable c : cableList) {
-        	c.setCable_idx(idx);        	
-        	String data = idx+","+c.getS_rack_number()+","+c.getS_rack_location()+","+c.getS_server_name()+","+c.getS_port_number()+","
-        					+c.getD_rack_number()+","+c.getD_rack_location()+","+c.getD_server_name()+","+c.getD_port_number();
-        	
-        	// QR code 정보 생성
-            BitMatrix encode;
-            try {
-            	// AES 키
-            	SecretKey key = getFixedKey();
-            	
-            	// 데이터 암호화
-            	String encryptedData = encrypt(data, key);
-            	
-                encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
-                
-                // 파일 경로 지정
-                Path savePath = Paths.get("src/main/resources/qrImage", "qr" + idx + ".png");
-                idx++;
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    cableService.insertCable(c);
+                    int idx = cableService.getCableIdx();
+                    
+                    String data = idx + "," + c.getS_rack_number() + "," + c.getS_rack_location() + "," +
+                                  c.getS_server_name() + "," + c.getS_port_number() + "," +
+                                  c.getD_rack_number() + "," + c.getD_rack_location() + "," +
+                                  c.getD_server_name() + "," + c.getD_port_number();
+                    
+                    // AES 키
+                    SecretKey key = getFixedKey();
+                    String encryptedData = encrypt(data, key);
+                    
+                    BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
+                    
+                    // 파일 경로 지정
+                    Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
+                    File directory = savePath.getParent().toFile();
+                    if (!directory.exists()) {
+                        directory.mkdirs();
+                    }
 
-                // 폴더가 존재하지 않으면 생성
-                File directory = savePath.getParent().toFile();
-                if (!directory.exists()) {
-                    directory.mkdirs();
+                    // QR 코드를 파일로 저장
+                    try (FileOutputStream out = new FileOutputStream(savePath.toFile())) {
+                        MatrixToImageWriter.writeToStream(encode, "PNG", out);
+                    }
+                    
+                    Qr qr = new Qr();
+                    qr.setCable_idx(idx);
+                    qr.setQr_data(encryptedData);
+                    qrService.insertQr(qr);
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                // QR 코드를 파일로 저장
-                try (FileOutputStream out = new FileOutputStream(savePath.toFile())) {
-                    MatrixToImageWriter.writeToStream(encode, "PNG", out);
-                }
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            }, executorService);
+            
+            futures.add(future);
         }
         
+        // 모든 작업이 완료될 때까지 대기
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        
+        // 스레드 풀 종료
+        executorService.shutdown();
+        
         return "완료";
-	}
+    }
 }

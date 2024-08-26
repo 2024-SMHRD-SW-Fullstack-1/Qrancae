@@ -15,7 +15,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/qr" element={<Qr />} />
-      <Route path="/qr/add" element={<Addqr />} />
+      <Route path="/addQr" element={<Addqr />} />
       <Route path="/log" element={<Log />} />
       <Route path="/maint" element={<Maintenance />} />
       <Route path="/user" element={<User />} />

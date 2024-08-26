@@ -1,22 +1,133 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
 import 'datatables.net';
 
 const Qr = () => {
-  useEffect(() => {
-    // 컴포넌트가 마운트될 때 DataTable을 초기화합니다
-    $('#basic-datatables').DataTable({});
+  const [jsonData, setJsonData] = useState([]);
 
-    // 컴포넌트가 언마운트될 때 DataTable을 파괴합니다
+  useEffect(() => {
+    // 페이지 로딩 시 데이터 가져오기
+    getData();
+  }, []);
+
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 DataTable을 초기화
+    $('#basic-datatables').DataTable({
+      ordering: false,
+      data: jsonData,
+      columns: [
+        {
+          title: '<input type="checkbox" id="select-all" checked>',
+          orderable: false,
+          render: function () {
+            return '<input type="checkbox" class="row-select" checked>';
+          },
+        },
+        { title: '케이블', data: 'cable_idx' },
+        { title: '소스 랙 번호', data: 's_rack_number' },
+        { title: '소스 랙 위치', data: 's_rack_location' },
+        { title: '소스 서버 이름', data: 's_server_name' },
+        { title: '소스 포트 번호', data: 's_port_number' },
+        { title: '목적지 랙 번호', data: 'd_rack_number' },
+        { title: '목적지 랙 위치', data: 'd_rack_location' },
+        { title: '목적지 서버 이름', data: 'd_server_name' },
+        { title: '목적지 포트 번호', data: 'd_port_number' },
+        {
+          title: '등록일',
+          data: 'cable_date',
+          render: function (data) {
+            return data ? data : '-';
+          },
+        },
+        {
+          title: '출력 상태',
+          data: 'qr',
+          render: function (data) {
+            if (data.qr_status != 'X') {
+              return `<span class="badge badge-success">출력</span>`;
+            } else {
+              return `<span class="badge badge-warning">미출력</span>`;
+            }
+          },
+        },
+      ],
+      columnDefs: [
+        {
+          targets: 0, // 첫 번째 컬럼
+          className: 'dt-control',
+          orderable: false,
+          render: function () {
+            return '<input type="checkbox" checked>';
+          },
+        },
+        {
+          targets: [2, 3, 4, 5],
+          className: 'source-data',
+        },
+        {
+          targets: [6, 7, 8, 9],
+          className: 'destination-data',
+        },
+      ],
+      initComplete: function () {
+        // "Select all" 체크박스의 클릭 이벤트 처리
+        $('#select-all').on('click', function () {
+          const rows = $('#basic-datatables')
+            .DataTable()
+            .rows({ search: 'applied' })
+            .nodes();
+          $('input[type="checkbox"]', rows).prop('checked', this.checked);
+        });
+      },
+    });
+
+    // 컴포넌트가 언마운트될 때 DataTable을 파괴
     return () => {
       $('#basic-datatables').DataTable().destroy();
     };
-  }, []);
+  }, [jsonData]);
+
+  function getData() {
+    axios({
+      url: 'http://localhost:8089/qrancae/cablelist',
+      method: 'GET',
+    }).then((res) => {
+      setJsonData(res.data);
+    }).catch((error) => {
+      console.error('Error fetching data: ', error);
+    });
+  }
+
   return (
     <div className="wrapper">
+      <style>
+        {`
+            table.dataTable thead th:first-child,
+            table.dataTable tbody td:first-child {
+              text-align: center;
+            }
+
+            table.dataTable td:nth-child(11),
+            table.dataTable th:nth-child(11),
+            table.dataTable td:nth-child(12),
+            table.dataTable th:nth-child(12) {
+              text-align: center;
+            }
+
+            table.dataTable thead .sorting::before,
+            table.dataTable thead .sorting::after,
+            table.dataTable thead .sorting_asc::before,
+            table.dataTable thead .sorting_asc::after,
+            table.dataTable thead .sorting_desc::before,
+            table.dataTable thead .sorting_desc::after {
+              display: none;
+            }
+          `}
+      </style>
       <Sidebar />
 
       <div className="main-panel">
@@ -39,7 +150,7 @@ const Qr = () => {
                         </span>
                         선택 삭제
                       </label>
-                      <Link to="/qr/add">
+                      <Link to="/addQr">
                         <label className="btn btn-label-primary btn-round btn-sm">
                           <span className="btn-label">
                             <i className="fas fa-plus"></i>
@@ -59,10 +170,17 @@ const Qr = () => {
                     <div className="table-responsive">
                       <table
                         id="basic-datatables"
-                        className="display table table-striped table-hover"
+                        className="display table table-striped table-bordered table-hover"
                       >
                         <thead>
                           <tr>
+                            <th>
+                              <input
+                                type="checkbox"
+                                id="select-all"
+                                checked
+                              />
+                            </th>
                             <th>케이블</th>
                             <th>랙 번호</th>
                             <th>랙 위치</th>
@@ -73,77 +191,10 @@ const Qr = () => {
                             <th>서버 이름</th>
                             <th>포트 번호</th>
                             <th>등록일</th>
-                            <th>상태</th>
+                            <th>출력 상태</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <tr>
-                            <td>001</td>
-                            <td>Rack01</td>
-                            <td>DataCenter01</td>
-                            <td>Webserver01</td>
-                            <td>eth0</td>
-                            <td>Rack02</td>
-                            <td>DataCenter02</td>
-                            <td>AppServer01</td>
-                            <td>eth0</td>
-                            <td>24-08-21</td>
-                            <td>
-                              <span className="badge badge-success">출력</span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>001</td>
-                            <td>Rack01</td>
-                            <td>DataCenter01</td>
-                            <td>Webserver01</td>
-                            <td>eth0</td>
-                            <td>Rack02</td>
-                            <td>DataCenter02</td>
-                            <td>AppServer01</td>
-                            <td>eth0</td>
-                            <td>24-08-21</td>
-                            <td>
-                              <span className="badge badge-warning">
-                                미출력
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>001</td>
-                            <td>Rack01</td>
-                            <td>DataCenter01</td>
-                            <td>Webserver01</td>
-                            <td>eth0</td>
-                            <td>Rack02</td>
-                            <td>DataCenter02</td>
-                            <td>AppServer01</td>
-                            <td>eth0</td>
-                            <td>24-08-21</td>
-                            <td>
-                              <span className="badge badge-warning">
-                                미출력
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>001</td>
-                            <td>Rack01</td>
-                            <td>DataCenter01</td>
-                            <td>Webserver01</td>
-                            <td>eth0</td>
-                            <td>Rack02</td>
-                            <td>DataCenter02</td>
-                            <td>AppServer01</td>
-                            <td>eth0</td>
-                            <td>24-08-21</td>
-                            <td>
-                              <span className="badge badge-warning">
-                                미출력
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
+                        <tbody></tbody>
                       </table>
                     </div>
                   </div>
