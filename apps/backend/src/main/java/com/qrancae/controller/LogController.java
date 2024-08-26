@@ -1,5 +1,6 @@
 package com.qrancae.controller;
 
+<<<<<<< HEAD
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,3 +31,13 @@ public class LogController {
    }
 
 }
+=======
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:3000")
+public class LogController {
+
+}
+>>>>>>> 5618cc1f3cef0b6bd4ec0bd39fea2dc648c97072
