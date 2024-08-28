@@ -5,12 +5,8 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -39,104 +35,88 @@ import com.qrancae.service.QrService;
 public class QrController {
 	@Autowired
 	private CableService cableService;
-	
+
 	@Autowired
 	private QrService qrService;
-	
-    // 고정 AES 키
-    private static final String FIXED_KEY = "qrancae123456789";
-    
-    // FIXED_KEY 가져오기
-    public static SecretKey getFixedKey() {
-        // 16바이트로 만든 고정 키
-        byte[] keyBytes = FIXED_KEY.getBytes(StandardCharsets.UTF_8);
-        return new SecretKeySpec(keyBytes, "AES");
-    }
-    
-    // 데이터를 암호화
-    public static String encrypt(String data, SecretKey key) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        byte[] encryptedData = cipher.doFinal(data.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedData);
-    }
-    
-    // 데이터를 복호화
-    public static String decrypt(String encryptedData, SecretKey key) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        byte[] decodedData = Base64.getDecoder().decode(encryptedData);
-        return new String(cipher.doFinal(decodedData));
-    }
-    
-    @GetMapping("/cablelist")
-    public List<Cable> cablelist() {
-    	System.out.println("cablelist 가져오기");
-    	List<Cable> cablelist = cableService.cablelist();
-    	System.out.println("가져온 cablelist : " + cablelist);
-    	return cablelist;
-    }
-	
-	// QR 코드 등록
-    @PostMapping("/registerQr")
-    public String registerQr(@RequestBody List<Cable> cableList) throws WriterException, JsonProcessingException {
-        int width = 118;
-        int height = 118;
-        
-        // 고정된 스레드 풀을 생성합니다.
-        ExecutorService executorService = Executors.newFixedThreadPool(4); // 스레드 개수는 필요에 따라 조정
-        
-        // CompletableFuture 리스트 생성
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
-        
-        for(Cable c : cableList) {
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                try {
-                    cableService.insertCable(c);
-                    int idx = cableService.getCableIdx();
-                    
-                    String data = idx + "," + c.getS_rack_number() + "," + c.getS_rack_location() + "," +
-                                  c.getS_server_name() + "," + c.getS_port_number() + "," +
-                                  c.getD_rack_number() + "," + c.getD_rack_location() + "," +
-                                  c.getD_server_name() + "," + c.getD_port_number();
-                    
-                    // AES 키
-                    SecretKey key = getFixedKey();
-                    String encryptedData = encrypt(data, key);
-                    
-                    BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
-                    
-                    // 파일 경로 지정
-                    Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
-                    File directory = savePath.getParent().toFile();
-                    if (!directory.exists()) {
-                        directory.mkdirs();
-                    }
 
-                    // QR 코드를 파일로 저장
-                    try (FileOutputStream out = new FileOutputStream(savePath.toFile())) {
-                        MatrixToImageWriter.writeToStream(encode, "PNG", out);
-                    }
-                    
-                    Qr qr = new Qr();
-                    qr.setCable_idx(idx);
-                    qr.setQr_data(encryptedData);
-                    qrService.insertQr(qr);
-                    
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }, executorService);
-            
-            futures.add(future);
-        }
-        
-        // 모든 작업이 완료될 때까지 대기
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        
-        // 스레드 풀 종료
-        executorService.shutdown();
-        
-        return "완료";
-    }
+	// 고정 AES 키
+	private static final String FIXED_KEY = "qrancae123456789";
+
+	// FIXED_KEY 가져오기
+	public static SecretKey getFixedKey() {
+		// 16바이트로 만든 고정 키
+		byte[] keyBytes = FIXED_KEY.getBytes(StandardCharsets.UTF_8);
+		return new SecretKeySpec(keyBytes, "AES");
+	}
+
+	// 데이터를 암호화
+	public static String encrypt(String data, SecretKey key) throws Exception {
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+		byte[] encryptedData = cipher.doFinal(data.getBytes());
+		return Base64.getEncoder().encodeToString(encryptedData);
+	}
+
+	// 데이터를 복호화
+	public static String decrypt(String encryptedData, SecretKey key) throws Exception {
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		byte[] decodedData = Base64.getDecoder().decode(encryptedData);
+		return new String(cipher.doFinal(decodedData));
+	}
+
+	@GetMapping("/cablelist")
+	public List<Cable> cablelist() {
+		System.out.println("cablelist 가져오기");
+		List<Cable> cablelist = cableService.cablelist();
+		System.out.println("가져온 cablelist : " + cablelist);
+		return cablelist;
+	}
+
+	// QR 코드 등록
+	@PostMapping("/registerQr")
+	public String registerQr(@RequestBody List<Cable> cableList) throws WriterException, JsonProcessingException {
+		int width = 118;
+		int height = 118;
+
+		for (Cable c : cableList) {
+			try {
+				cableService.insertCable(c);
+				int idx = cableService.getCableIdx();
+
+				String data = idx + "," + c.getS_rack_number() + "," + c.getS_rack_location() + ","
+						+ c.getS_server_name() + "," + c.getS_port_number() + "," + c.getD_rack_number() + ","
+						+ c.getD_rack_location() + "," + c.getD_server_name() + "," + c.getD_port_number();
+
+				// AES 키
+				SecretKey key = getFixedKey();
+				String encryptedData = encrypt(data, key);
+
+				BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
+
+				// 파일 경로 지정
+				Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
+				File directory = savePath.getParent().toFile();
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+
+				// QR 코드를 파일로 저장
+				try (FileOutputStream out = new FileOutputStream(savePath.toFile())) {
+					MatrixToImageWriter.writeToStream(encode, "PNG", out);
+				}
+
+				Qr qr = new Qr();
+				qr.setCable_idx(idx);
+				qr.setQr_data(encryptedData);
+				qrService.insertQr(qr);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		return "완료";
+	}
 }

@@ -14,7 +14,7 @@ public interface CableRepository extends JpaRepository<Cable, Integer>{
 	@Query("SELECT MAX(c.cable_idx) FROM Cable c")
 	Integer findMaxCableIdx();
 	
-	@Query("SELECT c FROM Cable c LEFT JOIN FETCH c.qr")
+	@Query("SELECT c FROM Cable c LEFT JOIN FETCH c.qr ORDER BY c.id DESC")
 	List<Cable> findAllWithQr();
 	
 }

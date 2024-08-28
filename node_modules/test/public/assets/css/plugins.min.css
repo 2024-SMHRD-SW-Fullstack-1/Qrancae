@@ -6406,6 +6406,15 @@ table.dataTable thead .sorting_desc_disabled:after {
   opacity: 0;
 }
 
+table.dataTable thead th:first-child .sorting::before,
+table.dataTable thead th:first-child .sorting::after,
+table.dataTable thead th:first-child .sorting_asc::before,
+table.dataTable thead th:first-child .sorting_asc::after,
+table.dataTable thead th:first-child .sorting_desc::before,
+table.dataTable thead th:first-child .sorting_desc::after {
+  display: none !important;
+}
+
 div.dataTables_scrollHead table.dataTable {
   margin-bottom: 0 !important;
 }

@@ -17,14 +17,14 @@ const Qr = () => {
   useEffect(() => {
     // 컴포넌트가 마운트될 때 DataTable을 초기화
     $('#basic-datatables').DataTable({
-      ordering: false,
       data: jsonData,
+      responsive: true,
       columns: [
         {
-          title: '<input type="checkbox" id="select-all" checked>',
+          title: '<input type="checkbox" id="select-all">',
           orderable: false,
           render: function () {
-            return '<input type="checkbox" class="row-select" checked>';
+            return '<input type="checkbox" class="row-select">';
           },
         },
         { title: '케이블', data: 'cable_idx' },
@@ -58,10 +58,10 @@ const Qr = () => {
       columnDefs: [
         {
           targets: 0, // 첫 번째 컬럼
-          className: 'dt-control',
           orderable: false,
+          className: 'orderable-false',
           render: function () {
-            return '<input type="checkbox" checked>';
+            return '<input type="checkbox">';
           },
         },
         {
@@ -72,6 +72,10 @@ const Qr = () => {
           targets: [6, 7, 8, 9],
           className: 'destination-data',
         },
+        {
+          targets: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          orderable: true
+        }
       ],
       initComplete: function () {
         // "Select all" 체크박스의 클릭 이벤트 처리
@@ -107,10 +111,7 @@ const Qr = () => {
       <style>
         {`
             table.dataTable thead th:first-child,
-            table.dataTable tbody td:first-child {
-              text-align: center;
-            }
-
+            table.dataTable tbody td:first-child,
             table.dataTable td:nth-child(11),
             table.dataTable th:nth-child(11),
             table.dataTable td:nth-child(12),
@@ -118,13 +119,13 @@ const Qr = () => {
               text-align: center;
             }
 
-            table.dataTable thead .sorting::before,
-            table.dataTable thead .sorting::after,
-            table.dataTable thead .sorting_asc::before,
-            table.dataTable thead .sorting_asc::after,
-            table.dataTable thead .sorting_desc::before,
-            table.dataTable thead .sorting_desc::after {
-              display: none;
+            table.dataTable thead th:first-child .sorting::before,
+            table.dataTable thead th:first-child .sorting::after,
+            table.dataTable thead th:first-child .sorting_asc::before,
+            table.dataTable thead th:first-child .sorting_asc::after,
+            table.dataTable thead th:first-child .sorting_desc::before,
+            table.dataTable thead th:first-child .sorting_desc::after {
+              display: none !important;
             }
           `}
       </style>
@@ -178,7 +179,6 @@ const Qr = () => {
                               <input
                                 type="checkbox"
                                 id="select-all"
-                                checked
                               />
                             </th>
                             <th>케이블</th>

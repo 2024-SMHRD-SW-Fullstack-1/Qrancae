@@ -9,11 +9,14 @@ import Form from './component/Form';
 import Login from './component/Login';
 import Charts from './component/Charts';
 import Addqr from './component/Addqr';
+import Repair from './component/Repair';
+
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/repair" element={<Repair />} />
       <Route path="/qr" element={<Qr />} />
       <Route path="/addQr" element={<Addqr />} />
       <Route path="/log" element={<Log />} />

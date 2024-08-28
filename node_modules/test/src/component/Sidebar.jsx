@@ -1,9 +1,13 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom'
 
 const Sidebar = () => {
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+
   const menus = [
     { name: '메인', path: '/', icon: 'fas fa-home' },
+    { name: '점검 관리', path: '/repair', icon: 'fas fa-wrench' },
     { name: 'QR 코드', path: '/qr', icon: 'fas fa-qrcode' },
     { name: '로그 내역', path: '/log', icon: 'fas fa-clipboard-list' },
     { name: '유지보수 내역', path: '/maint', icon: 'fas fa-clipboard-check' },
@@ -13,21 +17,21 @@ const Sidebar = () => {
 
   const subMenus = [
     { name: '설정', path: '/setting', icon: 'fas fa-cog' },
-    { name: '로그아웃', path: '/', icon: 'fas fa-sign-out-alt' },
+    { name: '로그아웃', path: '/login', icon: 'fas fa-sign-out-alt' },
   ];
 
   return (
     <div className="sidebar" data-background-color="dark">
       <div className="sidebar-logo">
         <div className="logo-header" data-background-color="dark">
-          <NavLink to="/" className="logo">
+          <Link to="/" className="logo">
             <img
               src="assets/img/kaiadmin/logo_light.svg"
               alt="navbar brand"
               className="navbar-brand"
               height="20"
             />
-          </NavLink>
+          </Link>
           <div className="nav-toggle">
             <button className="btn btn-toggle toggle-sidebar">
               <i className="gg-menu-right"></i>
@@ -44,26 +48,26 @@ const Sidebar = () => {
       <div className="sidebar-wrapper scrollbar scrollbar-inner">
         <div className="sidebar-content">
           <ul className="nav nav-secondary">
-            {menus.map((menu, index) => {
+            {menus.map((menu) => {
               return (
-                <li className="nav-item">
-                  <NavLink to={menu.path} key={index}>
+                <li key={menu.path} className={`nav-item ${isActive(menu.path) ? 'active' : ''}`}>
+                  <Link to={menu.path}>
                     <i className={menu.icon}></i>
                     <p>{menu.name}</p>
-                  </NavLink>
+                  </Link>
                 </li>
               );
             })}
           </ul>
           <hr />
           <ul className="nav nav-secondary">
-            {subMenus.map((menu, index) => {
+            {subMenus.map((menu) => {
               return (
-                <li className="nav-item">
-                  <NavLink to={menu.path} key={index}>
+                <li key={menu.path} className={`nav-item ${isActive(menu.path) ? 'active' : ''}`}>
+                  <Link to={menu.path}>
                     <i className={menu.icon}></i>
                     <p>{menu.name}</p>
-                  </NavLink>
+                  </Link>
                 </li>
               );
             })}

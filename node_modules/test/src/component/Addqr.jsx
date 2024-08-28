@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -7,10 +8,16 @@ import 'datatables.net';
 import * as xlsx from 'xlsx';
 
 const Addqr = () => {
+  // 로딩중인지 확인
   const [loading, setLoading] = useState(false);
+  // 삭제 기능 팝업 상태
   const [showPopup, setShowPopup] = useState(false);
   const [popupItemSelected, setPopupItemSelected] = useState(true);
+  // qr 코드 등록 완료 팝업 상태
+  const [showQrPopup, setShowQrPopup] = useState(false);
+  // 테이블에 표시할 json 데이터
   const [jsonData, setJsonData] = useState([]);
+  // 케이블 하나 추가할 때
   const [inputs, setInputs] = useState({
     s_rack_number: '',
     s_rack_location: '',
@@ -22,13 +29,7 @@ const Addqr = () => {
     d_port_number: '',
   });
 
-  useEffect(() => {
-    $('#basic-datatables1').DataTable({});
-
-    return () => {
-      $('#basic-datatables1').DataTable().destroy();
-    };
-  }, []);
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -41,7 +42,6 @@ const Addqr = () => {
       columns: [
         {
           title: '<input type="checkbox" id="select-all">',
-          orderable: false,
           render: function () {
             return '<input type="checkbox" class="row-select">';
           },
@@ -60,7 +60,6 @@ const Addqr = () => {
           targets: 0,
           className: 'dt-control',
           width: '60px',
-          orderable: false,
           render: function () {
             return '<input type="checkbox">';
           },
@@ -95,6 +94,20 @@ const Addqr = () => {
     };
   }, [jsonData]);
 
+  // 엑셀 양식 다운로드
+  const downloadExcelTemplate = () => {
+    const fileUrl = '/assets/cable_template.xlsx';
+
+    // 링크 요소를 생성하고, 다운로드 속성을 설정
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = 'template.xlsx'; // 다운로드할 파일 이름
+    document.body.appendChild(link); // 링크를 문서에 추가
+    link.click(); // 링크를 클릭하여 다운로드를 시작
+    document.body.removeChild(link);
+  };
+
+  // 엑셀 파일 업로드
   const readUploadFile = (e) => {
     e.preventDefault();
     if (e.target.files) {
@@ -111,6 +124,7 @@ const Addqr = () => {
     }
   };
 
+  // 케이블 정보 하나 추가
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputs({
@@ -128,9 +142,22 @@ const Addqr = () => {
       }
     }
     setJsonData([inputs, ...jsonData]);
-    console.log(jsonData);
+    console.log('등록된 하나의 케이블 정보', jsonData);
+
+    // 입력값 초기화
+    setInputs({
+      s_rack_number: '',
+      s_rack_location: '',
+      s_server_name: '',
+      s_port_number: '',
+      d_rack_number: '',
+      d_rack_location: '',
+      d_server_name: '',
+      d_port_number: '',
+    });
   };
 
+  // 팝업 기능
   const openPopup = () => {
     const selectedRows = $('#basic-datatables1 .row-select:checked').length;
     if (selectedRows === 0) {
@@ -143,6 +170,7 @@ const Addqr = () => {
 
   const closePopup = () => setShowPopup(false);
 
+  // 선택된 케이블 삭제
   const handleDeleteSelected = () => {
     const selectedIndexes = [];
     $('#basic-datatables1 .row-select:checked').each(function () {
@@ -155,6 +183,7 @@ const Addqr = () => {
     setJsonData(updatedData);
   };
 
+  // 전체 케이블 QR코드로 등록
   const registerQr = () => {
     setLoading(true);
     axios({
@@ -167,7 +196,13 @@ const Addqr = () => {
     }).then((res) => {
       console.log(res);
       setLoading(false);
+      setShowQrPopup(true); // QR 코드 등록 완료 팝업 표시
     });
+  };
+
+  const closeQrPopup = () => {
+    setShowQrPopup(false); // QR 코드 등록 완료 팝업 닫기
+    navigate('/qr'); // 케이블 목록 페이지로 이동
   };
 
   return (
@@ -177,15 +212,6 @@ const Addqr = () => {
           table.dataTable thead th:first-child,
           table.dataTable tbody td:first-child {
             text-align: center;
-          }
-
-          table.dataTable thead .sorting::before,
-          table.dataTable thead .sorting::after,
-          table.dataTable thead .sorting_asc::before,
-          table.dataTable thead .sorting_asc::after,
-          table.dataTable thead .sorting_desc::before,
-          table.dataTable thead .sorting_desc::after {
-            display: none;
           }
         `}
       </style>
@@ -222,6 +248,19 @@ const Addqr = () => {
           </div>
         )}
 
+        {showQrPopup && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <div className='popup-body'>
+                QR 코드 등록이 완료되었습니다.
+              </div>
+              <div className="popup-buttons">
+                <button onClick={closeQrPopup} className="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="container">
           <div className="page-inner">
             <div className="page-header">
@@ -241,6 +280,16 @@ const Addqr = () => {
                           <i className="fas fa-times"></i>
                         </span>
                         선택 삭제
+                      </label>
+                      <label
+                        htmlFor="download-file"
+                        className="btn btn-label-primary btn-round btn-sm"
+                        onClick={downloadExcelTemplate}
+                      >
+                        <span className="btn-label">
+                          <i className="fas fa-file-download"></i>
+                        </span>
+                        엑셀 양식 다운
                       </label>
                       <label
                         htmlFor="input-file"
