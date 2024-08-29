@@ -1,5 +1,9 @@
 package com.qrancae.repository;
 
-public interface QrRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.qrancae.model.Qr;
+
+public interface QrRepository extends JpaRepository<Qr, Integer> {
 
 }
