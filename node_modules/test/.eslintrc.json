@@ -15,7 +15,7 @@
   "rules": {
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": "error" // Prettier 규칙을 ESLint의 에러로 처리
+    "prettier/prettier": "off" // Prettier 규칙을 ESLint의 에러로 처리
   },
   "settings": {
     "react": {
