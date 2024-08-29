@@ -10896,4 +10896,82 @@ body[data-background-color='dark2'] .jvm-zoom-btn {
   }
 }
 
+/* 로딩 중 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  /* 어두운 배경색 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  /* 모든 요소 위에 표시되도록 */
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  background: transparent;
+}
+
+/* 팝업창 */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.popup-body {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* 소스, 목적지 데이터 */
+td.source-data {
+  color: #81292D;
+}
+
+td.destination-data {
+  color: #151284;
+}
+
 /*# sourceMappingURL=kaiadmin.css.map */

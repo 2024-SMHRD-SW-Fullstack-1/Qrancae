@@ -1,321 +1,271 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import koLocale from '@fullcalendar/core/locales/ko';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
+import AddEventPopup from './popups/AddEventPopup';
+import { useNavigate } from 'react-router-dom'; // useNavigate를 가져옴
+import Cookies from 'js-cookie';
 
 Chart.register(...registerables);
 
 const Home = () => {
-  const barChartRef = useRef(null);
+  const lineChartRef = useRef(null);
+  const pieChartRef = useRef(null);
+  /////////
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Bar Chart
-    if (barChartRef.current) {
-      new Chart(barChartRef.current, {
-        type: 'bar',
+    // 쿠키에서 userId를 가져와 로그인 상태 확인
+    const userId = Cookies.get('userId');
+    if (!userId) {
+      navigate('/login'); // userId 쿠키가 없으면 로그인 페이지로 이동
+    }
+  }, [navigate]);
+  //////////
+  const [events, setEvents] = useState([
+    {
+      id: 1,
+      title: '방청소',
+      start: '2024-08-27T12:00:00',
+      end: '2024-08-30T12:00:00',
+      allDay: false,
+      content: '아파트 청소',
+      color: "#FADADD",
+    },
+    {
+      id: 2,
+      title: '이승지(seung)',
+      start: '2024-08-16T09:00:00',
+      end: '2024-08-22T09:00:00',
+      color: "#FADADD",
+      content: ''
+    }
+  ]);
+
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    if (lineChartRef.current) {
+      new Chart(lineChartRef.current, {
+        type: 'line',
         data: {
           labels: [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'May',
-            'Jun',
-            'Jul',
-            'Aug',
-            'Sep',
-            'Oct',
-            'Nov',
-            'Dec',
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
           ],
-          datasets: [
-            {
-              backgroundColor: 'rgb(23, 125, 255)',
-              borderColor: 'rgb(23, 125, 255)',
-              data: [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
-            },
-          ],
+          datasets: [{
+            label: 'Active Users',
+            borderColor: '#1d7af3',
+            pointBorderColor: '#FFF',
+            pointBackgroundColor: '#1d7af3',
+            pointBorderWidth: 2,
+            pointHoverRadius: 4,
+            pointHoverBorderWidth: 1,
+            pointRadius: 4,
+            backgroundColor: 'transparent',
+            fill: true,
+            borderWidth: 2,
+            data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 900],
+          }],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 10,
+              fontColor: '#1d7af3',
             },
+          },
+          tooltips: {
+            bodySpacing: 4,
+            mode: 'nearest',
+            intersect: 0,
+            position: 'nearest',
+            xPadding: 10,
+            yPadding: 10,
+            caretPadding: 10,
+          },
+          layout: {
+            padding: { left: 15, right: 15, top: 15, bottom: 15 },
+          },
+        },
+      });
+    }
+
+    if (pieChartRef.current) {
+      new Chart(pieChartRef.current, {
+        type: 'pie',
+        data: {
+          labels: ['Red', 'Blue', 'Yellow'],
+          datasets: [{
+            label: 'Pie Chart',
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+            data: [300, 50, 100],
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return tooltipItem.label + ': ' + tooltipItem.raw;
+                }
+              }
+            }
           },
         },
       });
     }
   }, []);
 
+  const handleDateClick = (arg) => {
+    setSelectedDate(arg.dateStr);
+  };
+
+  const handleOpenPopup = () => {
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setSelectedDate(null);
+  };
+
+  const handleSaveEvent = (newEvent) => {
+    setEvents([
+      ...events,
+      {
+        id: events.length + 1,
+        ...newEvent,
+        color: "#FFCE56"
+      }
+    ]);
+    handleClosePopup();
+  };
+
+  // 클릭된 날짜가 일정의 범위 내에 있는지 확인
+  const filteredEvents = events.filter(event => {
+    const startDate = new Date(event.start);
+    const endDate = new Date(event.end);
+    const selectedDateObj = new Date(selectedDate);
+
+    return selectedDateObj >= startDate && selectedDateObj <= endDate;
+  });
+
   return (
-    <div className="App">
-      <div className="wrapper">
-        <Sidebar />
+    <div className="wrapper">
+      <Sidebar />
 
-        <div className="main-panel">
-          <Header />
+      <div className="main-panel">
+        <Header />
 
-          <div className="container">
-            <div className="page-inner">
-              <div className="page-header">
-                <h3 className="fw-bold mb-3">메인</h3>
+        <div className="container">
+          <div className="page-inner">
+            <div className="row h-100">
+              <div className="col-md-12">
+                <div className="common-labels outside-card-labels">
+                  <label className="btn btn-primary btn-border btn-round btn-sm">
+                    <span className="btn-label">
+                      <i className="fas fa-print icon-spacing"></i>
+                    </span>
+                    출력
+                  </label>
+                  <label className="btn btn-primary btn-border btn-round btn-sm">
+                    <span className="btn-label">
+                      <i className="fas fa-print icon-spacing"></i>
+                    </span>
+                    다운로드
+                  </label>
+                </div>
               </div>
-              {/* <div className="row">
-                <div className="col-sm-6 col-md-3">
-                  <div className="card card-stats card-round">
-                    <div className="card-body">
-                      <div className="row align-items-center">
-                        <div className="col-icon">
-                          <div className="icon-big text-center icon-primary bubble-shadow-small">
-                            <i className="fas fa-users"></i>
-                          </div>
+
+              <div className="col-md-5 d-flex flex-column">
+                <div className="card card-round flex-grow-1">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <div className="card-title">일정</div>
+                    <label className="btn btn-primary btn-border btn-round btn-sm" onClick={handleOpenPopup}>
+                      <span className="btn-label">
+                        <i className="far fa-calendar-plus icon-spacing"></i>
+                      </span>
+                      일정 추가
+                    </label>
+                  </div>
+                  <div className="card-body">
+                    <FullCalendar
+                      plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+                      initialView="dayGridMonth"
+                      events={events}
+                      locale={koLocale}
+                      headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek'
+                      }}
+                      dateClick={handleDateClick}  // 날짜 클릭 핸들러
+                    />
+                    <div className="text-center my-3">
+                      {filteredEvents.length > 0 && (
+                        <div className="filtered-events">
+                          {filteredEvents.map(event => (
+                            <div key={event.id} className="event-details">
+                              <p><strong>{event.title}</strong></p>
+                              <p>시작: {new Date(event.start).toLocaleString()}</p>
+                              <p>종료: {new Date(event.end).toLocaleString()}</p>
+                              <p>내용: {event.content}</p>
+                            </div>
+                          ))}
                         </div>
-                        <div className="col col-stats ms-3 ms-sm-0">
-                          <div className="numbers">
-                            <p className="card-category">Visitors</p>
-                            <h4 className="card-title">1,294</h4>
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
+                    {/* 팝업 표시 조건 추가 */}
+                    {showPopup && (
+                      <AddEventPopup
+                        isOpen={showPopup}
+                        onClose={handleClosePopup}
+                        onSave={handleSaveEvent}
+                        defaultStartDate={selectedDate}
+                      />
+                    )}
                   </div>
                 </div>
-                <div className="col-sm-6 col-md-3">
-                  <div className="card card-stats card-round">
-                    <div className="card-body">
-                      <div className="row align-items-center">
-                        <div className="col-icon">
-                          <div className="icon-big text-center icon-info bubble-shadow-small">
-                            <i className="fas fa-user-check"></i>
-                          </div>
-                        </div>
-                        <div className="col col-stats ms-3 ms-sm-0">
-                          <div className="numbers">
-                            <p className="card-category">Subscribers</p>
-                            <h4 className="card-title">1303</h4>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-sm-6 col-md-3">
-                  <div className="card card-stats card-round">
-                    <div className="card-body">
-                      <div className="row align-items-center">
-                        <div className="col-icon">
-                          <div className="icon-big text-center icon-success bubble-shadow-small">
-                            <i className="fas fa-luggage-cart"></i>
-                          </div>
-                        </div>
-                        <div className="col col-stats ms-3 ms-sm-0">
-                          <div className="numbers">
-                            <p className="card-category">Sales</p>
-                            <h4 className="card-title">$ 1,345</h4>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-sm-6 col-md-3">
-                  <div className="card card-stats card-round">
-                    <div className="card-body">
-                      <div className="row align-items-center">
-                        <div className="col-icon">
-                          <div className="icon-big text-center icon-secondary bubble-shadow-small">
-                            <i className="far fa-check-circle"></i>
-                          </div>
-                        </div>
-                        <div className="col col-stats ms-3 ms-sm-0">
-                          <div className="numbers">
-                            <p className="card-category">Order</p>
-                            <h4 className="card-title">576</h4>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
-              <div className="row">
-                <div className="col-md-8">
+              </div>
+
+              <div className="col-md-7 d-flex flex-column">
+                <div className="row">
                   <div className="card card-round">
                     <div className="card-header">
                       <div className="card-head-row">
-                        <div className="card-title">QR 코드 확인 횟수</div>
-                        <div className="card-tools">
-                          <select
-                            className="form-select input-fixed"
-                            id="notify_state"
-                          >
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                          </select>
-                        </div>
+                        <div className="card-title">라인 차트</div>
                       </div>
                     </div>
                     <div className="card-body">
                       <div className="chart-container">
-                        <canvas ref={barChartRef}></canvas>
+                        <canvas ref={lineChartRef}></canvas>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="card card-primary card-round">
+                  <div className="card card-round">
                     <div className="card-header">
                       <div className="card-head-row">
-                        <div className="card-title">Daily Sales</div>
-                        <div className="card-tools">
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-sm btn-label-light dropdown-toggle"
-                              type="button"
-                              id="dropdownMenuButton"
-                              data-bs-toggle="dropdown"
-                              aria-haspopup="true"
-                              aria-expanded="false"
-                            >
-                              Export
-                            </button>
-                            <div
-                              className="dropdown-menu"
-                              aria-labelledby="dropdownMenuButton"
-                            >
-                              <a className="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a className="dropdown-item" href="#">
-                                Another action
-                              </a>
-                              <a className="dropdown-item" href="#">
-                                Something else here
-                              </a>
-                            </div>
-                          </div>
-                        </div>
+                        <div className="card-title">파이 차트</div>
                       </div>
-                      <div className="card-category">March 25 - April 02</div>
-                    </div>
-                    <div className="card-body pb-0">
-                      <div className="mb-4 mt-2">
-                        <h1>$4,578.58</h1>
-                      </div>
-                      <div className="pull-in">
-                        <canvas id="dailySalesChart"></canvas>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card card-round">
-                    <div className="card-body pb-0">
-                      <div className="h1 fw-bold float-end text-primary">
-                        +5%
-                      </div>
-                      <h2 className="mb-2">17</h2>
-                      <p className="text-muted">Users online</p>
-                      <div className="pull-in sparkline-fix">
-                        <div id="lineChart"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-md-4">
-                  <div className="card card-round">
-                    <div className="card-body">
-                      <div className="card-head-row card-tools-still-right">
-                        <div className="card-title">New Customers</div>
-                        <div className="card-tools">
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-icon btn-clean me-0"
-                              type="button"
-                              id="dropdownMenuButton"
-                              data-bs-toggle="dropdown"
-                              aria-haspopup="true"
-                              aria-expanded="false"
-                            >
-                              <i className="fas fa-ellipsis-h"></i>
-                            </button>
-                            <div
-                              className="dropdown-menu"
-                              aria-labelledby="dropdownMenuButton"
-                            >
-                              <a className="dropdown-item" href="#">
-                                Action
-                              </a>
-                              <a className="dropdown-item" href="#">
-                                Another action
-                              </a>
-                              <a className="dropdown-item" href="#">
-                                Something else here
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="card-list py-4">
-                        <div className="item-list">
-                          <div className="avatar">
-                            <img
-                              alt="image"
-                              src="/assets/img/profile2.jpg"
-                              className="avatar-img rounded-circle"
-                            />
-                          </div>
-                          <div className="info-user">
-                            <span className="username">Vanessa Smith</span>
-                            <span className="status">2 new messages</span>
-                          </div>
-                        </div>
-                        <div className="item-list">
-                          <div className="avatar">
-                            <img
-                              alt="image"
-                              src="/assets/img/profile3.jpg"
-                              className="avatar-img rounded-circle"
-                            />
-                          </div>
-                          <div className="info-user">
-                            <span className="username">Derek Schuler</span>
-                            <span className="status">5 new messages</span>
-                          </div>
-                        </div>
-                        <div className="item-list">
-                          <div className="avatar">
-                            <img
-                              alt="image"
-                              src="/assets/img/profile4.jpg"
-                              className="avatar-img rounded-circle"
-                            />
-                          </div>
-                          <div className="info-user">
-                            <span className="username">Catherine Moore</span>
-                            <span className="status">7 new messages</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="card-footer text-center">
-                        <a href="#" className="btn btn-primary btn-round">
-                          View All
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-8">
-                  <div className="card card-round">
-                    <div className="card-header">
-                      <div className="card-title">Visitors</div>
                     </div>
                     <div className="card-body">
                       <div className="chart-container">
-                        <canvas id="visitorChart"></canvas>
+                        <canvas ref={pieChartRef}></canvas>
                       </div>
                     </div>
                   </div>
@@ -323,9 +273,9 @@ const Home = () => {
               </div>
             </div>
           </div>
-
-          <Footer />
         </div>
+
+        <Footer />
       </div>
     </div>
   );
