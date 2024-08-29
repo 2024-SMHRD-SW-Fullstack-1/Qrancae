@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Rack from './Rack';
+/* import Rack from './Rack'; */
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';

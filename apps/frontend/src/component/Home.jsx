@@ -19,24 +19,32 @@ const Home = () => {
   const [events, setEvents] = useState([
     {
       id: 1,
-      title: '방청소',
+      title: '주간회의',
       start: '2024-08-27T12:00:00',
       end: '2024-08-30T12:00:00',
       allDay: false,
       content: '아파트 청소',
-      color: "#FADADD",
+      color: "#D95319",
     },
     {
       id: 2,
-      title: '이승지(seung)',
+      title: '보고서',
       start: '2024-08-16T09:00:00',
       end: '2024-08-22T09:00:00',
-      color: "#FADADD",
+      color: "#77AC30",
+      content: ''
+    },
+    {
+      id: 3, // ID가 중복되지 않도록 수정
+      title: '회식',
+      start: '2024-08-16T17:00:00',
+      end: '2024-08-16T19:00:00',
+      color: "#7E7E7E",
       content: ''
     }
   ]);
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -129,7 +137,6 @@ const Home = () => {
 
   const handleClosePopup = () => {
     setShowPopup(false);
-    setSelectedDate(null);
   };
 
   const handleSaveEvent = (newEvent) => {
@@ -146,15 +153,33 @@ const Home = () => {
 
   // 클릭된 날짜가 일정의 범위 내에 있는지 확인
   const filteredEvents = events.filter(event => {
-    const startDate = new Date(event.start);
-    const endDate = new Date(event.end);
-    const selectedDateObj = new Date(selectedDate);
+    const startDate = new Date(event.start).setHours(0, 0, 0, 0);
+    const endDate = new Date(event.end).setHours(0, 0, 0, 0);
+    const selectedDateObj = new Date(selectedDate).setHours(0, 0, 0, 0);
 
     return selectedDateObj >= startDate && selectedDateObj <= endDate;
   });
 
   return (
     <div className="wrapper">
+      <style>
+        {`
+          table thead th, table tbody td {
+            text-align: center;
+          }
+          .flex-container {
+            display: flex;
+            gap: 20px;
+          }
+          .chart-container {
+            flex: 1;
+            min-width: 0;
+          }
+          .card-round {
+            border-radius: 0.5rem;
+          }
+        `}
+      </style>
       <Sidebar />
 
       <div className="main-panel">
@@ -198,27 +223,44 @@ const Home = () => {
                       events={events}
                       locale={koLocale}
                       headerToolbar={{
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek'
+                        left: 'title',
+                        right: 'prev today next'
                       }}
-                      dateClick={handleDateClick}  // 날짜 클릭 핸들러
+                      dateClick={handleDateClick}
+                      dayCellContent={(args) => {
+                        return (
+                          <div>
+                            {args.date.getDate()}
+                          </div>
+                        );
+                      }}
                     />
-                    <div className="text-center my-3">
-                      {filteredEvents.length > 0 && (
-                        <div className="filtered-events">
+                    <div className="my-3">
+                      {filteredEvents.length > 0 ? (
+                        <div className="event-list filtered-events">
+                          <p>{selectedDate}</p>
                           {filteredEvents.map(event => (
-                            <div key={event.id} className="event-details">
-                              <p><strong>{event.title}</strong></p>
-                              <p>시작: {new Date(event.start).toLocaleString()}</p>
-                              <p>종료: {new Date(event.end).toLocaleString()}</p>
-                              <p>내용: {event.content}</p>
+                            <div key={event.id} className="event-details" style={{ display: 'flex', alignItems: 'stretch' }}>
+                              <div style={{
+                                width: '.5rem',
+                                backgroundColor: event.color,
+                                marginRight: '1rem'
+                              }} />
+                              <div className='event-title-content-date'>
+                                <p className="event-title"><strong>{event.title}</strong></p>
+                                {event.content && <p className="event-content">{event.content}</p>} {/* 내용이 있을 때만 표시 */}
+                                <p className="event-date">{new Date(event.start).toLocaleDateString()} - {new Date(event.end).toLocaleDateString()}</p>
+                              </div>
                             </div>
                           ))}
                         </div>
+                      ) : (
+                        <div className="event-list filtered-events">
+                          <p>{selectedDate}</p>
+                          <p className='event-title text-center'>일정 없음</p>
+                        </div>
                       )}
                     </div>
-                    {/* 팝업 표시 조건 추가 */}
                     {showPopup && (
                       <AddEventPopup
                         isOpen={showPopup}
@@ -230,32 +272,102 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="col-md-7 d-flex flex-column">
-                <div className="row">
-                  <div className="card card-round">
-                    <div className="card-header">
-                      <div className="card-head-row">
-                        <div className="card-title">라인 차트</div>
+              <div className="col-md-7">
+                <div className="flex-container">
+                  <div className='col-md-4 flex-grow-1'>
+                    <div className="card card-round">
+                      <div className="card-header">
+                        <div className="card-head-row">
+                          <div className="card-title">오늘의 점검</div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="card-body">
-                      <div className="chart-container">
-                        <canvas ref={lineChartRef}></canvas>
+                      <div className="card-body text-center">
+                        <div className='today-repair text-center'>
+                          <div className="col-3">
+                            <i className="fas fa-server repair-i"></i>
+                          </div>
+                          <div className="col-9 col-stats text-center">
+                            <h4 className="card-title">신규 접수</h4>
+                            <p className="repair-num">4</p>
+                          </div>
+                        </div>
+                        <div className='today-repair'>
+                          <div className="col-3">
+                            <i className="fas fa-wrench repair-i"></i>
+                          </div>
+                          <div className="col-9 col-stats text-center">
+                            <h4 className="card-title">진행 중</h4>
+                            <p className="repair-num">6</p>
+                          </div>
+                        </div>
+                        <div className='today-repair'>
+                          <div className="col-3">
+                            <i className="far fa-check-circle repair-i"></i>
+                          </div>
+                          <div className="col-9 col-stats text-center">
+                            <h4 className="card-title">보수 완료</h4>
+                            <p className="repair-num">2</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="card card-round">
-                    <div className="card-header">
-                      <div className="card-head-row">
-                        <div className="card-title">파이 차트</div>
+                  <div className='col-md-8 flex-grow-1'>
+                    <div className="card card-round">
+                      <div className="card-header">
+                        <div className="card-head-row">
+                          <div className="card-title">로그 내역</div>
+                        </div>
+                      </div>
+                      <div className="card-body">
+                        <div className="chart-container">
+                          <canvas ref={lineChartRef}></canvas>
+                        </div>
                       </div>
                     </div>
-                    <div className="card-body">
-                      <div className="chart-container">
-                        <canvas ref={pieChartRef}></canvas>
-                      </div>
+                  </div>
+                </div>
+                <div className="card card-round mt-3">
+                  <div className="card-header">
+                    <div className="card-head-row">
+                      <div className="card-title">케이블 불량률</div>
                     </div>
+                  </div>
+                  <div className="card-body flex-card-body">
+                    <div className="chart-container defect-rate-chart">
+                      <canvas ref={pieChartRef}></canvas>
+                    </div>
+                    <table className="table table-striped table-bordered mt-3 defect-rate-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">높음</th>
+                          <th scope="col">랙 위치</th>
+                          <th scope="col">불량률</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1</td>
+                          <td>R33</td>
+                          <td>2.3%</td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td>R07</td>
+                          <td>1.9%</td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td>R19</td>
+                          <td>1.3%</td>
+                        </tr>
+                        <tr>
+                          <td>4</td>
+                          <td>R19</td>
+                          <td>1.3%</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -265,7 +377,7 @@ const Home = () => {
 
         <Footer />
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -108,7 +108,7 @@ p,
 td {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'NanumSquareNeo';
 }
 
 body,
@@ -3469,7 +3469,7 @@ label {
 .card-pricing2 .pricing-content li.disable:before,
 .card-pricing2 .pricing-content li:before {
   content: '\f00c';
-  font-family: 'Font Awesome 5 Solid';
+  font-family: 'NanumSquareNeo';
   font-weight: 900;
   width: 20px;
   height: 20px;
@@ -4073,7 +4073,7 @@ label {
 
 .accordion .card>.card-header>.span-mode:before {
   content: '\f068' !important;
-  font-family: 'Font Awesome 5 Solid';
+  font-family: 'NanumSquareNeo';
   font-weight: 900;
   font-size: 16px;
 }
@@ -4263,7 +4263,7 @@ label {
 
 .form-control {
   font-size: 1rem;
-  border-color: #ebedf2;
+  border-color: #cccccc;
   padding: 0.6rem 1rem;
   height: inherit !important;
   border-width: 2px;
@@ -4361,7 +4361,7 @@ label {
 .form-radio [type='radio']:not(:checked)+.form-radio-sign:before {
   content: '\f18a';
   font-size: 22px;
-  font-family: LineAwesome;
+  font-family: 'NanumSquareNeo';
   position: absolute;
   left: 0;
   top: auto;
@@ -4373,7 +4373,7 @@ label {
 .form-radio [type='radio']:checked+.form-radio-sign:before {
   content: '\f18a';
   font-size: 22px;
-  font-family: LineAwesome;
+  font-family: 'NanumSquareNeo';
   position: absolute;
   left: 0;
   top: auto;
@@ -4393,7 +4393,7 @@ label {
   color: #4d7cfe;
   transition: all 0.2s;
   line-height: 1;
-  font-family: LineAwesome;
+  font-family: 'NanumSquareNeo';
 }
 
 .form-radio [type='radio']:not(:checked)+.form-radio-sign:after {
@@ -10820,7 +10820,7 @@ body[data-background-color='dark'] .jvm-zoom-btn {
 
 .popup-content {
   background: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
@@ -10828,9 +10828,33 @@ body[data-background-color='dark'] .jvm-zoom-btn {
   position: relative;
 }
 
+.popup-content-left {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 800px;
+  max-width: 90%;
+  position: relative;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;
+}
+
 .popup-header {
   display: flex;
   justify-content: flex-end;
+}
+
+.popup-header h3 {
+  margin: 0;
+}
+
+.popup-color-header {
+  display: flex;
+  justify-content: space-between;
 }
 
 .close-button {
@@ -10845,14 +10869,14 @@ body[data-background-color='dark'] .jvm-zoom-btn {
   font-size: 16px;
 }
 
+.popup-body>* {
+  margin-bottom: 1.2rem;
+}
+
 .popup-footer {
   display: flex;
   justify-content: center;
   gap: 10px;
-}
-
-.color-picker {
-  margin-top: 10px;
 }
 
 .color-picker label {
@@ -10877,6 +10901,33 @@ body[data-background-color='dark'] .jvm-zoom-btn {
 .color-option.selected {
   border-color: #000;
 }
+
+.check-allday {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* 입력 필드와 화살표 사이의 간격 */
+}
+
+.date-range input {
+  flex: 1;
+  /* 입력 필드가 가능한 공간을 차지하도록 설정 */
+}
+
+.arrow {
+  font-size: 1.5rem;
+  /* 화살표의 크기 조절 */
+  margin: 0 0.5rem;
+  /* 입력 필드와 화살표 사이의 간격 */
+}
+
 
 /* 소스, 목적지 데이터 */
 td.source-data {
@@ -10911,6 +10962,117 @@ td.destination-data {
   color: black;
 }
 
+.event-list {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.filtered-events,
+.no-events {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.filtered-events>p:first-child {
+  /* selectedDate */
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.event-details {
+  display: flex;
+  align-items: center;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.event-details p {
+  margin: 0;
+}
+
+.event-details strong {
+  /* event title */
+  font-weight: bold;
+}
+
+.event-details p:not(:first-child) {
+  /* start, end, content */
+  font-size: 0.9em;
+  color: #666;
+}
+
+.event-title {
+  color: #666;
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.event-date {
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+.event-content {
+  font-size: 0.9em;
+}
+
+.event-title-content-date {
+  display: flex;
+  flex-direction: column;
+}
+
+.no-events p {
+  text-align: center;
+  color: #999;
+}
+
+/* 메인 */
+.flex-card-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.defect-rate-chart {
+  flex: 1;
+  max-width: 50%;
+}
+
+.defect-rate-table {
+  flex: 1;
+  max-width: 50%;
+  margin-right: 3rem;
+}
+
+/* 오늘의 점검 */
+.today-repair {
+  display: flex;
+  align-items: center;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.repair-num {
+  margin: 0;
+}
+
+.repair-i {
+  font-size: 2rem;
+}
+
 /* 라벨들 */
 .common-labels {
   display: flex;
@@ -10924,4 +11086,50 @@ td.destination-data {
 
 .btn .btn-label .icon-spacing {
   margin-right: .5rem;
+}
+
+/* 스위치 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked+.slider {
+  background-color: #1D3557;
+}
+
+input:checked+.slider:before {
+  transform: translateX(18px);
 }
