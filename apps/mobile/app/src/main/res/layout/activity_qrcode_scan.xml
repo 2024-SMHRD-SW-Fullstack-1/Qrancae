@@ -1,30 +1,143 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.journeyapps.barcodescanner.DecoratedBarcodeView
-        android:id="@+id/barcode_scanner"
+    <!-- 전체 화면에 카메라 프리뷰를 표시하는 PreviewView -->
+
+    <!-- 중앙의 인식 영역을 시각적으로 표시하기 위한 뷰 -->
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/fullPreviewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:zxing_framing_rect_height="250dp"
-        app:zxing_framing_rect_width="250dp"
-        app:zxing_viewfinder_laser_visibility="false"
+        android:scaleType="fitCenter"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteY="-16dp" />
 
-    <TextView
+    <!-- 가이드라인 -->
+    <View
+        android:id="@+id/frame_border"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/guideline6"
+        app:layout_constraintEnd_toStartOf="@id/guideline4"
+        app:layout_constraintStart_toEndOf="@id/guideline2"
+        app:layout_constraintTop_toBottomOf="@id/guideline3" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="130dp"
-        android:text="케이블 QR을 스캔해주세요."
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <View
+        android:id="@+id/center_line"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#4CAF50"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline_center_horizontal" />
+
+    <View
+        android:id="@+id/top_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#88000000"
+        app:layout_constraintBottom_toTopOf="@id/guideline3"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/bottom_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#88000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline6" />
+
+    <View
+        android:id="@+id/left_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#88000000"
+        app:layout_constraintBottom_toTopOf="@id/guideline6"
+        app:layout_constraintEnd_toStartOf="@id/guideline2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline3" />
+
+    <View
+        android:id="@+id/right_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#88000000"
+        app:layout_constraintBottom_toTopOf="@id/guideline6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline4"
+        app:layout_constraintTop_toBottomOf="@id/guideline3" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.23" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.78" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="20dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/guideline16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:gravity="center"
+        android:text="QR를 스캔해서\n케이블 정보를 확인하세요"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.10183875" />
 </androidx.constraintlayout.widget.ConstraintLayout>

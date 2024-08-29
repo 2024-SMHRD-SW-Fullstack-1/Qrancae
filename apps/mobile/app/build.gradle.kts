@@ -65,6 +65,18 @@ dependencies {
     implementation("com.google.zxing:core:3.4.1")
 
     implementation ("androidx.core:core-ktx:1.7.0")
+    implementation(libs.androidx.camera.mlkit.vision)
+
+    // CameraX 라이브러리 추가
+    val cameraxVersion = "1.1.0-beta01"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+    implementation("androidx.camera:camera-extensions:$cameraxVersion")
+
+    // ML Kit 바코드 스캐닝 라이브러리 추가
+    implementation("com.google.mlkit:barcode-scanning:17.0.2")
 
 
     implementation(libs.androidx.appcompat)
@@ -80,3 +92,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+

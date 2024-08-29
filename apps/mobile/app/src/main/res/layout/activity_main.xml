@@ -1,43 +1,278 @@
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="match_parent">
 
-    <!-- 다른 콘텐츠 뷰들 -->
+    <!-- Background Section -->
 
+    <!-- Progress Section -->
     <RelativeLayout
-        android:id="@+id/bottom_nav_bar"
+        android:id="@+id/header_section"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/bottom_nav_background"
-        android:elevation="8dp">
+        android:layout_height="460dp"
+        android:background="#004E8E"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 하단바 아이콘들 -->
-        <ImageView
-            android:id="@+id/home_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="40dp"
-            android:src="@drawable/home__icon" />
+        <!-- Logo and welcome text -->
 
         <ImageView
-            android:id="@+id/camera_icon"
-            android:layout_width="wrap_content"
+            android:id="@+id/logo"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:src="@drawable/camera_icon" />
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/logo" />
 
-        <ImageView
-            android:id="@+id/clipboard_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+
+        <ImageButton
+            android:id="@+id/btn_alarm"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="0dp"
+            android:layout_toStartOf="@+id/btn_setting"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_notifications"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/btn_setting"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="40dp"
-            android:src="@drawable/clipboard_icon" />
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="20dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_settings" />
+
+        <TextView
+            android:id="@+id/welcome_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/logo"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="20dp"
+            android:text="안녕하세요\n000님!"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="258dp"
+            android:layout_marginEnd="139dp"
+            android:src="@drawable/image_shadow" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="147dp"
+            android:layout_height="145dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="151dp"
+            android:layout_marginEnd="46dp"
+            android:src="@drawable/image_server" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="263dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/image_qrscan" />
+
+        <!-- Server image -->
     </RelativeLayout>
 
-</RelativeLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/progress_card"
+        android:layout_width="0dp"
+        android:layout_height="220dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="-130dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header_section">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/progress_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_arrow_forward"
+                android:drawablePadding="8dp"
+                android:paddingLeft="10dp"
+                android:text="진행 현황을 확인하세요                                       "
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="258dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/new_entry_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_border_new"
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="신규 접수"
+                    android:textColor="#4CAF50"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/new_entry_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="110dp"
+                    android:layout_marginRight="20dp"
+                    android:text="0건"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="259dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/in_progress_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_border_progress"
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="진행중"
+                    android:textColor="#7C7C7C"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/in_progress_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="110dp"
+                    android:layout_marginRight="20dp"
+                    android:text="0건"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="260dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/completed_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_border_completed"
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="보수 완료"
+                    android:textColor="#EE38AE"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/completed_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="110dp"
+                    android:layout_marginRight="20dp"
+                    android:text="0건"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- QR Code Button -->
+    <Button
+        android:id="@+id/qr_scan_button"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="38dp"
+        android:background="@drawable/rounded_button"
+        android:elevation="20dp"
+        android:text="QR 코드 스캔"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progress_card" />
+
+    <TextView
+        android:id="@+id/tv_Logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:paddingStart="5dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="5dp"
+        android:paddingBottom="5dp"
+        android:shadowColor="#888888"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="2"
+        android:text="로그아웃"
+        android:textColor="#CCCCCC"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.10042433" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
