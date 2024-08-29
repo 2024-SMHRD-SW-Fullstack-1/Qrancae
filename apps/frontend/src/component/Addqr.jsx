@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
@@ -76,7 +77,7 @@ const Addqr = () => {
       });
     }
 
-    console.log(jsonData);
+    console.log('jsonData has been updated:', jsonData);
 
     // 컴포넌트가 언마운트될 때 DataTable을 파괴합니다
     return () => {
@@ -111,7 +112,7 @@ const Addqr = () => {
     });
   };
 
-  // 제출 버튼을 클릭할 때 호출되는 함수
+  // 하나 추가 버튼 클릭
   const handleSubmit = (e) => {
     e.preventDefault();
     // 빈 입력값이 있는지 확인
@@ -124,6 +125,19 @@ const Addqr = () => {
     setJsonData([inputs, ...jsonData]);
     console.log(jsonData);
   };
+
+  function registerQr() {
+    axios({
+      url: 'http://localhost:8089/qrancae/registerQr',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: jsonData,
+    }).then((res) => {
+      console.log(res);
+    });
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -183,7 +197,10 @@ const Addqr = () => {
                           onChange={readUploadFile}
                           style={{ display: 'none' }}
                         />
-                        <label className="btn btn-label-primary btn-round btn-sm">
+                        <label
+                          className="btn btn-label-primary btn-round btn-sm"
+                          onClick={registerQr()}
+                        >
                           <span className="btn-label">
                             <i className="fas fa-check-circle"></i>
                           </span>
