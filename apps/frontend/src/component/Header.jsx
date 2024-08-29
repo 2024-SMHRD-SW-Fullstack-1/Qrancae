@@ -1,6 +1,23 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate 임포트 추가
+import Cookies from 'js-cookie'
+import Timer from './Timer';
 
 const Header = () => {
+
+  const [adminName, setAdminName] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedAdminName = Cookies.get('userId');
+    if (storedAdminName) {
+      setAdminName(storedAdminName);
+    } else {
+      navigate('/login'); // userId 쿠키가 없으면 로그인 페이지로 이동
+    }
+  }, [navigate]);
+
   return (
     <div className="main-header">
       <div className="main-header-logo">
@@ -28,6 +45,12 @@ const Header = () => {
       </div>
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div className="container-fluid">
+          <ul className="navbar-nav topbar-nav align-items-center">
+            {/* Timer 컴포넌트를 좌측에 배치 */}
+            <li className="nav-item">
+              <Timer />
+            </li>
+          </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
             <li className="nav-item topbar-icon dropdown hidden-caret">
               <a
@@ -122,7 +145,7 @@ const Header = () => {
                   />
                 </div>
                 <span className="profile-username">
-                  <span className="fw-bold">홍길동</span>
+                  <span className="fw-bold">{adminName}</span>
                   <span className="op-7">님 환영합니다!</span>
                 </span>
               </a>
