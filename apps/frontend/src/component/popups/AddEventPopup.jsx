@@ -126,7 +126,7 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="메모"
                         className="form-control"
-                        rows="1"
+                        rows="2"
                     />
                 </div>
                 <div className="popup-buttons">

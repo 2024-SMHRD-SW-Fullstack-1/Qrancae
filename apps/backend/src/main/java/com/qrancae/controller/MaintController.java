@@ -1,6 +1,9 @@
 package com.qrancae.controller;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qrancae.model.Maint;
@@ -31,7 +35,7 @@ public class MaintController {
       return maints;
    }
    // 작업자 가져오기
-   @GetMapping("/getusers")
+   @GetMapping("/maint/getusers")
    public List<User> getUsers(){
       return maintService.getAllUsers();
    }
@@ -40,10 +44,33 @@ public class MaintController {
    @PostMapping("/updatemaint")
    public ResponseEntity<Void> updateMaint(@RequestParam int maintIdx, @RequestParam String userId) {
       System.out.println("유지보수 번호:"+maintIdx);
-      maintService.updateMaint(maintIdx,userId);
+      //maintService.updateMaint(maintIdx,userId);
       
       return ResponseEntity.ok().build();
    }
-   
+   // 요청한 작업자와 추가 메세지 전달하기
+   @PostMapping("/maint/updateuser")
+   public ResponseEntity<String> updateMaintUser(@RequestBody Map<String, Object> request) {
+      
+      List<Integer> selectedMaints = (List<Integer>) request.get("maintIdxs");
+       String selectedUser = (String) request.get("userId");
+       String alarmMsg = (String) request.get("alarmMsg");
+       
+      if (selectedMaints == null || selectedMaints.isEmpty()) {
+       return ResponseEntity.status(400).body("유효하지 않은 maintIdxs 파라미터");
+      }
+      
+      if (selectedUser == null || selectedUser.isEmpty()) {
+           return ResponseEntity.status(400).body("유효하지 않은 userId 파라미터");
+       }
+      
+      System.out.println("추가 메세지 : " + alarmMsg);
+       try {
+           maintService.updateMaintUser(selectedMaints, selectedUser,alarmMsg);
+           return ResponseEntity.ok("작업자 할당 성공");
+       } catch (Exception e) {
+          return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
+       }
+   }
 
 }
