@@ -9,13 +9,25 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
 import AddEventPopup from './popups/AddEventPopup';
+import { useNavigate } from 'react-router-dom'; // useNavigate를 가져옴
+import Cookies from 'js-cookie';
 
 Chart.register(...registerables);
 
 const Home = () => {
   const lineChartRef = useRef(null);
   const pieChartRef = useRef(null);
+  /////////
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    // 쿠키에서 userId를 가져와 로그인 상태 확인
+    const userId = Cookies.get('userId');
+    if (!userId) {
+      navigate('/login'); // userId 쿠키가 없으면 로그인 페이지로 이동
+    }
+  }, [navigate]);
+  //////////
   const [events, setEvents] = useState([
     {
       id: 1,
