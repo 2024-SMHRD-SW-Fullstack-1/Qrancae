@@ -28,14 +28,14 @@ const Qr = () => {
           },
         },
         { title: '케이블', data: 'cable_idx' },
-        { title: '소스 랙 번호', data: 's_rack_number' },
-        { title: '소스 랙 위치', data: 's_rack_location' },
-        { title: '소스 서버 이름', data: 's_server_name' },
-        { title: '소스 포트 번호', data: 's_port_number' },
-        { title: '목적지 랙 번호', data: 'd_rack_number' },
-        { title: '목적지 랙 위치', data: 'd_rack_location' },
-        { title: '목적지 서버 이름', data: 'd_server_name' },
-        { title: '목적지 포트 번호', data: 'd_port_number' },
+        { title: '랙 번호', data: 's_rack_number' },
+        { title: '랙 위치', data: 's_rack_location' },
+        { title: '서버 이름', data: 's_server_name' },
+        { title: '포트 번호', data: 's_port_number' },
+        { title: '랙 번호', data: 'd_rack_number' },
+        { title: '랙 위치', data: 'd_rack_location' },
+        { title: '서버 이름', data: 'd_server_name' },
+        { title: '포트 번호', data: 'd_port_number' },
         {
           title: '등록일',
           data: 'cable_date',
@@ -144,24 +144,24 @@ const Qr = () => {
                 <div className="card">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <h4 className="card-title">케이블 목록</h4>
-                    <div className="cable-btns">
+                    <div className="common-labels">
                       <label className="btn btn-label-primary btn-round btn-sm">
                         <span className="btn-label">
-                          <i className="fas fa-times"></i>
+                          <i className="fas fa-times icon-spacing"></i>
                         </span>
                         선택 삭제
                       </label>
                       <Link to="/addQr">
                         <label className="btn btn-label-primary btn-round btn-sm">
                           <span className="btn-label">
-                            <i className="fas fa-plus"></i>
+                            <i className="fas fa-plus icon-spacing"></i>
                           </span>
                           케이블 추가
                         </label>
                       </Link>
                       <label className="btn btn-label-primary btn-round btn-sm">
                         <span className="btn-label">
-                          <i className="fas fa-print"></i>
+                          <i className="fas fa-print icon-spacing"></i>
                         </span>
                         QR 인쇄
                       </label>

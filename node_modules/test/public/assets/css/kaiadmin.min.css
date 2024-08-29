@@ -10851,6 +10851,33 @@ body[data-background-color='dark'] .jvm-zoom-btn {
   gap: 10px;
 }
 
+.color-picker {
+  margin-top: 10px;
+}
+
+.color-picker label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.color-options {
+  display: flex;
+  gap: 8px;
+}
+
+.color-option {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.color-option.selected {
+  border-color: #000;
+}
+
 /* 소스, 목적지 데이터 */
 td.source-data {
   color: #81292D;
@@ -10869,4 +10896,32 @@ td.destination-data {
 
 .date-info {
   margin-top: 20px;
+}
+
+/* 캘린더 */
+.fc-day-sat a {
+  color: blue !important;
+}
+
+.fc-day-sun a {
+  color: red !important;
+}
+
+.fc-day a {
+  color: black;
+}
+
+/* 라벨들 */
+.common-labels {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+
+.outside-card-labels {
+  margin-bottom: 1.5rem;
+}
+
+.btn .btn-label .icon-spacing {
+  margin-right: .5rem;
 }

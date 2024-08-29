@@ -277,7 +277,7 @@ const Addqr = () => {
                         onClick={openPopup}
                       >
                         <span className="btn-label">
-                          <i className="fas fa-times"></i>
+                          <i className="fas fa-times icon-spacing"></i>
                         </span>
                         선택 삭제
                       </label>
@@ -287,7 +287,7 @@ const Addqr = () => {
                         onClick={downloadExcelTemplate}
                       >
                         <span className="btn-label">
-                          <i className="fas fa-file-download"></i>
+                          <i className="fas fa-file-download icon-spacing"></i>
                         </span>
                         엑셀 양식 다운
                       </label>
@@ -296,7 +296,7 @@ const Addqr = () => {
                         className="btn btn-label-primary btn-round btn-sm"
                       >
                         <span className="btn-label">
-                          <i className="fas fa-file-upload"></i>
+                          <i className="fas fa-file-upload icon-spacing"></i>
                         </span>
                         엑셀 업로드
                       </label>

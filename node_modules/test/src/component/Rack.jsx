@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Rack = () => {
-    const numRows = 42;
+    const numRows = 32;
     const numCols = 10;
 
     const columnWidth = `${100 / (numCols + 1)}%`;
@@ -24,7 +24,8 @@ const Rack = () => {
                                     width: columnWidth
                                 }}
                             >
-                                {42 - rowIndex}
+                                {/* 줄 */}
+                                {32 - rowIndex}
                             </td>
                             {Array.from({ length: numCols }, (_, colIndex) => (
                                 <td
@@ -32,7 +33,9 @@ const Rack = () => {
                                     style={{
                                         border: '5px solid black',
                                         height: '10px',
-                                        backgroundColor: '#D3D3D3',
+                                        backgroundColor: rowIndex === 2 && colIndex === 5
+                                            ? '#FF4000' // 주황색으로 변경
+                                            : '#D3D3D3', // 기본 배경색
                                         width: columnWidth
                                     }}
                                 >

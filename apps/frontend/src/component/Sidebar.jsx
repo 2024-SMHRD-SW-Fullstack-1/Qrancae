@@ -12,7 +12,6 @@ const Sidebar = () => {
     { name: '로그 내역', path: '/log', icon: 'fas fa-clipboard-list' },
     { name: '유지보수 내역', path: '/maint', icon: 'fas fa-clipboard-check' },
     { name: '사용자 관리', path: '/user', icon: 'fas fa-user-cog' },
-    { name: '차트', path: '/charts', icon: 'far fa-chart-bar' },
   ];
 
   const subMenus = [
