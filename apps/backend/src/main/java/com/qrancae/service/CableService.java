@@ -29,4 +29,10 @@ public class CableService {
 		cableRepository.save(cable);
 	}
 	
+	// 해당 케이블 리스트
+	public Cable getCableByIdx(Integer calbeIdx) {
+		Cable cable = cableRepository.findByCableIdx(calbeIdx);
+		return cable;
+	}
+	
 }

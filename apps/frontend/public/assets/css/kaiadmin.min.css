@@ -11133,3 +11133,49 @@ input:checked+.slider {
 input:checked+.slider:before {
   transform: translateX(18px);
 }
+
+/* QR 프린트 */
+.qrBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 248.7mm;
+  border: 1px solid lightgray;
+}
+
+.qrBoxContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.qrBoxContent-item {
+  display: flex;
+  align-items: center;
+}
+
+.QR-img {
+  max-width: 70px;
+  height: auto;
+}
+
+.QR-start-data {
+  font-size: 14px !important;
+  margin: 0 20px 10px 0;
+}
+
+.QR-end-data {
+  font-size: 14px !important;
+  margin: 0 0 0 20px;
+}
+
+.start-end {
+  margin: 0 10px;
+}
+
+@media print {
+  .printable-content {
+    display: block !important;
+  }
+}

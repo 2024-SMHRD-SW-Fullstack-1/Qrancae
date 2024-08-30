@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
+import axios from 'axios';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -9,6 +10,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
 import AddEventPopup from './popups/AddEventPopup';
+import EditEventPopup from './popups/EditEventPopup';
 import { useNavigate } from 'react-router-dom'; // useNavigate를 가져옴
 import Cookies from 'js-cookie';
 
@@ -17,49 +19,49 @@ Chart.register(...registerables);
 const Home = () => {
   const lineChartRef = useRef(null);
   const pieChartRef = useRef(null);
-  /////////
   const navigate = useNavigate();
+  const userId = Cookies.get('userId');
 
   useEffect(() => {
     // 쿠키에서 userId를 가져와 로그인 상태 확인
-    const userId = Cookies.get('userId');
     if (!userId) {
       navigate('/login'); // userId 쿠키가 없으면 로그인 페이지로 이동
     }
   }, [navigate]);
-  //////////
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: '주간회의',
-      start: '2024-08-27T12:00:00',
-      end: '2024-08-30T12:00:00',
-      allDay: false,
-      content: '아파트 청소',
-      color: "#D95319",
-    },
-    {
-      id: 2,
-      title: '보고서',
-      start: '2024-08-16T09:00:00',
-      end: '2024-08-22T09:00:00',
-      color: "#77AC30",
-      content: ''
-    },
-    {
-      id: 3, // ID가 중복되지 않도록 수정
-      title: '회식',
-      start: '2024-08-16T17:00:00',
-      end: '2024-08-16T19:00:00',
-      color: "#7E7E7E",
-      content: ''
-    }
-  ]);
+
+  const [events, setEvents] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showPopup, setShowPopup] = useState(false);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState(null);
+
+  const getCalendarList = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/calendar',
+      method: 'post',
+      data: userId
+    }).then((res) => {
+      console.log('캘린더 리스트', res.data);
+      const data = res.data;
+      const formattedData = data.map(event => ({
+        id: event.calendar_idx,
+        title: event.calendar_title,
+        content: event.calendar_content,
+        start: event.calendar_start,
+        end: event.calendar_end,
+        color: event.calendar_color,
+        allDay: event.calendar_allday === 'O',
+      }))
+      console.log('formattedData', formattedData);
+      setEvents(formattedData);
+    });
+  };
 
   useEffect(() => {
+
+    getCalendarList();
+
     if (lineChartRef.current) {
       new Chart(lineChartRef.current, {
         type: 'line',
@@ -143,6 +145,19 @@ const Home = () => {
     setSelectedDate(arg.dateStr);
   };
 
+  const handleEventClick = (info) => {
+    setCurrentEvent({
+      id: info.event.id,
+      title: info.event.title,
+      start: info.event.start,
+      end: info.event.end,
+      content: info.event.extendedProps.content,
+      color: info.event.backgroundColor,
+      allDay: info.event.allDay
+    });
+    setShowEditPopup(true); // 일정 수정 팝업 열기
+  };
+
   const handleOpenPopup = () => {
     setShowPopup(true);
   };
@@ -151,15 +166,36 @@ const Home = () => {
     setShowPopup(false);
   };
 
+  const handleCloseEditPopup = () => {
+    setShowEditPopup(false);
+  };
+
   const handleSaveEvent = (newEvent) => {
-    setEvents([
-      ...events,
-      {
-        id: events.length + 1,
-        ...newEvent,
-        color: "#FFCE56"
-      }
-    ]);
+    console.log(newEvent);
+
+    const eventData = {
+      user_id: userId,
+      calendar_title: newEvent.title,
+      calendar_start: new Date(newEvent.start).toISOString(),
+      calendar_end: new Date(newEvent.end).toISOString(),
+      calendar_content: newEvent.content,
+      calendar_color: newEvent.color,
+      calendar_allday: newEvent.allDay ? 'O' : 'X'
+    };
+
+    axios({
+      url: 'http://localhost:8089/qrancae/addCalendar',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: eventData,
+    }).then((res) => {
+      console.log(res);
+      getCalendarList();
+    });
+
+
     handleClosePopup();
   };
 
@@ -171,6 +207,51 @@ const Home = () => {
 
     return selectedDateObj >= startDate && selectedDateObj <= endDate;
   });
+
+  const handleUpdateEvent = (updatedEvent) => {
+    console.log(updatedEvent);
+
+    const eventData = {
+      user_id: userId,
+      calendar_id: updatedEvent.id, // 수정할 이벤트 ID
+      calendar_title: updatedEvent.title,
+      calendar_start: new Date(updatedEvent.start).toISOString(),
+      calendar_end: new Date(updatedEvent.end).toISOString(),
+      calendar_content: updatedEvent.content,
+      calendar_color: updatedEvent.color,
+      calendar_allday: updatedEvent.allDay ? 'O' : 'X'
+    };
+
+    axios({
+      url: 'http://localhost:8089/qrancae/updateCalendar',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: eventData,
+    }).then((res) => {
+      console.log(res);
+      getCalendarList();
+    });
+
+    handleClosePopup();
+  };
+
+  const handleDeleteEvent = (eventId) => {
+    axios({
+      url: 'http://localhost:8089/qrancae/deleteCalendar',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: { calendar_id: eventId },
+    }).then((res) => {
+      console.log(res);
+      getCalendarList();
+    });
+
+    handleClosePopup();
+  };
 
   return (
     <div className="wrapper">
@@ -232,6 +313,7 @@ const Home = () => {
                     <FullCalendar
                       plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
                       initialView="dayGridMonth"
+                      contentHeight="auto"
                       events={events}
                       locale={koLocale}
                       headerToolbar={{
@@ -239,6 +321,7 @@ const Home = () => {
                         right: 'prev today next'
                       }}
                       dateClick={handleDateClick}
+                      eventClick={handleEventClick}
                       dayCellContent={(args) => {
                         return (
                           <div>
@@ -260,8 +343,13 @@ const Home = () => {
                               }} />
                               <div className='event-title-content-date'>
                                 <p className="event-title"><strong>{event.title}</strong></p>
-                                {event.content && <p className="event-content">{event.content}</p>} {/* 내용이 있을 때만 표시 */}
-                                <p className="event-date">{new Date(event.start).toLocaleDateString()} - {new Date(event.end).toLocaleDateString()}</p>
+                                {event.content && <p className="event-content">{event.content}</p>}
+                                <p className="event-date">
+                                  {event.allDay
+                                    ? `${new Date(event.start).toLocaleDateString()} - ${new Date(new Date(event.end).setHours(23, 59)).toLocaleDateString()}`
+                                    : `${new Date(event.start).toLocaleDateString()} ${new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(event.end).toLocaleDateString()} ${new Date(event.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                  }
+                                </p>
                               </div>
                             </div>
                           ))}
@@ -279,6 +367,15 @@ const Home = () => {
                         onClose={handleClosePopup}
                         onSave={handleSaveEvent}
                         defaultStartDate={selectedDate}
+                      />
+                    )}
+                    {currentEvent && (
+                      <EditEventPopup
+                        isOpen={showEditPopup}
+                        onClose={handleCloseEditPopup}
+                        onSave={handleUpdateEvent}
+                        onDelete={handleDeleteEvent}
+                        event={currentEvent}
                       />
                     )}
                   </div>
@@ -299,7 +396,7 @@ const Home = () => {
                             <i className="fas fa-server repair-i"></i>
                           </div>
                           <div className="col-9 col-stats text-center">
-                            <h4 className="card-title">신규 접수</h4>
+                            <h5>신규 접수</h5>
                             <p className="repair-num">4</p>
                           </div>
                         </div>
@@ -308,7 +405,7 @@ const Home = () => {
                             <i className="fas fa-wrench repair-i"></i>
                           </div>
                           <div className="col-9 col-stats text-center">
-                            <h4 className="card-title">진행 중</h4>
+                            <h5>진행 중</h5>
                             <p className="repair-num">6</p>
                           </div>
                         </div>
@@ -317,7 +414,7 @@ const Home = () => {
                             <i className="far fa-check-circle repair-i"></i>
                           </div>
                           <div className="col-9 col-stats text-center">
-                            <h4 className="card-title">보수 완료</h4>
+                            <h5>보수 완료</h5>
                             <p className="repair-num">2</p>
                           </div>
                         </div>

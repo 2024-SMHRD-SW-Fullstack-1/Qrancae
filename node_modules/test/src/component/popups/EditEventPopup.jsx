@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-// 색상 배열
 const colors = [
     '#D95319',
     '#EDB120',
@@ -9,68 +9,70 @@ const colors = [
     '#7E7E7E',
 ];
 
-const AddEventPopup = ({ isOpen, onClose, onSave }) => {
-    // 현재 날짜 및 시간 포맷팅 함수
-    const getCurrentDateTime = () => {
-        const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000; // 밀리초 단위로 변환
-        const localNow = new Date(now.getTime() - offset);
-        return localNow.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM" 포맷
-    };
+const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
+    console.log(event.start);
+    console.log(new Date(event.start.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16));
 
-    const [title, setTitle] = useState('');
-    const [start, setStart] = useState(getCurrentDateTime());
-    const [end, setEnd] = useState(getCurrentDateTime());
-    const [content, setContent] = useState('');
-    const [selectedColor, setSelectedColor] = useState(colors[0]);
-    const [allDay, setAllDay] = useState(false); // 하루종일 상태
+    const [title, setTitle] = useState(event?.title || '');
+    const [content, setContent] = useState(event?.content || '');
+    const [start, setStart] = useState(event?.start ? new Date(event.start.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
+    const [end, setEnd] = useState(event?.end ? new Date(event.end.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
+    const [color, setColor] = useState(event?.color || '#ffffff');
+    const [allDay, setAllDay] = useState(event?.allDay || false);
 
     useEffect(() => {
-        if (isOpen) {
-            const now = getCurrentDateTime();
-            setStart(now);
-            setEnd(now);
+        if (event) {
+            setTitle(event.title || '');
+            setContent(event.content || '');
+            setStart(event.start ? new Date(event.start.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
+            setEnd(event.end ? new Date(event.end.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
+            setColor(event.color || '#ffffff');
+            setAllDay(event.allDay || false);
         }
-    }, [isOpen]);
-
-    useEffect(() => {
-        // 시작 날짜와 종료 날짜 간의 유효성 검사를 수행합니다.
-        const startDateTime = new Date(start);
-        const endDateTime = new Date(end);
-
-        if (startDateTime > endDateTime) {
-            setEnd(start); // 종료 날짜를 시작 날짜와 동일하게 설정
-        }
-    }, [start]);
-
-    useEffect(() => {
-        // 종료 날짜와 시작 날짜 간의 유효성 검사를 수행합니다.
-        const startDateTime = new Date(start);
-        const endDateTime = new Date(end);
-
-        if (endDateTime < startDateTime) {
-            setStart(end); // 시작 날짜를 종료 날짜와 동일하게 설정
-        }
-    }, [end]);
+    }, [event]);
 
     const handleSave = () => {
-        onSave({ title, start, end, content, color: selectedColor, allDay });
+        // 입력된 값 그대로 사용
+        const updatedEvent = {
+            ...event,
+            title,
+            content,
+            start,
+            end,
+            color,
+            allDay,
+        };
+
+        onSave(updatedEvent);
+        onClose();
     };
+
+    const handleDelete = () => {
+        axios({
+            url: `http://localhost:8089/qrancae/deleteCalendar/${event.id}`,
+            method: 'delete',
+        }).then(() => {
+            onSave(null); // null indicates deletion
+            onClose();
+        });
+    };
+
+    if (!isOpen) return null;
 
     return (
         <div className={`popup-overlay popup ${isOpen ? 'open' : ''}`}>
             <div className="popup-content-left">
                 <div className='popup-body'>
                     <div className='popup-color-header'>
-                        <h3>일정 추가</h3>
+                        <h3>일정 수정</h3>
                         <div className="color-picker">
                             <div className="color-options">
-                                {colors.map((color) => (
+                                {colors.map((item) => (
                                     <div
-                                        key={color}
-                                        className={`colorinput color-option ${selectedColor === color ? 'selected' : ''}`}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => setSelectedColor(color)}
+                                        key={item}
+                                        className={`colorinput color-option ${item === color ? 'selected' : ''}`}
+                                        style={{ backgroundColor: item }}
+                                        onClick={() => setColor(item)}
                                     ></div>
                                 ))}
                             </div>
@@ -123,11 +125,12 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                 </div>
                 <div className="popup-buttons">
                     <button onClick={onClose} className="btn btn-primary btn-border close-btn">취소</button>
-                    <button onClick={handleSave} className="btn btn-primary">저장</button>
+                    <button onClick={handleDelete} className="btn btn-primary">삭제</button>
+                    <button onClick={handleSave} className="btn btn-primary">수정</button>
                 </div>
             </div>
         </div>
     );
 };
 
-export default AddEventPopup;
+export default EditEventPopup;
