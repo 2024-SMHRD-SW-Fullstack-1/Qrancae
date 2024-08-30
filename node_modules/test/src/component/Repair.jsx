@@ -9,19 +9,21 @@ import axios from 'axios';
 const Repair = () => {
     const [maints, setMaints] = useState([]); // 유지보수 내역 가져오기
     const [users, setUsers] = useState([]); // 작업자 목록
-    const [selectedMaintIdxs, setSelectedMaintIdxs] = useState([]);// 선택된 유지보수내역
+    const [selectedMaintIdxs, setSelectedMaintIdxs] = useState([]); // 선택된 유지보수 내역
     const [selectedUser, setSelectedUser] = useState(''); // 처리할 작업자 선택
     const [alarmMsg, setAlarmMsg] = useState(''); // 추가 요청사항 추가
-
-    const [tableInstance, setTableInstance] = useState(null);
+    const [tableInstance, setTableInstance] = useState(null); // 테이블 갱신
     const [modalIsOpen, setModalIsOpen] = useState(false); // 모달창
+    const [confirmModalIsOpen, setConfirmModalIsOpen] = useState(false); // 최종 확인 모달
+    const [rackLocationInfo, setRackLocationInfo] = useState(''); // 랙 위치
+    const [highlightPosition, setHighlightPosition] = useState(null); // 보여줄 위치 저장
+    const [selectedMaintsInfo, setSelectedMaintsInfo] = useState([]); // 선택된 유지보수 내역 정보
 
     useEffect(() => {
         getData();
         getUsers();
     }, []);
 
-    // DataTable 초기화 및 갱신
     useEffect(() => {
         if (maints.length > 0) {
             if (tableInstance) {
@@ -33,11 +35,10 @@ const Repair = () => {
         }
     }, [maints]);
 
-    // db에서 가져오기
+    // 유지 보수 내역 가져오기
     function getData() {
         axios.get('http://localhost:8089/qrancae/getmaint')
             .then((res) => {
-                console.log('maintData:', res.data);
                 setMaints(res.data);
             })
             .catch((err) => {
@@ -45,21 +46,23 @@ const Repair = () => {
             });
     }
 
+    // 처리할 작업자 가져오기
     function getUsers() {
         axios.get('http://localhost:8089/qrancae/maint/getusers')
             .then((res) => {
-                console.log('m.user가져오기:', res.data);
                 setUsers(res.data);
             })
             .catch((err) => {
-                console.log('m.user가져오기 오류 error:', err);
+                console.log('m.user 가져오기 오류:', err);
             });
     }
 
+    // 처리 작업자와 처리 날짜 필터링
     function filterMaints(data) {
         return data.filter(item => !item.maintUser && !item.maint_update);
     }
 
+    // 테이블 초기화
     function initializeDataTable() {
         // 점검 대상
         const repairTable = $('#repair-table').DataTable({
@@ -79,7 +82,15 @@ const Repair = () => {
                         return `${data.user.user_name} (${data.user.user_id})`;
                     }
                 },
-                { title: '케이블', data: 'cable.cable_idx' },
+                {
+                    title: '케이블', data: 'cable.cable_idx',
+                    render: function (data, type, row) {
+                        return `<a href="#" class="cable-link"
+                        data-rack-location="${row.cable.s_rack_location}" 
+                        data-port-number="${row.cable.s_port_number}"
+                        data-rack-number="${row.cable.s_rack_number}" >${data}</a>`;
+                    }
+                },
                 {
                     title: '오류 내용',
                     data: null,
@@ -110,7 +121,7 @@ const Repair = () => {
                     }
                 }
             ],
-            destroy: true // DataTable을 다시 초기화할 수 있도록 설정
+            destroy: true
         });
 
         // 점검 현황
@@ -162,63 +173,95 @@ const Repair = () => {
                         if (data === null || data === '') {
                             return '진행중';
                         }
-                        return data;
+                        return `완료(${data})`;
                     }
                 }
             ],
-            destroy: true // DataTable을 다시 초기화할 수 있도록 설정
+            // maint_update가 없는 항목을 먼저 표시하고, 있는 항목을 나중에 표시
+            order: [[5, 'desc']], // '상태' 열을 기준으로 정렬
+            destroy: true
         });
 
         setTableInstance({ repairTable, repairingTable });
+
+        $('#repair-table').on('click', '.cable-link', function (e) {
+            e.preventDefault();
+
+            const rackLocation = $(this).data('rack-location');
+            const rackNumber = $(this).data('rack-number');
+            const portNumber = $(this).data('port-number');
+            setRackLocationInfo(rackLocation);
+
+            const extractNumber = (str) => {
+                const match = str.match(/\d+/);
+                return match ? parseInt(match[0], 10) : null;
+            };
+
+            setHighlightPosition({
+                rackNumber: extractNumber(rackNumber),
+                portNumber: extractNumber(portNumber)
+            });
+        });
     }
 
-    // 작업자 선택하기
+    // 작업자 선택 클릭 시 모달 열기
     const maintUserSelectClick = () => {
         const selectedIdxs = $('#repair-table .select-checkbox:checked').map(function () {
             return $(this).data('id');
         }).get();
         if (selectedIdxs.length > 0) {
             setSelectedMaintIdxs(selectedIdxs);
+            // 선택된 유지보수 내역 정보 가져오기
+            const selectedMaintsInfo = maints.filter(item => selectedIdxs.includes(item.maint_idx));
+            setSelectedMaintsInfo(selectedMaintsInfo);
             setModalIsOpen(true);
         } else {
             alert('선택된 항목이 없습니다.');
         }
     };
 
-    // 서버로 선택한 작업자와 메시지 전송 처리
+    // 작업자 선택 및 추가 요청사항을 최종 확인 모달에서 확인
     const handleUserConfirm = () => {
-        if (selectedMaintIdxs.length > 0 && selectedUser) {
-            axios.post('http://localhost:8089/qrancae/maint/updateuser', {
-                maintIdxs: selectedMaintIdxs,
-                userId: selectedUser,
-                alarmMsg: alarmMsg
-            })
-                .then((res) => {
-                    console.log('작업자 할당 성공:', res.data);
-                    // 성공 후 테이블 데이터 업데이트
-                    const updatedData = maints.map(item => {
-                        if (selectedMaintIdxs.includes(item.maint_idx)) {
-                            return { ...item, maintUser: { user_id: selectedUser }, user_note: alarmMsg };
-                        }
-                        return item;
-                    });
-                    setMaints(updatedData);
-                    setModalIsOpen(false);
-                    alert('작업자 할당 성공')
-                })
-                .catch((err) => {
-                    console.log('작업자 할당 오류:', err);
-                });
+        if (selectedUser) {
+            // 최종 확인 모달 열고 그 전 모달 닫기
+            setConfirmModalIsOpen(true);
+            setModalIsOpen(false);
         } else {
-            alert('작업자와 추가 요청사항을 모두 입력해주세요.');
+            alert('작업자는 필수로 선택해 주세요.');
         }
+    };
+
+    // 최종 확인 모달에서 제출 버튼 클릭 시
+    const handleConfirmSubmit = () => {
+        axios.post('http://localhost:8089/qrancae/maint/updateuser', {
+            maintIdxs: selectedMaintIdxs,
+            userId: selectedUser,
+            alarmMsg: alarmMsg
+        })
+            .then(() => {
+                alert('유지보수 내역이 업데이트되었습니다.');
+                setConfirmModalIsOpen(false); // 최종 확인 모달 닫기
+                // 유지보수 내역 업데이트
+                const updatedData = maints.map(item => {
+                    if (selectedMaintIdxs.includes(item.maint_idx)) {
+                        return { ...item, maintUser: { user_id: selectedUser }, user_note: alarmMsg };
+                    }
+                    return item;
+                });
+                setMaints(updatedData);
+                setRackLocationInfo('');
+            })
+            .catch((err) => {
+                console.log('처리 작업자 선택 오류:', err);
+                alert('서버와의 통신 오류가 발생했습니다.');
+            });
     };
 
     const handleUserChange = (event) => {
         setSelectedUser(event.target.value);
     };
 
-    const handlealarmMsgChange = (event) => {
+    const handleAlarmMsgChange = (event) => {
         setAlarmMsg(event.target.value);
     };
 
@@ -239,16 +282,15 @@ const Repair = () => {
                                         <div className="card-header">
                                             <div className="card-head-row">
                                                 <div className="card-title">케이블 위치 확인</div>
-                                                <div className="card-tools">
-                                                    <select className="form-select input-fixed" id="notify_state">
-                                                        <option value="1">랙 번호 1</option>
-                                                        <option value="2">랙 번호 2</option>
-                                                    </select>
-                                                </div>
+                                                {rackLocationInfo && (
+                                                    <div className="card-tools">
+                                                        <h6>랙 위치 : {rackLocationInfo}</h6>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="card-body" style={{ height: '100%', overflowY: 'auto' }}>
-                                            <Rack />
+                                            <Rack highlightPosition={highlightPosition} />
                                         </div>
                                     </div>
                                 </div>
@@ -326,31 +368,83 @@ const Repair = () => {
                             </button>
                         </div>
                         <div className="modal-body">
-                            <div className="form-group">
-                                <label htmlFor="userSelect">작업자 선택</label>
-                                <select id="userSelect" className="form-control" value={selectedUser} onChange={handleUserChange}>
-                                    <option value="">작업자를 선택하세요</option>
-                                    {users.map(user => (
-                                        <option key={user.user_id} value={user.user_id}>
-                                            {user.user_name} ({user.user_id})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group mt-3">
-                                <label htmlFor="alarmMsg">추가 요청사항</label>
-                                <textarea
-                                    id="alarmMsg"
-                                    className="form-control"
-                                    value={alarmMsg}
-                                    onChange={handlealarmMsgChange}
-                                    placeholder="추가 요청사항을 입력해주세요"
-                                />
-                            </div>
+                            {selectedMaintsInfo.length > 0 && (
+                                <>
+                                    <div className="form-group">
+                                        <label htmlFor="userSelect">작업자</label>
+                                        <select id="userSelect" className="form-control" value={selectedUser} onChange={handleUserChange}>
+                                            <option value="">작업자를 선택하세요</option>
+                                            {users.map(user => (
+                                                <option key={user.user_id} value={user.user_id}>
+                                                    {user.user_name} ({user.user_id})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="form-group mt-3">
+                                        <label htmlFor="alarmMsg">추가 요청사항</label>
+                                        <textarea
+                                            id="alarmMsg"
+                                            className="form-control"
+                                            value={alarmMsg}
+                                            onChange={handleAlarmMsgChange}
+                                            placeholder="추가 요청사항을 입력해주세요"
+                                        />
+                                    </div>
+                                    <div className="mt-4">
+                                        <h5>선택된 유지보수 내역</h5>
+                                        <ul>
+                                            {selectedMaintsInfo.map((item) => (
+                                                <li key={item.maint_idx}>
+                                                    <strong>케이블 번호:</strong> {item.cable.cable_idx}<br />
+                                                    <strong>오류 내용:</strong>
+                                                    {item.maint_qr === '불량' ? `QR 상태: ${item.maint_qr}` : ''}
+                                                    {item.maint_cable === '불량' ? `케이블 상태: ${item.maint_cable}` : ''}
+                                                    {item.maint_power === '불량' ? `전원 공급 상태: ${item.maint_power}` : ''}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={() => setModalIsOpen(false)}>취소</button>
                             <button type="button" className="btn btn-primary" onClick={handleUserConfirm}>확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 최종 확인 모달 */}
+            <div className={`modal fade ${confirmModalIsOpen ? 'show d-block' : ''}`} id="confirmModal" tabIndex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden={!confirmModalIsOpen}>
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="confirmModalLabel">최종 확인</h5>
+                            <button type="button" className="close" onClick={() => setConfirmModalIsOpen(false)} aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <h5>작업자: {users.find(user => user.user_id === selectedUser)?.user_name} ({selectedUser})</h5>
+                            <p><strong>추가 요청사항:</strong> {alarmMsg || '없음'}</p>
+                            <h5>선택된 유지보수 내역</h5>
+                            <ul>
+                                {selectedMaintsInfo.map((item) => (
+                                    <li key={item.maint_idx}>
+                                        <strong>케이블 번호:</strong> {item.cable.cable_idx}<br />
+                                        <strong>오류 내용:</strong>
+                                        {item.maint_qr === '불량' ? `QR 상태: ${item.maint_qr}` : ''}
+                                        {item.maint_cable === '불량' ? `케이블 상태: ${item.maint_cable}` : ''}
+                                        {item.maint_power === '불량' ? `전원 공급 상태: ${item.maint_power}` : ''}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={() => setConfirmModalIsOpen(false)}>취소</button>
+                            <button type="button" className="btn btn-primary" onClick={handleConfirmSubmit}>확인</button>
                         </div>
                     </div>
                 </div>
