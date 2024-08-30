@@ -46,6 +46,7 @@ const Log = () => {
     return () => {
       if ($.fn.DataTable.isDataTable('#basic-logtables')) {
         $('#basic-logtables').DataTable().destroy();
+        // 안녕
       }
 
     };
