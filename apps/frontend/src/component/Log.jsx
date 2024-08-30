@@ -30,9 +30,16 @@ const Log = () => {
     $('#basic-logtables').DataTable({
       data: logdata,
       columns: [
-        { title: '번호', data: 'log_idx' },
-        { title: '사용자ID', data: 'user.user_id' },
-        { title: '이름', data: 'user.user_name' },
+        {
+          title: '번호', data: null,
+          render: (_, __, row, meta) => meta.row + 1
+        },
+        { title: 'log_idx', data: 'log_idx', visible: false },
+        {
+          title: '작업자',
+          data: null,
+          render: (data) => `${data.user.user_name}(${data.user.user_id})`
+        },
         { title: '케이블', data: 'cable.cable_idx' },
         { title: '소스 랙 번호', data: 'cable.s_rack_number' },
         { title: '소스 랙 위치', data: 'cable.s_rack_location' },
@@ -101,8 +108,8 @@ const Log = () => {
                         <thead>
                           <tr>
                             <th>번호</th>
-                            <th>사용자ID</th>
-                            <th>이름</th>
+                            <th>log_idx</th>
+                            <th>작업자</th>
                             <th>케이블</th>
                             <th>소스 랙 번호</th>
                             <th>소스 랙 위치</th>

@@ -23,7 +23,7 @@ const Maintenance = () => {
     }
   }, [maints]);
 
-  // db에서 가져오기
+  // db에서 가져오기(요청 날짜 순으로 정렬)
   function getData() {
     axios.get('http://localhost:8089/qrancae/getmaint')
       .then((res) => {
@@ -34,18 +34,12 @@ const Maintenance = () => {
         console.log('maintData error:', err);
       });
   }
-
+  // 유지보수 내역
   function initializeDataTable() {
     const table = $('#basic-mainttables').DataTable({
       data: maints,
+      autoWidth: true,
       columns: [
-        {
-          title: '<input type="checkbox" id="select-all" />',
-          orderable: false,
-          render: function (_, __, row) {
-            return `<input type="checkbox" class="select-checkbox" data-id="${row.maint_idx}" />`;
-          }
-        },
         {
           title: '요청 작업자',
           data: null,
@@ -82,27 +76,28 @@ const Maintenance = () => {
         },
         { title: '요청 날짜', data: 'maint_date' },
         {
-          title: '처리 작업자',
+          title: '상태',
           data: null,
           render: function (data) {
-            if (data.maintUser) {
-              return `${data.maintUser.user_name} (${data.maintUser.user_id})`;
+            const maintUser = data.maintUser;
+            const maintUpdate = data.maint_update;
+
+            if (!maintUser && !maintUpdate) {
+              return '접수 대기중';
+            } else if (maintUser && !maintUpdate) {
+              return `진행중 (${maintUser.user_name})`;
+            } else if (maintUser && maintUpdate) {
+              return `${maintUpdate} (${maintUser.user_name}) 완료`;
             }
-            return '없음';
-          }
-        },
-        {
-          title: '처리 날짜',
-          data: 'maint_update',
-          render: function (data) {
-            if (data === null || data === '') {
-              return '<button class="btn btn-primary check-btn">확인하기</button>';
-            }
-            return data;
           }
         }
       ],
-      destroy: true // DataTable을 다시 초기화할 수 있도록 설정
+      columnDefs: [
+        { targets: 7, width: '15%' }, // 요청 날짜의 너비를 15%로 설정
+        { targets: 8, width: '18%' }// 상태 컬럼의 너비를 18%로 설정
+
+      ],
+      destroy: true // DataTable을 다시 초기화
     });
 
     setTableInstance(table);
@@ -131,7 +126,6 @@ const Maintenance = () => {
                       >
                         <thead>
                           <tr>
-                            <th><input type="checkbox" id="select-all" /></th>
                             <th>요청 작업자</th>
                             <th>케이블</th>
                             <th>랙 위치</th>
@@ -140,8 +134,7 @@ const Maintenance = () => {
                             <th>케이블 상태</th>
                             <th>전원 공급 상태</th>
                             <th>요청 날짜</th>
-                            <th>처리 작업자</th>
-                            <th>처리 날짜</th>
+                            <th>상태</th>
                           </tr>
                         </thead>
                         <tbody></tbody>
@@ -153,7 +146,6 @@ const Maintenance = () => {
             </div>
           </div>
         </div>
-
         <Footer />
       </div>
     </div>
