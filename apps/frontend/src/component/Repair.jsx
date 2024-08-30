@@ -172,7 +172,6 @@ const Repair = () => {
         setTableInstance({ repairTable, repairingTable });
     }
 
-
     // 작업자 선택하기
     const maintUserSelectClick = () => {
         const selectedIdxs = $('#repair-table .select-checkbox:checked').map(function () {
