@@ -10,24 +10,23 @@ const colors = [
 ];
 
 const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
-    console.log(event.start);
-    console.log(new Date(event.start.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16));
+    console.log(event);
 
     const [title, setTitle] = useState(event?.title || '');
     const [content, setContent] = useState(event?.content || '');
-    const [start, setStart] = useState(event?.start ? new Date(event.start.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
-    const [end, setEnd] = useState(event?.end ? new Date(event.end.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
+    const [start, setStart] = useState(event?.start || '');
+    const [end, setEnd] = useState(event?.end || '');
     const [color, setColor] = useState(event?.color || '#ffffff');
-    const [allDay, setAllDay] = useState(event?.allDay || false);
+    const [allDay, setAllDay] = useState(event?.allDay === "O" || false);
 
     useEffect(() => {
         if (event) {
             setTitle(event.title || '');
             setContent(event.content || '');
-            setStart(event.start ? new Date(event.start.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
-            setEnd(event.end ? new Date(event.end.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16) : '');
+            setStart(event.start || '');
+            setEnd(event.end || '');
             setColor(event.color || '#ffffff');
-            setAllDay(event.allDay || false);
+            setAllDay(event.allDay === "O" || false);
         }
     }, [event]);
 
@@ -41,6 +40,7 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
             end,
             color,
             allDay,
+            id: event.id,
         };
 
         onSave(updatedEvent);
@@ -50,12 +50,31 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
     const handleDelete = () => {
         axios({
             url: `http://localhost:8089/qrancae/deleteCalendar/${event.id}`,
-            method: 'delete',
+            method: 'get',
         }).then(() => {
-            onSave(null); // null indicates deletion
             onClose();
         });
     };
+
+    useEffect(() => {
+        // 시작 날짜와 종료 날짜 간의 유효성 검사를 수행합니다.
+        const startDateTime = new Date(start);
+        const endDateTime = new Date(end);
+
+        if (startDateTime > endDateTime) {
+            setEnd(start); // 종료 날짜를 시작 날짜와 동일하게 설정
+        }
+    }, [start]);
+
+    useEffect(() => {
+        // 종료 날짜와 시작 날짜 간의 유효성 검사를 수행합니다.
+        const startDateTime = new Date(start);
+        const endDateTime = new Date(end);
+
+        if (endDateTime < startDateTime) {
+            setStart(end); // 시작 날짜를 종료 날짜와 동일하게 설정
+        }
+    }, [end]);
 
     if (!isOpen) return null;
 

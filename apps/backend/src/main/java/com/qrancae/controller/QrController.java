@@ -97,7 +97,8 @@ public class QrController {
 				String encryptedData = encrypt(data, key);
 
 				BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
-
+				//BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
+				
 				// 파일 경로 지정
 				Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
 				File directory = savePath.getParent().toFile();
@@ -112,7 +113,7 @@ public class QrController {
 
 				Qr qr = new Qr();
 				qr.setCable_idx(idx);
-				qr.setQr_data(encryptedData);
+				qr.setQr_data(data);
 				qrService.insertQr(qr);
 
 			} catch (Exception e) {

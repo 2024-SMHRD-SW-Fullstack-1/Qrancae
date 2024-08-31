@@ -11135,47 +11135,49 @@ input:checked+.slider:before {
 }
 
 /* QR 프린트 */
-.qrBox {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.QR-print-table {
   width: 248.7mm;
-  border: 1px solid lightgray;
+  height: 18mm;
+  border-collapse: collapse;
 }
 
-.qrBoxContent {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  justify-content: space-between;
+.QR-print-table td {
+  color: black;
 }
 
-.qrBoxContent-item {
-  display: flex;
-  align-items: center;
+.QR-print-body {
+  border: 1px solid;
+}
+
+.cell-s,
+.cell-e,
+.cell-arrow {
+  width: 10mm;
+  text-align: center;
+}
+
+.cell-img {
+  width: 18mm;
 }
 
 .QR-img {
-  max-width: 70px;
+  max-width: 17mm;
   height: auto;
 }
 
-.QR-start-data {
-  font-size: 14px !important;
-  margin: 0 20px 10px 0;
+.cell-start {
+  text-align: left;
+  padding-left: 2mm;
 }
 
-.QR-end-data {
-  font-size: 14px !important;
-  margin: 0 0 0 20px;
-}
-
-.start-end {
-  margin: 0 10px;
+.cell-end {
+  text-align: right;
+  padding-right: 2mm;
 }
 
 @media print {
   .printable-content {
     display: block !important;
+    justify-content: center;
   }
 }

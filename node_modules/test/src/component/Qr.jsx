@@ -53,7 +53,7 @@ const Qr = () => {
           { title: '서버 이름', data: 'd_server_name' },
           { title: '포트 번호', data: 'd_port_number' },
           {
-            title: '등록일',
+            title: '케이블 연결',
             data: 'cable_date',
           },
           {
@@ -115,6 +115,8 @@ const Qr = () => {
         console.error('Error fetching data: ', error);
       });
   };
+
+  const arrow = "<->"
 
   return (
     <div className="wrapper">
@@ -200,7 +202,7 @@ const Qr = () => {
                             <th>랙 위치</th>
                             <th>서버 이름</th>
                             <th>포트 번호</th>
-                            <th>등록일</th>
+                            <th>케이블 연결</th>
                             <th>출력 상태</th>
                           </tr>
                         </thead>
@@ -245,39 +247,57 @@ const Qr = () => {
 
         <Footer />
 
-        <div ref={printRef} style={{ display: 'none' }} className='printable-content'>
-          {qrList.length > 0 ? (
-            qrList.map((item, index) => (
-              <div className='qrBox' key={index}>
-                <div className='qrBoxContent'>
-                  <div className='qrBoxContent-item'>
-                    <span className='start-end'>S</span>
-                    <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
-                    <div>
-                      <p className='QR-start-data'><b>start</b> {item.source}</p>
-                      <p className='QR-end-data'><b>end</b> {item.destination}</p>
-                    </div>
-                    <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
-                  </div>
-                  <span className='start-end'>{'<->'}</span>
-                  <div className='qrBoxContent-item'>
-                    <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
-                    <div>
-                      <p className='QR-start-data'><b>start</b> {item.source}</p>
-                      <p className='QR-end-data'><b>end</b> {item.destination}</p>
-                    </div>
-                    <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
-                    <span className='start-end'>E</span>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>선택된 케이블이 없습니다.</p>
-          )}
+        <div ref={printRef} style={{ display: 'none' }} className='printable-content col-md-12'>
+          <table className='QR-print-table'>
+            {qrList.length > 0 ? (
+              qrList.map((item, index) => (
+                <React.Fragment key={index}>
+                  <tbody className='QR-print-body'>
+                    <tr>
+                      <td rowSpan="2" className='cell-s'>S</td>
+                      <td rowSpan="2" className='cell-img'>
+                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      </td>
+                      <td className='cell-start'>
+                        <b>Start</b> {item.source}
+                      </td>
+                      <td rowSpan="2" className='cell-img'>
+                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      </td>
+                      <td rowSpan="2" className='cell-arrow'>{arrow}</td>
+                      <td rowSpan="2" className='cell-img'>
+                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      </td>
+                      <td className='cell-start'>
+                        <b>Start</b> {item.source}
+                      </td>
+                      <td rowSpan="2" className='cell-img'>
+                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      </td>
+                      <td rowSpan="2" className='cell-e'>E</td>
+                    </tr>
+                    <tr>
+                      <td className='cell-end'>
+                        <b>End</b> {item.destination}
+                      </td>
+                      <td className='cell-end'>
+                        <b>End</b> {item.destination}
+                      </td>
+                    </tr>
+                  </tbody>
+                </React.Fragment>
+              ))
+            ) : (
+              <tbody>
+                <tr>
+                  <td>선택된 케이블이 없습니다.</td>
+                </tr>
+              </tbody>
+            )}
+          </table>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -146,16 +146,25 @@ const Home = () => {
   };
 
   const handleEventClick = (info) => {
-    setCurrentEvent({
-      id: info.event.id,
-      title: info.event.title,
-      start: info.event.start,
-      end: info.event.end,
-      content: info.event.extendedProps.content,
-      color: info.event.backgroundColor,
-      allDay: info.event.allDay
+    console.log(info.event)
+
+    axios({
+      url: `http://localhost:8089/qrancae/findCalendar/${info.event.id}`,
+      method: 'get',
+    }).then((res) => {
+      console.log('캘린더 리스트', res.data);
+      setCurrentEvent({
+        id: res.data.calendar_idx,
+        title: res.data.calendar_title,
+        start: res.data.calendar_start,
+        end: res.data.calendar_end,
+        content: res.data.calendar_content,
+        color: res.data.calendar_color,
+        allDay: res.data.calendar_allday,
+      });
+      setShowEditPopup(true); // 일정 수정 팝업 열기
     });
-    setShowEditPopup(true); // 일정 수정 팝업 열기
+
   };
 
   const handleOpenPopup = () => {
@@ -195,7 +204,6 @@ const Home = () => {
       getCalendarList();
     });
 
-
     handleClosePopup();
   };
 
@@ -213,7 +221,7 @@ const Home = () => {
 
     const eventData = {
       user_id: userId,
-      calendar_id: updatedEvent.id, // 수정할 이벤트 ID
+      calendar_idx: updatedEvent.id,
       calendar_title: updatedEvent.title,
       calendar_start: new Date(updatedEvent.start).toISOString(),
       calendar_end: new Date(updatedEvent.end).toISOString(),
@@ -237,19 +245,8 @@ const Home = () => {
     handleClosePopup();
   };
 
-  const handleDeleteEvent = (eventId) => {
-    axios({
-      url: 'http://localhost:8089/qrancae/deleteCalendar',
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: { calendar_id: eventId },
-    }).then((res) => {
-      console.log(res);
-      getCalendarList();
-    });
-
+  const handleDeleteEvent = () => {
+    getCalendarList();
     handleClosePopup();
   };
 
