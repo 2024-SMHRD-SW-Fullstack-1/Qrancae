@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AlarmListActivity">
+    tools:context=".activity.AlarmListActivity">
 
     <!-- 상단바 -->
 
@@ -25,20 +25,14 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#F2F2F2"
         android:text="알림"
         android:textColor="#000000"
         android:textSize="18dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/rv_alarm_list"
+        app:layout_constraintBottom_toTopOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="165dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_alarm_list"
-        android:layout_width="358dp"
-        android:layout_height="645dp"
-        app:layout_constraintTop_toTopOf="@+id/guideline7"
-        tools:layout_editor_absoluteX="1dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline7"
@@ -46,12 +40,5 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.1" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="50dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

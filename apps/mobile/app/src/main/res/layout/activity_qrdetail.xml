@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".QRdetailActivity">
+    android:background="#F2F2F2"
+    tools:context=".activity.QRdetailActivity">
 
 
     <!-- Source Section -->
@@ -37,7 +38,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/elapsed_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -45,22 +46,21 @@
         android:textColor="#242323"
         android:textSize="18dp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/textView8"
-        app:layout_constraintHorizontal_bias="0.882"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/aging_date"
+        app:layout_constraintHorizontal_bias="0.075"
+        app:layout_constraintStart_toStartOf="@+id/guideline39"
         app:layout_constraintTop_toBottomOf="@+id/install_date" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/aging_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:layout_marginEnd="132dp"
         android:text="00일"
         android:textColor="#242323"
         android:textSize="18dp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline38"
         app:layout_constraintTop_toBottomOf="@+id/cable_date" />
 
     <ImageButton
@@ -81,8 +81,8 @@
         android:id="@+id/source_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="80dp"
         android:text="Source"
         android:textColor="#1D3557"
         android:textSize="22sp"
@@ -110,7 +110,7 @@
             android:padding="16dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="264dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -121,10 +121,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_s_number"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_rack"
                         android:drawablePadding="8dp"
                         android:text="랙 번호"
@@ -134,11 +133,13 @@
 
                     <TextView
                         android:id="@+id/s_rack_number"
-                        android:layout_width="wrap_content"
+                        android:layout_width="185dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="R12"
                         android:textColor="#1D3557"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        app:layout_constraintEnd_toStartOf="@+id/guideline41" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -148,10 +149,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_s_location"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_rack"
                         android:drawablePadding="8dp"
                         android:text="랙 위치"
@@ -161,8 +161,9 @@
 
                     <TextView
                         android:id="@+id/s_rack_location"
-                        android:layout_width="wrap_content"
+                        android:layout_width="185dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="U24"
                         android:textColor="#1D3557"
                         android:textSize="18sp" />
@@ -175,10 +176,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_s_server"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_server"
                         android:drawablePadding="8dp"
                         android:text="서버 이름"
@@ -188,8 +188,9 @@
 
                     <TextView
                         android:id="@+id/s_server_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="169dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="Server01"
                         android:textColor="#1D3557"
                         android:textSize="18sp"
@@ -203,10 +204,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView4"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_s_port"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_cable"
                         android:drawablePadding="8dp"
                         android:text="포트 번호"
@@ -216,8 +216,9 @@
 
                     <TextView
                         android:id="@+id/s_port_number"
-                        android:layout_width="wrap_content"
+                        android:layout_width="169dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="D102"
                         android:textColor="#1D3557"
                         android:textSize="18sp"
@@ -274,10 +275,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView_dest_rack_number"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_d_number"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_rack"
                         android:drawablePadding="8dp"
                         android:text="랙 번호"
@@ -287,8 +287,9 @@
 
                     <TextView
                         android:id="@+id/d_rack_number"
-                        android:layout_width="wrap_content"
+                        android:layout_width="185dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="R15"
                         android:textColor="#1D3557"
                         android:textSize="18sp" />
@@ -301,10 +302,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView_dest_rack_location"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_d_location"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_rack"
                         android:drawablePadding="8dp"
                         android:text="랙 위치"
@@ -314,8 +314,9 @@
 
                     <TextView
                         android:id="@+id/d_rack_location"
-                        android:layout_width="wrap_content"
+                        android:layout_width="185dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="U30"
                         android:textColor="#1D3557"
                         android:textSize="18sp" />
@@ -328,10 +329,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView_dest_server_name"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_d_server"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_server"
                         android:drawablePadding="8dp"
                         android:text="서버 이름"
@@ -341,8 +341,9 @@
 
                     <TextView
                         android:id="@+id/d_server_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="169dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="Server02"
                         android:textColor="#1D3557"
                         android:textSize="18sp"
@@ -356,10 +357,9 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/textView_dest_port_number"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_d_port"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawableStart="@drawable/ic_cable"
                         android:drawablePadding="8dp"
                         android:text="포트 번호"
@@ -369,8 +369,9 @@
 
                     <TextView
                         android:id="@+id/d_port_number"
-                        android:layout_width="wrap_content"
+                        android:layout_width="169dp"
                         android:layout_height="wrap_content"
+                        android:gravity="right"
                         android:text="G1/0/12"
                         android:textColor="#1D3557"
                         android:textSize="18sp"
@@ -405,7 +406,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.87" />
+        app:layout_constraintGuide_percent="0.86" />
 
     <TextView
         android:id="@+id/tv_home"
@@ -475,14 +476,49 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="50dp" />
+        app:layout_constraintGuide_percent="0.055555556" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="50dp" />
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.16" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline38"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="268dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline39"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="98dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="37dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline41"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="52dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

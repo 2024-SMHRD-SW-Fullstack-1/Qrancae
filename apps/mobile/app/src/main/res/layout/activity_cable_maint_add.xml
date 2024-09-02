@@ -1,132 +1,401 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CableMaintAddActivity">
+    android:background="#F2F2F2"
+    tools:context=".activity.CableMaintAddActivity">
 
-    <!-- 헤더 -->
-    <TextView
-        android:id="@+id/tv_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <!-- 뒤로가기 버튼 -->
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
-        android:text="케이블 점검"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="뒤로가기"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 날짜 및 시간 -->
+    <!-- 제목 -->
     <TextView
-        android:id="@+id/tv_date"
+        android:id="@+id/tv_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="2024-08-28 14:00"
-        app:layout_constraintTop_toBottomOf="@+id/tv_header"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 점검 항목 -->
-    <LinearLayout
-        android:id="@+id/layout_checklist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_date">
-
-        <!-- 케이블 상태 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="케이블 상태"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-        <CheckBox
-            android:id="@+id/check_cable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="양호"/>
-
-        <!-- QR 상태 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="QR 상태"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-        <CheckBox
-            android:id="@+id/check_qr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="양호"/>
-
-        <!-- 전원 상태 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="전원 상태"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-        <CheckBox
-            android:id="@+id/check_power"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="양호"/>
-
-        <!-- 추가 의견 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="추가 의견"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-        <EditText
-            android:id="@+id/et_opinion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="추가 의견을 입력하세요"/>
-
-    </LinearLayout>
-
-    <!-- 점검자 이름 -->
-    <TextView
-        android:id="@+id/tv_user"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="점검자: 홍길동"
-        app:layout_constraintTop_toBottomOf="@+id/layout_checklist"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 제출 버튼 -->
-    <Button
-        android:id="@+id/btn_submit"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="제출"
-        app:layout_constraintTop_toBottomOf="@+id/tv_user"
+        android:text="케이블 점검"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_cable_check"
+    <!-- 스크롤뷰를 포함한 레이아웃 -->
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/guideline19"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline17">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 안내 사항 카드뷰 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toEndOf="@+id/guideline18"
+                app:layout_constraintStart_toStartOf="@+id/guideline12">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tv_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="안내사항"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_notice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:text="전달 받은 안내 사항이 없습니다."
+                        android:textColor="#000000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 점검 항목 카드뷰 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_checklist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="점검 항목"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2024.08.29(목)"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </LinearLayout>
+
+                    <!-- 점검 항목 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_cable"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="케이블 연결 상태 불량"
+                            android:textColor="#000000"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_cable"
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="3dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rounded_button_check"
+                            android:drawableStart="@drawable/ic_check"
+                            android:paddingStart="5sp"
+                            android:paddingEnd="5sp"
+                            android:text="체크"
+                            android:textColor="#A5A5A5" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/line_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="3dp"
+                        android:background="#EBEBEB" />
+
+                    <!-- 점검 항목 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_power"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="전원 공급 상태 불량"
+                            android:textColor="#000000"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_power"
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="3dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rounded_button_check"
+                            android:drawableStart="@drawable/ic_check"
+                            android:paddingStart="5sp"
+                            android:paddingEnd="5sp"
+                            android:text="체크"
+                            android:textColor="#A5A5A5" />
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/line_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="3dp"
+                        android:background="#EBEBEB" />
+
+                    <!-- 점검 항목 3 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_qr"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="QR 상태 손상 발생"
+                            android:textColor="#000000"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_qr"
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="3dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rounded_button_check"
+                            android:drawableStart="@drawable/ic_check"
+                            android:paddingStart="5sp"
+                            android:paddingEnd="5sp"
+                            android:text="체크"
+                            android:textColor="#A5A5A5" />
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/line_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="3dp"
+                        android:background="#EBEBEB" />
+
+                    <!-- 점검 항목 4 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_complete"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="이상 없습니다."
+                            android:textColor="#000000"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_no_issues"
+                            android:layout_width="70dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="3dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rounded_button_check"
+                            android:drawableStart="@drawable/ic_check"
+                            android:paddingStart="5sp"
+                            android:paddingEnd="5sp"
+                            android:text="체크"
+                            android:textColor="#A5A5A5" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 메모 카드뷰 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/textView17"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="메모"
+                            android:textColor="#000000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textView18"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="체크 시 필수 입력 사항 입니다."
+                            android:textColor="#000000"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/editTextText"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/rounded_edittext_border"
+                        android:gravity="top"
+                        android:hint="특이사항을 보고해주세요."
+                        android:inputType="textMultiLine"
+                        android:maxLines="5"
+                        android:padding="8dp"
+                        android:paddingStart="10dp"
+                        android:scrollHorizontally="false"
+                        android:singleLine="false"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_new_problem"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10sp"
+                            android:layout_marginTop="4sp"
+                            android:layout_weight="1"
+                            android:text="새로운 문제 발생"
+                            android:textColor="#000000"
+                            android:textSize="14sp" />
+
+                        <CheckBox
+                            android:id="@+id/checkBox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5sp" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- 제출 버튼 -->
+        </LinearLayout>
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline12"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#49A617"
-        android:text="정상(양호)"
-        android:textColor="@android:color/white"
-        android:tooltipText="상태를 변경하려면 눌러주세요"
-        tools:layout_editor_absoluteX="173dp"
-        tools:layout_editor_absoluteY="590dp" />
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.055555556" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95555556" />
+
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#004BA0"
+        android:text="제출"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/guideline18"
+        app:layout_constraintStart_toStartOf="@+id/guideline12"
+        app:layout_constraintTop_toBottomOf="@id/guideline19" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.89" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline33"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.24" />
 </androidx.constraintlayout.widget.ConstraintLayout>

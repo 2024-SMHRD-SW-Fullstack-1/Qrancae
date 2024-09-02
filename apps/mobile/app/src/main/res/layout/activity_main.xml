@@ -2,7 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F2F2F2">
 
     <!-- Background Section -->
 
@@ -19,14 +20,14 @@
 
         <!-- Logo and welcome text -->
 
+
         <ImageView
             android:id="@+id/logo"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
             android:src="@drawable/logo" />
-
 
         <ImageButton
             android:id="@+id/btn_alarm"
@@ -57,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/logo"
             android:layout_marginStart="40dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="21dp"
             android:text="안녕하세요\n000님!"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -120,6 +121,7 @@
                 android:id="@+id/progress_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:drawableEnd="@drawable/ic_arrow_forward"
                 android:drawablePadding="8dp"
                 android:paddingLeft="10dp"
@@ -131,14 +133,14 @@
             <LinearLayout
                 android:layout_width="258dp"
                 android:layout_height="35dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="20dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/new_entry_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="25dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_border_new"
                     android:gravity="center"
@@ -153,8 +155,8 @@
                     android:id="@+id/new_entry_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="110dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="75dp"
+                    android:layout_marginRight="50dp"
                     android:text="0건"
                     android:textColor="#000000"
                     android:textSize="20sp"
@@ -171,7 +173,7 @@
                     android:id="@+id/in_progress_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="25dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_border_progress"
                     android:gravity="center"
@@ -186,8 +188,8 @@
                     android:id="@+id/in_progress_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="110dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="75dp"
+                    android:layout_marginRight="50dp"
                     android:text="0건"
                     android:textColor="#000000"
                     android:textSize="20sp"
@@ -204,7 +206,7 @@
                     android:id="@+id/completed_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="25dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_border_completed"
                     android:gravity="center"
@@ -219,8 +221,8 @@
                     android:id="@+id/completed_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="110dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="75dp"
+                    android:layout_marginRight="50dp"
                     android:text="0건"
                     android:textColor="#000000"
                     android:textSize="20sp"
@@ -273,6 +275,27 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.10042433" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8910891" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline26"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="149dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

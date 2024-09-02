@@ -78,6 +78,9 @@ dependencies {
     // ML Kit 바코드 스캐닝 라이브러리 추가
     implementation("com.google.mlkit:barcode-scanning:17.0.2")
 
+    // 로그인을 위한 Retrofit2 기능 추가
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
