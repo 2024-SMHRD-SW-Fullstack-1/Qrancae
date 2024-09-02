@@ -5,6 +5,12 @@ import Footer from './Footer';
 import 'datatables.net';
 import axios from 'axios';
 
+// 날짜 및 시간 포맷팅
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '');
+};
+
 const Maintenance = () => {
   const [maints, setMaints] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
@@ -34,6 +40,7 @@ const Maintenance = () => {
         console.log('maintData error:', err);
       });
   }
+
   // 유지보수 내역
   function initializeDataTable() {
     const table = $('#basic-mainttables').DataTable({
@@ -74,28 +81,30 @@ const Maintenance = () => {
             return `<span style="color:${color}">${data}</span>`;
           }
         },
-        { title: '요청 날짜', data: 'maint_date' },
+        { title: '날짜', data: 'maint_date', render: data => formatDate(data) },
         {
           title: '상태',
           data: null,
           render: function (data) {
             const maintUser = data.maintUser;
             const maintUpdate = data.maint_update;
+            const allGood = data.maint_qr === '양호' && data.maint_cable === '양호' && data.maint_power === '양호';
 
-            if (!maintUser && !maintUpdate) {
+            if (allGood) {
+              return '정기 점검 완료';
+            } else if (!maintUser && !maintUpdate) {
               return '접수 대기중';
             } else if (maintUser && !maintUpdate) {
               return `진행중 (${maintUser.user_name})`;
             } else if (maintUser && maintUpdate) {
-              return `${maintUpdate} (${maintUser.user_name}) 완료`;
+              return `${formatDate(maintUpdate)} (${maintUser.user_name}) 완료`;
             }
           }
         }
       ],
       columnDefs: [
         { targets: 7, width: '15%' }, // 요청 날짜의 너비를 15%로 설정
-        { targets: 8, width: '18%' }// 상태 컬럼의 너비를 18%로 설정
-
+        { targets: 8, width: '18%' } // 상태 컬럼의 너비를 18%로 설정
       ],
       destroy: true // DataTable을 다시 초기화
     });
@@ -133,7 +142,7 @@ const Maintenance = () => {
                             <th>QR 상태</th>
                             <th>케이블 상태</th>
                             <th>전원 공급 상태</th>
-                            <th>요청 날짜</th>
+                            <th>날짜</th>
                             <th>상태</th>
                           </tr>
                         </thead>

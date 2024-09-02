@@ -4,7 +4,7 @@ const Rack = ({ highlightPosition }) => {
     const numRows = 42; // 총 행 수
     const numCols = 10; // 총 열 수
 
-    // 포트가 채워진 상태를 저장할 상태 변수
+    // 포트가 채워진 상태를 저장
     const [filledPorts, setFilledPorts] = useState({});
 
     // 랙 번호와 포트 번호로 인덱스 계산
@@ -13,7 +13,7 @@ const Rack = ({ highlightPosition }) => {
 
     const columnWidth = `${100 / (numCols + 1)}%`;
 
-    // 하이라이트 여부를 결정하는 함수
+    // 하이라이트 여부를 결정
     const isHighlighted = (rowIndex, colIndex) => {
         if (!highlightPosition) return false;
 
@@ -46,7 +46,7 @@ const Rack = ({ highlightPosition }) => {
 
             setFilledPorts((prev) => {
                 const updatedPorts = { ...prev, [portNum]: true };
-                console.log(`Port filled: Rack ${rackNumber}, Port ${portNumber}, Row ${rowIndex}, Col ${colIndex}`);
+                //console.log(`선택된 포트: Rack ${rackNumber}, Port ${portNumber}, Row ${rowIndex}, Col ${colIndex}`);
                 return updatedPorts;
             });
         }
@@ -56,11 +56,6 @@ const Rack = ({ highlightPosition }) => {
     useEffect(() => {
         fillPort();
     }, [highlightPosition]);
-
-    // 콘솔에 상태 출력
-    useEffect(() => {
-        console.log('Current filled ports:', filledPorts);
-    }, [filledPorts]);
 
     return (
         <div style={{ padding: '20px' }}>
