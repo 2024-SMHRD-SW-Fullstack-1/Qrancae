@@ -1,4 +1,5 @@
 import React from 'react';
+import Chatgpt from './Chatgpt';
 
 const Footer = () => {
   return (
@@ -22,6 +23,9 @@ const Footer = () => {
                 {' '}
                 Licenses{' '}
               </a>
+            </li>
+            <li>
+              <Chatgpt/>
             </li>
           </ul>
         </nav>

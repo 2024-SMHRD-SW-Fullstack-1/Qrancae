@@ -31,4 +31,11 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
    int updateMaint(@Param("maintIdx") int maintIdx, 
                   @Param("userId") String userId, 
                   @Param("maintUpdate") LocalDateTime maintUpdate);
+   
+   // '추천'인 경우 maint_advice 필드를 업데이트하는 메소드
+   @Modifying
+   @Transactional
+   @Query("UPDATE Maint m SET m.maintAdvice = '비추천' "
+           + "WHERE m.maintAdvice = '추천' AND m.cable.cable_idx = :cableIdx")
+   int updateMaintAdviceToNotRecommended(@Param("cableIdx") int cableIdx);
 }
