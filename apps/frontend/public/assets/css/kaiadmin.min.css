@@ -4636,7 +4636,7 @@ label {
 }
 
 .input-fixed {
-  width: 200px;
+  width: 100px;
 }
 
 .form-control.input-full {
@@ -5045,7 +5045,7 @@ label.error {
 }
 
 .table-head-bg-info thead {
-  border: 1px solid #48abf7 !important;
+  border: 1px solid #1D3557 !important;
 }
 
 .table-head-bg-success thead {
@@ -5083,7 +5083,7 @@ label.error {
 
 .table-head-bg-info thead th,
 .table-striped-bg-info tbody tr:nth-of-type(odd) {
-  background: #48abf7 !important;
+  background: #1D3557 !important;
   color: #fff !important;
   border: 0 !important;
 }
@@ -5547,7 +5547,7 @@ label.error {
   padding: 4px 7px;
   vertical-align: middle;
   font-weight: 400;
-  font-size: 11px;
+  font-size: 14px;
   border: 1px solid #ddd;
   height: fit-content !important;
 }
@@ -6195,7 +6195,7 @@ label.error {
   font-size: 1rem;
   font-weight: 500;
   opacity: 1;
-  border-radius: 3px;
+  /* border-radius: 3px; */
 }
 
 .btn:focus,
@@ -6428,15 +6428,16 @@ label.error {
 }
 
 .btn-label-primary {
-  background: rgba(21, 114, 232, 0.1);
-  color: #1572e8 !important;
+  background: rgba(29, 53, 87, 0.1);
+  color: #1D3557 !important;
   border-color: transparent;
 }
 
+.select-btn-label,
 .btn-label-primary:disabled,
 .btn-label-primary:focus,
 .btn-label-primary:hover {
-  background: #1572e8;
+  background: #1D3557;
   color: #fff !important;
   opacity: 1;
 }
@@ -6529,7 +6530,9 @@ label.error {
 
 .btn-border:focus,
 .btn-border:hover {
-  background: 0 0 !important;
+  background: #1D3557;
+  color: #fff !important;
+  opacity: 1;
 }
 
 .btn-border.btn-white {
@@ -6543,7 +6546,7 @@ label.error {
 }
 
 .btn-border.btn-primary {
-  color: #1D3557 !important;
+  /* color: #1D3557 !important; */
   border: 1px solid #1D3557 !important;
 }
 
@@ -10899,7 +10902,7 @@ body[data-background-color='dark'] .jvm-zoom-btn {
 }
 
 .color-option.selected {
-  border-color: #000;
+  border-color: #1D3557;
 }
 
 .check-allday {
@@ -10913,29 +10916,37 @@ body[data-background-color='dark'] .jvm-zoom-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  /* 입력 필드와 화살표 사이의 간격 */
 }
 
 .date-range input {
   flex: 1;
-  /* 입력 필드가 가능한 공간을 차지하도록 설정 */
 }
 
 .arrow {
   font-size: 1.5rem;
-  /* 화살표의 크기 조절 */
   margin: 0 0.5rem;
-  /* 입력 필드와 화살표 사이의 간격 */
+}
+
+.custom-modal-dialog {
+  max-width: 700px !important;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.modal-footer-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 
 /* 소스, 목적지 데이터 */
 td.source-data {
-  color: #81292D;
+  color: red;
 }
 
 td.destination-data {
-  color: #151284;
+  color: #1572e8;
 }
 
 .datepicker {
@@ -11041,19 +11052,41 @@ td.destination-data {
 .flex-card-body {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-and-table-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
 }
 
 .defect-rate-chart {
-  flex: 1;
-  max-width: 50%;
+  flex: 8;
+  min-width: 0;
 }
 
 .defect-rate-table {
-  flex: 1;
-  max-width: 50%;
-  margin-right: 3rem;
+  flex: 2;
+  min-width: 0;
+  overflow-x: auto;
 }
+
+.select-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.form-select {
+  flex: 1;
+  max-width: 200px;
+}
+
 
 /* 오늘의 점검 */
 .today-repair {
@@ -11180,4 +11213,67 @@ input:checked+.slider:before {
     display: block !important;
     justify-content: center;
   }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cable-one-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 체크박스 */
+/* 기본 체크박스 스타일 */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #1D3557;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* 체크박스 체크 시 스타일 */
+input[type="checkbox"]:checked {
+  background-color: white;
+  border-color: #1D3557;
+}
+
+/* 체크박스 체크 표시 */
+input[type="checkbox"]:checked::before {
+  content: '\2714';
+  font-size: 14px;
+  color: #1D3557;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+tr.input-datas {
+  background-color: #1D3557;
+  color: white;
+}
+
+.date-picker {
+  width: 110%;
+  text-align: center;
+  padding: 3px;
+  font-size: 14px;
+  border: 1px solid rgb(204, 204, 204);
+  border-radius: 4px;
+}
+
+.user-card-body {
+  padding: 60px !important;
 }
