@@ -47,14 +47,14 @@ const Addqr = () => {
             return '<input type="checkbox" class="row-select">';
           },
         },
-        { title: '소스 랙 번호', data: 's_rack_number' },
-        { title: '소스 랙 위치', data: 's_rack_location' },
-        { title: '소스 서버 이름', data: 's_server_name' },
-        { title: '소스 포트 번호', data: 's_port_number' },
-        { title: '목적지 랙 번호', data: 'd_rack_number' },
-        { title: '목적지 랙 위치', data: 'd_rack_location' },
-        { title: '목적지 서버 이름', data: 'd_server_name' },
-        { title: '목적지 포트 번호', data: 'd_port_number' },
+        { title: '랙 번호', data: 's_rack_number' },
+        { title: '랙 위치', data: 's_rack_location' },
+        { title: '서버 이름', data: 's_server_name' },
+        { title: '포트 번호', data: 's_port_number' },
+        { title: '랙 번호', data: 'd_rack_number' },
+        { title: '랙 위치', data: 'd_rack_location' },
+        { title: '서버 이름', data: 'd_server_name' },
+        { title: '포트 번호', data: 'd_port_number' },
       ],
       columnDefs: [
         {
@@ -64,14 +64,6 @@ const Addqr = () => {
           render: function () {
             return '<input type="checkbox">';
           },
-        },
-        {
-          targets: [1, 2, 3, 4],
-          className: 'source-data',
-        },
-        {
-          targets: [5, 6, 7, 8],
-          className: 'destination-data',
         },
       ],
       initComplete: function () {
@@ -210,8 +202,7 @@ const Addqr = () => {
     <div className="wrapper">
       <style>
         {`
-          table.dataTable thead th:first-child,
-          table.dataTable tbody td:first-child {
+          table.dataTable {
             text-align: center;
           }
         `}
@@ -419,13 +410,22 @@ const Addqr = () => {
                               />
                             </th>
                           </tr>
-                          <tr>
-                            <th>
+                          <tr className='input-datas'>
+                            <th rowSpan="2">
                               <input
                                 type="checkbox"
                                 id="select-all"
+                                className="header-checkbox"
+                                defaultChecked={true}
                               />
                             </th>
+                            <th colSpan="4">
+                              <i className="fas fa-sign-out-alt" style={{ color: 'red', marginRight: '.5rem' }}></i> 출발점 (Start)
+                            </th>
+                            <th colSpan="4">
+                              <i className="fas fa-sign-in-alt" style={{ color: '#1572e8', marginRight: '.5rem' }}></i> 도착점 (End)</th>
+                          </tr>
+                          <tr className='input-datas'>
                             <th>랙 번호</th>
                             <th>랙 위치</th>
                             <th>서버 이름</th>

@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
-// 색상 배열
 const colors = [
-    '#D95319',
-    '#EDB120',
-    '#77AC30',
-    '#0072BD',
-    '#7E7E7E',
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56',
+    '#FF9F40',
+    '#4CAF50',
 ];
 
 const AddEventPopup = ({ isOpen, onClose, onSave }) => {
-    // 현재 날짜 및 시간 포맷팅 함수
     const getCurrentDateTime = () => {
         const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000; // 밀리초 단위로 변환
+        const offset = now.getTimezoneOffset() * 60000;
         const localNow = new Date(now.getTime() - offset);
-        return localNow.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM" 포맷
+        return localNow.toISOString().slice(0, 16);
     };
 
     const [title, setTitle] = useState('');
@@ -23,7 +22,7 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
     const [end, setEnd] = useState(getCurrentDateTime());
     const [content, setContent] = useState('');
     const [selectedColor, setSelectedColor] = useState(colors[0]);
-    const [allDay, setAllDay] = useState(false); // 하루종일 상태
+    const [allDay, setAllDay] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -34,56 +33,65 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
     }, [isOpen]);
 
     useEffect(() => {
-        // 시작 날짜와 종료 날짜 간의 유효성 검사를 수행합니다.
         const startDateTime = new Date(start);
         const endDateTime = new Date(end);
 
         if (startDateTime > endDateTime) {
-            setEnd(start); // 종료 날짜를 시작 날짜와 동일하게 설정
+            setEnd(start);
         }
     }, [start]);
 
     useEffect(() => {
-        // 종료 날짜와 시작 날짜 간의 유효성 검사를 수행합니다.
         const startDateTime = new Date(start);
         const endDateTime = new Date(end);
 
         if (endDateTime < startDateTime) {
-            setStart(end); // 시작 날짜를 종료 날짜와 동일하게 설정
+            setStart(end);
         }
     }, [end]);
+
+    const handleStartChange = (e) => {
+        const value = e.target.value;
+
+        if (allDay) {
+            const datePart = value.slice(0, 10); // '2024-09-18'
+            setStart(`${datePart}T00:00`);
+        } else {
+            setStart(value);
+        }
+    };
+
+    const handleEndChange = (e) => {
+        const value = e.target.value;
+
+        if (allDay) {
+            const datePart = value.slice(0, 10); // '2024-09-18'
+            setEnd(`${datePart}T00:00`);
+        } else {
+            setEnd(value);
+        }
+    };
 
     const handleSave = () => {
         onSave({ title, start, end, content, color: selectedColor, allDay });
     };
 
     return (
-        <div className={`popup-overlay popup ${isOpen ? 'open' : ''}`}>
-            <div className="popup-content-left">
-                <div className='popup-body'>
-                    <div className='popup-color-header'>
-                        <h3>일정 추가</h3>
-                        <div className="color-picker">
-                            <div className="color-options">
-                                {colors.map((color) => (
-                                    <div
-                                        key={color}
-                                        className={`colorinput color-option ${selectedColor === color ? 'selected' : ''}`}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => setSelectedColor(color)}
-                                    ></div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+        <Modal show={isOpen} onHide={onClose} centered className="add-event-popup">
+            <Modal.Dialog className="custom-modal-dialog" style={{ width: '700px' }}>
+                <Modal.Header closeButton>
+                    <Modal.Title>일정 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
                     <input
                         className="form-control input-full"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="제목"
+                        style={{ marginBottom: '0.5rem' }}
                     />
-                    <div className="check-allday">
+                    <div className="check-allday" style={{ marginBottom: '0.5rem' }}>
                         <span>하루종일</span>
                         <label className="switch">
                             <input
@@ -94,13 +102,14 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                             <span className="slider"></span>
                         </label>
                     </div>
-                    <div className="date-range">
+                    <div className="date-range" style={{ marginBottom: '0.5rem' }}>
                         <input
                             type={allDay ? 'date' : 'datetime-local'}
                             value={allDay ? start.slice(0, 10) : start}
-                            onChange={(e) => setStart(e.target.value)}
+                            onChange={handleStartChange}
                             placeholder="시작 날짜"
                             className="form-control"
+                            style={{ marginBottom: '0.5rem' }}
                         />
                         <span className="arrow">
                             <i className='fas fa-arrow-right'></i>
@@ -108,9 +117,10 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                         <input
                             type={allDay ? 'date' : 'datetime-local'}
                             value={allDay ? end.slice(0, 10) : end}
-                            onChange={(e) => setEnd(e.target.value)}
+                            onChange={handleEndChange}
                             placeholder="종료 날짜"
                             className="form-control"
+                            style={{ marginBottom: '0.5rem' }}
                         />
                     </div>
                     <textarea
@@ -120,13 +130,31 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                         className="form-control"
                         rows="2"
                     />
-                </div>
-                <div className="popup-buttons">
-                    <button onClick={onClose} className="btn btn-primary btn-border close-btn">취소</button>
-                    <button onClick={handleSave} className="btn btn-primary">저장</button>
-                </div>
-            </div>
-        </div>
+                </Modal.Body>
+                <Modal.Footer className="modal-footer-custom">
+                    <div className="color-picker">
+                        <div className="color-options">
+                            {colors.map((color) => (
+                                <div
+                                    key={color}
+                                    className={`colorinput color-option ${selectedColor === color ? 'selected' : ''}`}
+                                    style={{ backgroundColor: color }}
+                                    onClick={() => setSelectedColor(color)}
+                                ></div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <Button onClick={onClose} className="btn btn-primary btn-border close-btn" style={{ marginRight: '0.5rem' }}>
+                            취소
+                        </Button>
+                        <Button onClick={handleSave}>
+                            저장
+                        </Button>
+                    </div>
+                </Modal.Footer>
+            </Modal.Dialog>
+        </Modal>
     );
 };
 

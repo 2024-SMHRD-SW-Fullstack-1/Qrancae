@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -80,8 +81,8 @@ public class QrController {
 	// QR 코드 등록
 	@PostMapping("/registerQr")
 	public String registerQr(@RequestBody List<Cable> cableList) throws WriterException, JsonProcessingException {
-		int width = 118;
-		int height = 118;
+		int width = 70;
+		int height = 70;
 
 		for (Cable c : cableList) {
 			try {
@@ -93,11 +94,11 @@ public class QrController {
 						+ c.getD_rack_location() + "," + c.getD_server_name() + "," + c.getD_port_number();
 
 				// AES 키
-				SecretKey key = getFixedKey();
-				String encryptedData = encrypt(data, key);
+				//SecretKey key = getFixedKey();
+				//String encryptedData = encrypt(data, key);
 
-				BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
-				//BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
+				//BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
+				BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
 				
 				// 파일 경로 지정
 				Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
@@ -140,5 +141,24 @@ public class QrController {
 		}
 		
 		return qrImgList;
+	}
+	
+	// 선택된 케이블 정보 삭제
+	@PostMapping("/deleteQr")
+	public String deleteQr(@RequestBody List<Integer> cableIdxList) {
+		// 해당 케이블의 케이블과 QR 정보 삭제
+		cableService.deleteCables(cableIdxList);
+		
+		// 해당 케이블의 QR 코드 이미지 파일 삭제
+	    for (Integer idx : cableIdxList) {
+	        Path imagePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
+	        try {
+	            Files.deleteIfExists(imagePath);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+		
+		return "삭제 완료";
 	}
 }
