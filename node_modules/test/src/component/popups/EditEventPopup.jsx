@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const colors = [
@@ -9,9 +10,7 @@ const colors = [
     '#7E7E7E',
 ];
 
-const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
-    console.log(event);
-
+const EditEventPopup = ({ isOpen, onClose, event, onSave, getCalendarList }) => {
     const [title, setTitle] = useState(event?.title || '');
     const [content, setContent] = useState(event?.content || '');
     const [start, setStart] = useState(event?.start || '');
@@ -31,7 +30,6 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
     }, [event]);
 
     const handleSave = () => {
-        // 입력된 값 그대로 사용
         const updatedEvent = {
             ...event,
             title,
@@ -52,59 +50,67 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
             url: `http://localhost:8089/qrancae/deleteCalendar/${event.id}`,
             method: 'get',
         }).then(() => {
+            getCalendarList();
             onClose();
         });
     };
 
     useEffect(() => {
-        // 시작 날짜와 종료 날짜 간의 유효성 검사를 수행합니다.
         const startDateTime = new Date(start);
         const endDateTime = new Date(end);
 
         if (startDateTime > endDateTime) {
-            setEnd(start); // 종료 날짜를 시작 날짜와 동일하게 설정
+            setEnd(start);
         }
     }, [start]);
 
     useEffect(() => {
-        // 종료 날짜와 시작 날짜 간의 유효성 검사를 수행합니다.
         const startDateTime = new Date(start);
         const endDateTime = new Date(end);
 
         if (endDateTime < startDateTime) {
-            setStart(end); // 시작 날짜를 종료 날짜와 동일하게 설정
+            setStart(end);
         }
     }, [end]);
 
-    if (!isOpen) return null;
+    const handleStartChange = (e) => {
+        const value = e.target.value;
+
+        if (allDay) {
+            const datePart = value.slice(0, 10); // '2024-09-18'
+            setStart(`${datePart}T00:00`);
+        } else {
+            setStart(value);
+        }
+    };
+
+    const handleEndChange = (e) => {
+        const value = e.target.value;
+
+        if (allDay) {
+            const datePart = value.slice(0, 10); // '2024-09-18'
+            setEnd(`${datePart}T00:00`);
+        } else {
+            setEnd(value);
+        }
+    };
 
     return (
-        <div className={`popup-overlay popup ${isOpen ? 'open' : ''}`}>
-            <div className="popup-content-left">
-                <div className='popup-body'>
-                    <div className='popup-color-header'>
-                        <h3>일정 수정</h3>
-                        <div className="color-picker">
-                            <div className="color-options">
-                                {colors.map((item) => (
-                                    <div
-                                        key={item}
-                                        className={`colorinput color-option ${item === color ? 'selected' : ''}`}
-                                        style={{ backgroundColor: item }}
-                                        onClick={() => setColor(item)}
-                                    ></div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+        <Modal show={isOpen} onHide={onClose} centered className="edit-event-popup">
+            <Modal.Dialog className="custom-modal-dialog" style={{ width: '700px' }}>
+                <Modal.Header closeButton>
+                    <Modal.Title>일정 수정</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
                     <input
                         className="form-control input-full"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="제목"
+                        style={{ marginBottom: '0.5rem' }}
                     />
-                    <div className="check-allday">
+                    <div className="check-allday" style={{ marginBottom: '0.5rem' }}>
                         <span>하루종일</span>
                         <label className="switch">
                             <input
@@ -115,21 +121,21 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
                             <span className="slider"></span>
                         </label>
                     </div>
-                    <div className="date-range">
+                    <div className="date-range" style={{ marginBottom: '0.5rem' }}>
                         <input
                             type={allDay ? 'date' : 'datetime-local'}
                             value={allDay ? start.slice(0, 10) : start}
-                            onChange={(e) => setStart(e.target.value)}
+                            onChange={handleStartChange}
                             placeholder="시작 날짜"
                             className="form-control"
                         />
-                        <span className="arrow">
+                        <span className="arrow" style={{ marginBottom: '0.5rem' }}>
                             <i className='fas fa-arrow-right'></i>
                         </span>
                         <input
                             type={allDay ? 'date' : 'datetime-local'}
                             value={allDay ? end.slice(0, 10) : end}
-                            onChange={(e) => setEnd(e.target.value)}
+                            onChange={handleEndChange}
                             placeholder="종료 날짜"
                             className="form-control"
                         />
@@ -140,15 +146,33 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave }) => {
                         placeholder="메모"
                         className="form-control"
                         rows="2"
+                        style={{ marginBottom: '0.5rem' }}
                     />
-                </div>
-                <div className="popup-buttons">
-                    <button onClick={onClose} className="btn btn-primary btn-border close-btn">취소</button>
-                    <button onClick={handleDelete} className="btn btn-primary">삭제</button>
-                    <button onClick={handleSave} className="btn btn-primary">수정</button>
-                </div>
-            </div>
-        </div>
+                </Modal.Body>
+                <Modal.Footer className="modal-footer-custom">
+                    <div className="color-picker">
+                        <div className="color-options">
+                            {colors.map((item) => (
+                                <div
+                                    key={item}
+                                    className={`colorinput color-option ${item === color ? 'selected' : ''}`}
+                                    style={{ backgroundColor: item }}
+                                    onClick={() => setColor(item)}
+                                ></div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <label onClick={handleDelete} className='btn btn-label-primary' style={{ marginRight: '0.5rem' }}>
+                            삭제
+                        </label>
+                        <Button onClick={handleSave} className='btn btn-primary'>
+                            수정
+                        </Button>
+                    </div>
+                </Modal.Footer>
+            </Modal.Dialog>
+        </Modal>
     );
 };
 

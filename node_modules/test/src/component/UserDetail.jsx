@@ -14,8 +14,8 @@ const UserDetail = () => {
     useEffect(() => {
         // 초기 로드 시 사용자 정보를 가져옵니다.
         axios.get(`http://localhost:8089/qrancae/api/users/${userId}`)
-            .then(response => {
-                const user = response.data;
+            .then(({ data }) => { // destructuring을 통해 data를 바로 사용
+                const user = data;
                 setUserPw(user.userPw);
                 setUserName(user.userName);
             })
@@ -34,7 +34,7 @@ const UserDetail = () => {
             userPw: userPw,
             userName: userName
         })
-            .then(response => {
+            .then(() => { // response 변수를 사용하지 않음
                 alert('작업자 정보가 수정되었습니다.');
                 navigate('/user');
             })
@@ -46,7 +46,7 @@ const UserDetail = () => {
     const handleDelete = () => {
         if (window.confirm('정말로 이 작업자를 삭제하시겠습니까?')) {
             axios.delete(`http://localhost:8089/qrancae/api/users/${userId}`)
-                .then(response => {
+                .then(() => { // response 변수를 사용하지 않음
                     alert('작업자 정보가 삭제되었습니다.');
                     navigate('/user');
                 })
