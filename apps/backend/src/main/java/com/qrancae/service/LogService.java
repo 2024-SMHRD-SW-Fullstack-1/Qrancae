@@ -26,7 +26,6 @@ public class LogService {
    
    public List<Log> getLogResult(){
       List<Log> results = logRepository.findAllWithUserAndCable();
-      System.out.println("로그result"+results.toString());
       
       return results;
    }

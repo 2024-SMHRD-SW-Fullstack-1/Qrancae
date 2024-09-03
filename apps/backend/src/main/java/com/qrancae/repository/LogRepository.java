@@ -13,7 +13,7 @@ import com.qrancae.model.Log;
 @Repository
 public interface LogRepository extends JpaRepository<Log, Integer> {
 
-   @Query("SELECT l FROM Log l JOIN FETCH l.user u JOIN FETCH l.cable c")
+   @Query("SELECT l FROM Log l JOIN FETCH l.user u JOIN FETCH l.cable c ORDER BY l.log_date DESC")
    List<Log> findAllWithUserAndCable();
    
    @Query("SELECT MONTH(l.log_date) AS month, COUNT(l) AS count " +
