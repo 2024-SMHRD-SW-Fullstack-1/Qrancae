@@ -9,8 +9,16 @@ import axios from 'axios';
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
     const date = new Date(dateString);
-    let formattedDate = date.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    let formattedDate = date.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
 
+    // 연도를 두 자리로 변환
     const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
     formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
 
@@ -177,7 +185,7 @@ const Repair = () => {
                 {
                     title: '오류 내용',
                     data: null,
-                    width: '30%',// 너비 30% 설정
+                    width: '30%', // 너비 30% 설정
                     render: function (data) {
                         let errorMessages = [];
 
@@ -202,7 +210,7 @@ const Repair = () => {
                         if (data.maintUser) {
                             return `${data.maintUser.user_name} (${data.maintUser.user_id})`;
                         }
-                        return '요청 대기중';
+
                     }
                 },
                 {
@@ -215,7 +223,7 @@ const Repair = () => {
                             }
                             return '진행중'
                         }
-                        return '접수 대기중'
+
 
                     }
                 },
@@ -246,9 +254,8 @@ const Repair = () => {
         });
 
         setTableInstance({ repairTable, repairingTable });
-        // 오늘 날짜 포맷
-        const today = new Date().toISOString().split('T')[0];
-        // 오류 상태가 불량인 항목만 필터링하는 함수
+
+        // 오류 상태가 불량, 처리작업자 없는 항목 필터링
         const filterFaultyMaints = (data) => {
             return data.filter(item =>
                 item.maint_qr === '불량' ||
@@ -257,12 +264,7 @@ const Repair = () => {
             );
         };
 
-        // 오늘/진행중/완료 탭으로 구분
-        $('#tab-today').on('click', function () {
-            const filteredData = filterFaultyMaints(maints).filter(item => item.maint_date.startsWith(today));
-            repairingTable.clear().rows.add(filteredData).draw();
-            setSelectedBtn("오늘");
-        });
+        // 전체/진행중/완료 탭으로 구분
         // 진행
         $('#tab-in-progress').on('click', function () {
             const filteredData = filterFaultyMaints(maints).filter(item =>
@@ -281,13 +283,11 @@ const Repair = () => {
         });
         // 전체
         $('#tab-all').on('click', function () {
-            const filteredData = filterFaultyMaints(maints);
-            repairingTable.clear().rows.add(filteredData).draw();
+            repairingTable.clear().rows.add(filterFaultyMaints(maints).filter(item => item.maintUser !== null)).draw();
             setSelectedBtn("전체");
         });
-
-
     }
+
 
     // 작업자 선택 클릭 시 모달 열기
     const maintUserSelectClick = () => {
@@ -414,7 +414,6 @@ const Repair = () => {
                                         <div className="card-title">케이블 점검 현황</div>
                                         <div>
                                             <label id="tab-all" className={`btn btn-label-primary btn-sm ${selectedBtn === "전체" ? 'select-btn-label' : ''}`}>전체</label>
-                                            <label id="tab-today" className={`btn btn-label-primary btn-sm ${selectedBtn === "오늘" ? 'select-btn-label' : ''}`}>오늘</label>
                                             <label id="tab-in-progress" className={`btn btn-label-primary btn-sm ${selectedBtn === "진행중" ? 'select-btn-label' : ''}`}>진행중</label>
                                             <label id="tab-completed" className={`btn btn-label-primary btn-sm ${selectedBtn === "완료" ? 'select-btn-label' : ''}`}>완료</label>
                                         </div>

@@ -126,7 +126,7 @@ const Log = () => {
                   <div className="card-body">
                     <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px' }}>
                       <div style={{ marginRight: '20px', marginBottom: '10px' }}>
-                        <label style={{ marginRight: '10px' }}>조회일자:</label>
+                        <label style={{ marginRight: '10px' }}>조회 일자</label>
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
