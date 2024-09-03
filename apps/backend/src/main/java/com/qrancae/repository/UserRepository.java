@@ -7,5 +7,5 @@ import com.qrancae.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String>{
-
+	
 }

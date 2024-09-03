@@ -1,14 +1,19 @@
 package com.qrancae.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.qrancae.model.Alarm;
+import com.qrancae.model.Cable;
 import com.qrancae.model.Maint;
 import com.qrancae.model.User;
 import com.qrancae.repository.AlarmRepository;
@@ -24,6 +29,11 @@ public class MaintService {
    UserRepository userRepository;
    @Autowired
    AlarmRepository alarmRepository;
+   
+   // 해당 케이블의 모든 유지보수 내역
+   public Maint findByCable(Cable cable) {
+       return maintRepository.findByCable(cable);
+   }
    
    // 유지보수 내역 불러오기
    public List<Maint> getMaint(){
@@ -83,4 +93,62 @@ public class MaintService {
        
        alarmRepository.saveAll(alarms);
    }
+   
+   /* 오늘의 점검 */
+   // - 신규 내역
+   public int cntNewRepair() {
+	   return maintRepository.countByMaintDateAndMaintUserIsNull();
+   }
+   // 진행 중
+   public int cntInProgressRepair() {
+	   return maintRepository.countByMaintUserIsNotNullAndMaintUpdateIsNull();
+   }
+   // 보수 완료
+   public int cntCompleteRepair() {
+	   return maintRepository.countByMaintUserIsNotNullAndMaintUpdateIsNotNull();
+   }
+   // 보수 완료 시 작업자의 수
+   public int cntCompleteUser() {
+	   return maintRepository.countDistinctMaintUserIdsForCompletedMaintenance();
+   }
+   
+   /* 이달의 케이블 점검 */
+   // 이번 달 총 유지보수 수
+   public int countMaintThisMonth() {
+	   return maintRepository.countDistinctCablesThisMonth();
+   }
+   
+   // 이번 달에 보수 완료인 케이블의 수
+   public int countCablesCompletedThisMonth() {
+       return maintRepository.countDistinctCablesCompletedThisMonth();
+   }
+   
+   // 이번 달에 보수 완료한 작업자
+   public int countDistinctMaintUserIdsForCompletedMaintenanceThisMonth() {
+       return maintRepository.countDistinctMaintUserIdsForCompletedMaintenanceMonth();
+   }
+   
+	/* 케이블 불량률 */
+   // 해당 Rack 위치 당 불량 수
+   public Map<String, Integer> cntDefectRack(Integer year, Integer month) {
+	    Map<String, Integer> defectCounts = new HashMap<>();
+
+	    List<Object[]> sourceDefect = maintRepository.countDefectsBySourceRackLocation(year, month);
+	    List<Object[]> destinationDefect = maintRepository.countDefectsByDestinationRackLocation(year, month);
+
+	    for (Object[] record : sourceDefect) {
+	        String rackLocation = (String) record[0];
+	        Integer defectCount = ((Long) record[1]).intValue();
+	        defectCounts.put(rackLocation, defectCounts.getOrDefault(rackLocation, 0) + defectCount);
+	    }
+
+	    for (Object[] record : destinationDefect) {
+	        String rackLocation = (String) record[0];
+	        Integer defectCount = ((Long) record[1]).intValue();
+	        defectCounts.put(rackLocation, defectCounts.getOrDefault(rackLocation, 0) + defectCount);
+	    }
+
+	    return defectCounts;
+	}
+   
 }

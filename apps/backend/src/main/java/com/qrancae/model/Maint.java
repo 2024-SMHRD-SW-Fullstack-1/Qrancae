@@ -49,5 +49,10 @@ public class Maint {
    @Column(name = "maint_update")
    private LocalDateTime maint_update;
    
+   @Column(name = "maint_msg", length = 100)
+   private String maint_msg;
+   
+   @Column(name = "maint_status", length = 20)
+   private String maint_status;
 
 }

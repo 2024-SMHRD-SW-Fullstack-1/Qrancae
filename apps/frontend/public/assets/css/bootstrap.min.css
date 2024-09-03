@@ -5512,8 +5512,8 @@ fieldset:disabled .btn {
 .page-link.active {
   z-index: 3;
   color: var(--bs-pagination-active-color);
-  background-color: var(--bs-pagination-active-bg);
-  border-color: var(--bs-pagination-active-border-color);
+  background-color: #1D3557;
+  border-color: #1D3557;
 }
 
 .disabled>.page-link,
@@ -6342,7 +6342,7 @@ fieldset:disabled .btn {
 
 .modal-content {
   position: relative;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   width: 100%;
   color: var(--bs-modal-color);
@@ -6421,7 +6421,7 @@ fieldset:disabled .btn {
 
 @media (min-width: 576px) {
   .modal {
-    --bs-modal-margin: 1.75rem;
+    /* --bs-modal-margin: 1.75rem; */
     --bs-modal-box-shadow: var(--bs-box-shadow);
   }
 

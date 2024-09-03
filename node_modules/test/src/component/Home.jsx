@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Chart, registerables } from 'chart.js';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,14 +10,13 @@ import Header from './Header';
 import Footer from './Footer';
 import AddEventPopup from './popups/AddEventPopup';
 import EditEventPopup from './popups/EditEventPopup';
-import { useNavigate } from 'react-router-dom'; // useNavigate를 가져옴
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-
-Chart.register(...registerables);
+import LineChart from './charts/LineChart';
+import PieChart from './charts/PieChart';
 
 const Home = () => {
-  const lineChartRef = useRef(null);
-  const pieChartRef = useRef(null);
+  // 로그인 확인
   const navigate = useNavigate();
   const userId = Cookies.get('userId');
 
@@ -29,12 +27,41 @@ const Home = () => {
     }
   }, [navigate]);
 
+  // 일정 관리
   const [events, setEvents] = useState([]);
+  const [repairCnt, setRepairCnt] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showPopup, setShowPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
+
+  // 라인 차트
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  // 파이 차트
+  const [selectedDefectYear, setSelectedDefectYear] = useState(new Date().getFullYear());
+  const [selectedDefectMonth, setSelectedDefectMonth] = useState(new Date().getMonth() + 1);
+  const [selectedDefectRange, setSelectedDefectRange] = useState('max');
+
+  const handleReportDownload = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/reportMain',
+      method: 'get',
+      responseType: 'blob',
+    }).then((res) => {
+      // Blob을 사용하여 파일 다운로드 처리
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'report.xlsx'); // 파일 이름 지정
+      document.body.appendChild(link);
+      link.click();
+
+      // 클릭 후 링크 제거
+      document.body.removeChild(link);
+    });
+  }
 
   const getCalendarList = () => {
     axios({
@@ -44,6 +71,7 @@ const Home = () => {
     }).then((res) => {
       console.log('캘린더 리스트', res.data);
       const data = res.data;
+
       const formattedData = data.map(event => ({
         id: event.calendar_idx,
         title: event.calendar_title,
@@ -58,87 +86,21 @@ const Home = () => {
     });
   };
 
+  const getTodayRepair = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/todayRepair',
+      method: 'get',
+    }).then((res) => {
+      console.log('오늘의 점검', res.data);
+      setRepairCnt(res.data);
+    });
+  }
+
   useEffect(() => {
 
     getCalendarList();
+    getTodayRepair();
 
-    if (lineChartRef.current) {
-      new Chart(lineChartRef.current, {
-        type: 'line',
-        data: {
-          labels: [
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-          ],
-          datasets: [{
-            label: 'Active Users',
-            borderColor: '#1d7af3',
-            pointBorderColor: '#FFF',
-            pointBackgroundColor: '#1d7af3',
-            pointBorderWidth: 2,
-            pointHoverRadius: 4,
-            pointHoverBorderWidth: 1,
-            pointRadius: 4,
-            backgroundColor: 'transparent',
-            fill: true,
-            borderWidth: 2,
-            data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 900],
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 10,
-              fontColor: '#1d7af3',
-            },
-          },
-          tooltips: {
-            bodySpacing: 4,
-            mode: 'nearest',
-            intersect: 0,
-            position: 'nearest',
-            xPadding: 10,
-            yPadding: 10,
-            caretPadding: 10,
-          },
-          layout: {
-            padding: { left: 15, right: 15, top: 15, bottom: 15 },
-          },
-        },
-      });
-    }
-
-    if (pieChartRef.current) {
-      new Chart(pieChartRef.current, {
-        type: 'pie',
-        data: {
-          labels: ['Red', 'Blue', 'Yellow'],
-          datasets: [{
-            label: 'Pie Chart',
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            data: [300, 50, 100],
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              callbacks: {
-                label: function (tooltipItem) {
-                  return tooltipItem.label + ': ' + tooltipItem.raw;
-                }
-              }
-            }
-          },
-        },
-      });
-    }
   }, []);
 
   const handleDateClick = (arg) => {
@@ -185,8 +147,8 @@ const Home = () => {
     const eventData = {
       user_id: userId,
       calendar_title: newEvent.title,
-      calendar_start: new Date(newEvent.start).toISOString(),
-      calendar_end: new Date(newEvent.end).toISOString(),
+      calendar_start: newEvent.start,
+      calendar_end: newEvent.end,
       calendar_content: newEvent.content,
       calendar_color: newEvent.color,
       calendar_allday: newEvent.allDay ? 'O' : 'X'
@@ -217,14 +179,14 @@ const Home = () => {
   });
 
   const handleUpdateEvent = (updatedEvent) => {
-    console.log(updatedEvent);
+    console.log('수정할 캘린더', updatedEvent);
 
     const eventData = {
       user_id: userId,
       calendar_idx: updatedEvent.id,
       calendar_title: updatedEvent.title,
-      calendar_start: new Date(updatedEvent.start).toISOString(),
-      calendar_end: new Date(updatedEvent.end).toISOString(),
+      calendar_start: updatedEvent.start,
+      calendar_end: updatedEvent.end,
       calendar_content: updatedEvent.content,
       calendar_color: updatedEvent.color,
       calendar_allday: updatedEvent.allDay ? 'O' : 'X'
@@ -249,6 +211,26 @@ const Home = () => {
     getCalendarList();
     handleClosePopup();
   };
+
+  // 라인 차트 - 연도 선택
+  const handleYearChange = (event) => {
+    setSelectedYear(event.target.value);
+  }
+
+  /* 파이 차트 */
+  // - 연도 선택
+  const handleDefectYearChange = (event) => {
+    setSelectedDefectYear(event.target.value);
+  }
+  // - 달 선택
+  const handleDefectMonthChange = (event) => {
+    setSelectedDefectMonth(event.target.value);
+  }
+
+  // - 최고 최저 선택
+  const handleDefectRangeChange = (event) => {
+    setSelectedDefectRange(event.target.value);
+  }
 
   return (
     <div className="wrapper">
@@ -286,7 +268,7 @@ const Home = () => {
                     </span>
                     출력
                   </label>
-                  <label className="btn btn-primary btn-border btn-round btn-sm">
+                  <label className="btn btn-primary btn-border btn-round btn-sm" onClick={handleReportDownload}>
                     <span className="btn-label">
                       <i className="fas fa-print icon-spacing"></i>
                     </span>
@@ -311,7 +293,10 @@ const Home = () => {
                       plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
                       initialView="dayGridMonth"
                       contentHeight="auto"
-                      events={events}
+                      events={events.map(event => ({
+                        ...event,
+                        end: event.allDay ? new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1)) : event.end
+                      }))}
                       locale={koLocale}
                       headerToolbar={{
                         left: 'title',
@@ -373,6 +358,7 @@ const Home = () => {
                         onSave={handleUpdateEvent}
                         onDelete={handleDeleteEvent}
                         event={currentEvent}
+                        getCalendarList={getCalendarList}
                       />
                     )}
                   </div>
@@ -393,8 +379,8 @@ const Home = () => {
                             <i className="fas fa-server repair-i"></i>
                           </div>
                           <div className="col-9 col-stats text-center">
-                            <h5>신규 접수</h5>
-                            <p className="repair-num">4</p>
+                            <h5 style={{ margin: '0' }}>신규 접수</h5>
+                            <p className="repair-num">{repairCnt.cntNewRepair}</p>
                           </div>
                         </div>
                         <div className='today-repair'>
@@ -402,8 +388,8 @@ const Home = () => {
                             <i className="fas fa-wrench repair-i"></i>
                           </div>
                           <div className="col-9 col-stats text-center">
-                            <h5>진행 중</h5>
-                            <p className="repair-num">6</p>
+                            <h5 style={{ margin: '0' }}>진행 중</h5>
+                            <p className="repair-num">{repairCnt.cntInProgressRepair}</p>
                           </div>
                         </div>
                         <div className='today-repair'>
@@ -411,8 +397,8 @@ const Home = () => {
                             <i className="far fa-check-circle repair-i"></i>
                           </div>
                           <div className="col-9 col-stats text-center">
-                            <h5>보수 완료</h5>
-                            <p className="repair-num">2</p>
+                            <h5 style={{ margin: '0' }}>보수 완료</h5>
+                            <p className="repair-num">{repairCnt.cntCompleteRepair}</p>
                           </div>
                         </div>
                       </div>
@@ -421,59 +407,68 @@ const Home = () => {
                   <div className='col-md-8 flex-grow-1'>
                     <div className="card card-round">
                       <div className="card-header">
-                        <div className="card-head-row">
-                          <div className="card-title">로그 내역</div>
-                        </div>
+                        <div className="card-title">로그 내역</div>
+                        <select
+                          className="form-select input-fixed"
+                          id="notify_state"
+                          value={selectedYear}
+                          onChange={handleYearChange}
+                        >
+                          <option value="2024">2024</option>
+                          <option value="2023">2023</option>
+                        </select>
                       </div>
                       <div className="card-body">
-                        <div className="chart-container">
-                          <canvas ref={lineChartRef}></canvas>
-                        </div>
+                        <LineChart year={selectedYear} />
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="card card-round mt-3">
                   <div className="card-header">
-                    <div className="card-head-row">
-                      <div className="card-title">케이블 불량률</div>
+                    <div className="card-title">케이블 불량률</div>
+                    <div className="select-container">
+                      <select
+                        className="form-select input-fixed"
+                        id="notify_state"
+                        value={selectedDefectYear}
+                        onChange={handleDefectYearChange}
+                      >
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                      </select>
+                      <select
+                        className="form-select input-fixed"
+                        id="notify_state"
+                        value={selectedDefectMonth}
+                        onChange={handleDefectMonthChange}
+                      >
+                        <option value="1">1월</option>
+                        <option value="2">2월</option>
+                        <option value="3">3월</option>
+                        <option value="4">4월</option>
+                        <option value="5">5월</option>
+                        <option value="6">6월</option>
+                        <option value="7">7월</option>
+                        <option value="8">8월</option>
+                        <option value="9">9월</option>
+                        <option value="10">10월</option>
+                        <option value="11">11월</option>
+                        <option value="12">12월</option>
+                      </select>
+                      <select
+                        className="form-select input-fixed"
+                        id="notify_state"
+                        value={selectedDefectRange}
+                        onChange={handleDefectRangeChange}
+                      >
+                        <option value="max">최고</option>
+                        <option value="min">최저</option>
+                      </select>
                     </div>
                   </div>
                   <div className="card-body flex-card-body">
-                    <div className="chart-container defect-rate-chart">
-                      <canvas ref={pieChartRef}></canvas>
-                    </div>
-                    <table className="table table-striped table-bordered mt-3 defect-rate-table">
-                      <thead>
-                        <tr>
-                          <th scope="col">높음</th>
-                          <th scope="col">랙 위치</th>
-                          <th scope="col">불량률</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>1</td>
-                          <td>R33</td>
-                          <td>2.3%</td>
-                        </tr>
-                        <tr>
-                          <td>2</td>
-                          <td>R07</td>
-                          <td>1.9%</td>
-                        </tr>
-                        <tr>
-                          <td>3</td>
-                          <td>R19</td>
-                          <td>1.3%</td>
-                        </tr>
-                        <tr>
-                          <td>4</td>
-                          <td>R19</td>
-                          <td>1.3%</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <PieChart year={selectedDefectYear} month={selectedDefectMonth} range={selectedDefectRange} />
                   </div>
                 </div>
               </div>
