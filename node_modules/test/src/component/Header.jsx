@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import Timer from './Timer';
 import AIButton from './AIButton'; 
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const Header = () => {
   const [adminName, setAdminName] = useState('');
@@ -56,6 +59,7 @@ const Header = () => {
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div className="container-fluid">
           <ul className="navbar-nav topbar-nav align-items-center">
+            {/* Timer 컴포넌트를 좌측에 배치 */}
             <li className="nav-item">
               <Timer />
             </li>
@@ -212,15 +216,19 @@ const Header = () => {
       </nav>
       {/* 팝업 창 */}
       {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h2>점검 추천</h2>
-            <p>{advice}</p>
-            <button onClick={handleClosePopup} className="btn btn-secondary">
-              닫기
-            </button>
-          </div>
-        </div>
+        <Modal
+          isOpen={showPopup}
+          onRequestClose={handleClosePopup}
+          contentLabel="점검 추천"
+          className="popup-content"
+          overlayClassName="popup-overlay"
+        >
+          <h2>점검 추천</h2>
+          <p>{advice}</p>
+          <button onClick={handleClosePopup} className="btn btn-secondary">
+            닫기
+          </button>
+        </Modal>
       )}
     </div>
   );

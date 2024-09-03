@@ -2,9 +2,11 @@ package com.qrancae.controller;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -25,7 +27,9 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import com.qrancae.codec.Base64Codec;
 import com.qrancae.model.Cable;
+import com.qrancae.model.PrintQr;
 import com.qrancae.model.Qr;
 import com.qrancae.service.CableService;
 import com.qrancae.service.QrService;
@@ -93,7 +97,8 @@ public class QrController {
 				String encryptedData = encrypt(data, key);
 
 				BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
-
+				//BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
+				
 				// 파일 경로 지정
 				Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
 				File directory = savePath.getParent().toFile();
@@ -108,7 +113,7 @@ public class QrController {
 
 				Qr qr = new Qr();
 				qr.setCable_idx(idx);
-				qr.setQr_data(encryptedData);
+				qr.setQr_data(data);
 				qrService.insertQr(qr);
 
 			} catch (Exception e) {
@@ -118,5 +123,22 @@ public class QrController {
 		}
 
 		return "완료";
+	}
+	
+	// QR 코드 프린트
+	@PostMapping("/printQr")
+	public List<PrintQr> printQr(@RequestBody List<Integer> cableIdxList) throws IOException {
+		
+		List<PrintQr> qrImgList = new ArrayList<PrintQr>();
+		
+		for(Integer i : cableIdxList) {
+			String img = Base64Codec.makeStringWithFile("src/main/resources/qrImage/cable"+i+".png");		
+			Cable cable = cableService.getCableByIdx(i);
+			String source = cable.getS_rack_number() + "-"+ cable.getS_rack_location() + "-"+ cable.getS_port_number();
+			String destination = cable.getD_rack_number() + "-"+ cable.getD_rack_location() + "-"+ cable.getD_port_number();
+			qrImgList.add(new PrintQr(img, source, destination));
+		}
+		
+		return qrImgList;
 	}
 }

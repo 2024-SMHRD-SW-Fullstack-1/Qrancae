@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.qrancae.model.Member;
 import com.qrancae.service.MemberService;
 import jakarta.servlet.http.HttpSession;
-
+import org.springframework.http.HttpStatus;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000")  // React 개발 서버 주소
@@ -86,6 +86,7 @@ public class MemberController {
             return ResponseEntity.notFound().build();
         }
     }
+    
     
     
     

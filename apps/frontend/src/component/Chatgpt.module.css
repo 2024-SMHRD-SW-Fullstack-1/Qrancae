@@ -32,8 +32,8 @@
 .chatIcon {
   /* 고정된 위치에 아이콘을 배치 */
   background-image: url(/public/chatbot.svg);
-  width: 100px; /* 예시로 너비 설정 */
-  height: 100px; /* 예시로 높이 설정 */
+  width: 70px; /* 예시로 너비 설정 */
+  height: 70px; /* 예시로 높이 설정 */
 
   background-size: cover;
   position: fixed;

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
+import axios from 'axios';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -9,6 +10,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
 import AddEventPopup from './popups/AddEventPopup';
+import EditEventPopup from './popups/EditEventPopup';
 import { useNavigate } from 'react-router-dom'; // useNavigate를 가져옴
 import Cookies from 'js-cookie';
 
@@ -17,41 +19,49 @@ Chart.register(...registerables);
 const Home = () => {
   const lineChartRef = useRef(null);
   const pieChartRef = useRef(null);
-  /////////
   const navigate = useNavigate();
+  const userId = Cookies.get('userId');
 
   useEffect(() => {
     // 쿠키에서 userId를 가져와 로그인 상태 확인
-    const userId = Cookies.get('userId');
     if (!userId) {
       navigate('/login'); // userId 쿠키가 없으면 로그인 페이지로 이동
     }
   }, [navigate]);
-  //////////
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: '방청소',
-      start: '2024-08-27T12:00:00',
-      end: '2024-08-30T12:00:00',
-      allDay: false,
-      content: '아파트 청소',
-      color: "#FADADD",
-    },
-    {
-      id: 2,
-      title: '이승지(seung)',
-      start: '2024-08-16T09:00:00',
-      end: '2024-08-22T09:00:00',
-      color: "#FADADD",
-      content: ''
-    }
-  ]);
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [events, setEvents] = useState([]);
+
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showPopup, setShowPopup] = useState(false);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState(null);
+
+  const getCalendarList = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/calendar',
+      method: 'post',
+      data: userId
+    }).then((res) => {
+      console.log('캘린더 리스트', res.data);
+      const data = res.data;
+      const formattedData = data.map(event => ({
+        id: event.calendar_idx,
+        title: event.calendar_title,
+        content: event.calendar_content,
+        start: event.calendar_start,
+        end: event.calendar_end,
+        color: event.calendar_color,
+        allDay: event.calendar_allday === 'O',
+      }))
+      console.log('formattedData', formattedData);
+      setEvents(formattedData);
+    });
+  };
 
   useEffect(() => {
+
+    getCalendarList();
+
     if (lineChartRef.current) {
       new Chart(lineChartRef.current, {
         type: 'line',
@@ -135,38 +145,131 @@ const Home = () => {
     setSelectedDate(arg.dateStr);
   };
 
+  const handleEventClick = (info) => {
+    console.log(info.event)
+
+    axios({
+      url: `http://localhost:8089/qrancae/findCalendar/${info.event.id}`,
+      method: 'get',
+    }).then((res) => {
+      console.log('캘린더 리스트', res.data);
+      setCurrentEvent({
+        id: res.data.calendar_idx,
+        title: res.data.calendar_title,
+        start: res.data.calendar_start,
+        end: res.data.calendar_end,
+        content: res.data.calendar_content,
+        color: res.data.calendar_color,
+        allDay: res.data.calendar_allday,
+      });
+      setShowEditPopup(true); // 일정 수정 팝업 열기
+    });
+
+  };
+
   const handleOpenPopup = () => {
     setShowPopup(true);
   };
 
   const handleClosePopup = () => {
     setShowPopup(false);
-    setSelectedDate(null);
+  };
+
+  const handleCloseEditPopup = () => {
+    setShowEditPopup(false);
   };
 
   const handleSaveEvent = (newEvent) => {
-    setEvents([
-      ...events,
-      {
-        id: events.length + 1,
-        ...newEvent,
-        color: "#FFCE56"
-      }
-    ]);
+    console.log(newEvent);
+
+    const eventData = {
+      user_id: userId,
+      calendar_title: newEvent.title,
+      calendar_start: new Date(newEvent.start).toISOString(),
+      calendar_end: new Date(newEvent.end).toISOString(),
+      calendar_content: newEvent.content,
+      calendar_color: newEvent.color,
+      calendar_allday: newEvent.allDay ? 'O' : 'X'
+    };
+
+    axios({
+      url: 'http://localhost:8089/qrancae/addCalendar',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: eventData,
+    }).then((res) => {
+      console.log(res);
+      getCalendarList();
+    });
+
     handleClosePopup();
   };
 
   // 클릭된 날짜가 일정의 범위 내에 있는지 확인
   const filteredEvents = events.filter(event => {
-    const startDate = new Date(event.start);
-    const endDate = new Date(event.end);
-    const selectedDateObj = new Date(selectedDate);
+    const startDate = new Date(event.start).setHours(0, 0, 0, 0);
+    const endDate = new Date(event.end).setHours(0, 0, 0, 0);
+    const selectedDateObj = new Date(selectedDate).setHours(0, 0, 0, 0);
 
     return selectedDateObj >= startDate && selectedDateObj <= endDate;
   });
 
+  const handleUpdateEvent = (updatedEvent) => {
+    console.log(updatedEvent);
+
+    const eventData = {
+      user_id: userId,
+      calendar_idx: updatedEvent.id,
+      calendar_title: updatedEvent.title,
+      calendar_start: new Date(updatedEvent.start).toISOString(),
+      calendar_end: new Date(updatedEvent.end).toISOString(),
+      calendar_content: updatedEvent.content,
+      calendar_color: updatedEvent.color,
+      calendar_allday: updatedEvent.allDay ? 'O' : 'X'
+    };
+
+    axios({
+      url: 'http://localhost:8089/qrancae/updateCalendar',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: eventData,
+    }).then((res) => {
+      console.log(res);
+      getCalendarList();
+    });
+
+    handleClosePopup();
+  };
+
+  const handleDeleteEvent = () => {
+    getCalendarList();
+    handleClosePopup();
+  };
+
   return (
     <div className="wrapper">
+      <style>
+        {`
+          table thead th, table tbody td {
+            text-align: center;
+          }
+          .flex-container {
+            display: flex;
+            gap: 20px;
+          }
+          .chart-container {
+            flex: 1;
+            min-width: 0;
+          }
+          .card-round {
+            border-radius: 0.5rem;
+          }
+        `}
+      </style>
       <Sidebar />
 
       <div className="main-panel">
@@ -207,30 +310,54 @@ const Home = () => {
                     <FullCalendar
                       plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
                       initialView="dayGridMonth"
+                      contentHeight="auto"
                       events={events}
                       locale={koLocale}
                       headerToolbar={{
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek'
+                        left: 'title',
+                        right: 'prev today next'
                       }}
-                      dateClick={handleDateClick}  // 날짜 클릭 핸들러
+                      dateClick={handleDateClick}
+                      eventClick={handleEventClick}
+                      dayCellContent={(args) => {
+                        return (
+                          <div>
+                            {args.date.getDate()}
+                          </div>
+                        );
+                      }}
                     />
-                    <div className="text-center my-3">
-                      {filteredEvents.length > 0 && (
-                        <div className="filtered-events">
+                    <div className="my-3">
+                      {filteredEvents.length > 0 ? (
+                        <div className="event-list filtered-events">
+                          <p>{selectedDate}</p>
                           {filteredEvents.map(event => (
-                            <div key={event.id} className="event-details">
-                              <p><strong>{event.title}</strong></p>
-                              <p>시작: {new Date(event.start).toLocaleString()}</p>
-                              <p>종료: {new Date(event.end).toLocaleString()}</p>
-                              <p>내용: {event.content}</p>
+                            <div key={event.id} className="event-details" style={{ display: 'flex', alignItems: 'stretch' }}>
+                              <div style={{
+                                width: '.5rem',
+                                backgroundColor: event.color,
+                                marginRight: '1rem'
+                              }} />
+                              <div className='event-title-content-date'>
+                                <p className="event-title"><strong>{event.title}</strong></p>
+                                {event.content && <p className="event-content">{event.content}</p>}
+                                <p className="event-date">
+                                  {event.allDay
+                                    ? `${new Date(event.start).toLocaleDateString()} - ${new Date(new Date(event.end).setHours(23, 59)).toLocaleDateString()}`
+                                    : `${new Date(event.start).toLocaleDateString()} ${new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(event.end).toLocaleDateString()} ${new Date(event.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                  }
+                                </p>
+                              </div>
                             </div>
                           ))}
                         </div>
+                      ) : (
+                        <div className="event-list filtered-events">
+                          <p>{selectedDate}</p>
+                          <p className='event-title text-center'>일정 없음</p>
+                        </div>
                       )}
                     </div>
-                    {/* 팝업 표시 조건 추가 */}
                     {showPopup && (
                       <AddEventPopup
                         isOpen={showPopup}
@@ -239,35 +366,114 @@ const Home = () => {
                         defaultStartDate={selectedDate}
                       />
                     )}
+                    {currentEvent && (
+                      <EditEventPopup
+                        isOpen={showEditPopup}
+                        onClose={handleCloseEditPopup}
+                        onSave={handleUpdateEvent}
+                        onDelete={handleDeleteEvent}
+                        event={currentEvent}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
-
-              <div className="col-md-7 d-flex flex-column">
-                <div className="row">
-                  <div className="card card-round">
-                    <div className="card-header">
-                      <div className="card-head-row">
-                        <div className="card-title">라인 차트</div>
+              <div className="col-md-7">
+                <div className="flex-container">
+                  <div className='col-md-4 flex-grow-1'>
+                    <div className="card card-round">
+                      <div className="card-header">
+                        <div className="card-head-row">
+                          <div className="card-title">오늘의 점검</div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="card-body">
-                      <div className="chart-container">
-                        <canvas ref={lineChartRef}></canvas>
+                      <div className="card-body text-center">
+                        <div className='today-repair text-center'>
+                          <div className="col-3">
+                            <i className="fas fa-server repair-i"></i>
+                          </div>
+                          <div className="col-9 col-stats text-center">
+                            <h5>신규 접수</h5>
+                            <p className="repair-num">4</p>
+                          </div>
+                        </div>
+                        <div className='today-repair'>
+                          <div className="col-3">
+                            <i className="fas fa-wrench repair-i"></i>
+                          </div>
+                          <div className="col-9 col-stats text-center">
+                            <h5>진행 중</h5>
+                            <p className="repair-num">6</p>
+                          </div>
+                        </div>
+                        <div className='today-repair'>
+                          <div className="col-3">
+                            <i className="far fa-check-circle repair-i"></i>
+                          </div>
+                          <div className="col-9 col-stats text-center">
+                            <h5>보수 완료</h5>
+                            <p className="repair-num">2</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="card card-round">
-                    <div className="card-header">
-                      <div className="card-head-row">
-                        <div className="card-title">파이 차트</div>
+                  <div className='col-md-8 flex-grow-1'>
+                    <div className="card card-round">
+                      <div className="card-header">
+                        <div className="card-head-row">
+                          <div className="card-title">로그 내역</div>
+                        </div>
+                      </div>
+                      <div className="card-body">
+                        <div className="chart-container">
+                          <canvas ref={lineChartRef}></canvas>
+                        </div>
                       </div>
                     </div>
-                    <div className="card-body">
-                      <div className="chart-container">
-                        <canvas ref={pieChartRef}></canvas>
-                      </div>
+                  </div>
+                </div>
+                <div className="card card-round mt-3">
+                  <div className="card-header">
+                    <div className="card-head-row">
+                      <div className="card-title">케이블 불량률</div>
                     </div>
+                  </div>
+                  <div className="card-body flex-card-body">
+                    <div className="chart-container defect-rate-chart">
+                      <canvas ref={pieChartRef}></canvas>
+                    </div>
+                    <table className="table table-striped table-bordered mt-3 defect-rate-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">높음</th>
+                          <th scope="col">랙 위치</th>
+                          <th scope="col">불량률</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1</td>
+                          <td>R33</td>
+                          <td>2.3%</td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td>R07</td>
+                          <td>1.9%</td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td>R19</td>
+                          <td>1.3%</td>
+                        </tr>
+                        <tr>
+                          <td>4</td>
+                          <td>R19</td>
+                          <td>1.3%</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -277,7 +483,7 @@ const Home = () => {
 
         <Footer />
       </div>
-    </div>
+    </div >
   );
 };
 

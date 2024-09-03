@@ -7,14 +7,11 @@ import axios from 'axios';
 
 const Maintenance = () => {
   const [maints, setMaints] = useState([]);
-  const [users, setUsers] = useState([]); // 작업자 목록 상태
-  const [selectedMaints, setSelectedMaints] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
 
   // 내역 불러오기
   useEffect(() => {
     getData();
-    getUsers();
   }, []);
 
   // DataTable 초기화 및 갱신
@@ -26,7 +23,7 @@ const Maintenance = () => {
     }
   }, [maints]);
 
-  // db에서 가져오기
+  // db에서 가져오기(요청 날짜 순으로 정렬)
   function getData() {
     axios.get('http://localhost:8089/qrancae/getmaint')
       .then((res) => {
@@ -37,28 +34,12 @@ const Maintenance = () => {
         console.log('maintData error:', err);
       });
   }
-  function getUsers() {
-    axios.get('http://localhost:8089/qrancae/getusers')
-      .then((res) => {
-        console.log('m.user가져오기:', res.data)
-        setUsers(res.data);
-      })
-      .catch((err) => {
-        console.log('m.user가져오기 오류 error:', err);
-      })
-  }
-
+  // 유지보수 내역
   function initializeDataTable() {
     const table = $('#basic-mainttables').DataTable({
       data: maints,
+      autoWidth: true,
       columns: [
-        {
-          title: '<input type="checkbox" id="select-all" />',
-          orderable: false,
-          render: function (_, __, row) {
-            return `<input type="checkbox" class="select-checkbox" data-id="${row.maint_idx}" />`;
-          }
-        },
         {
           title: '요청 작업자',
           data: null,
@@ -95,101 +76,32 @@ const Maintenance = () => {
         },
         { title: '요청 날짜', data: 'maint_date' },
         {
-          title: '처리 작업자',
+          title: '상태',
           data: null,
           render: function (data) {
-            if (data.maintUser) {
-              return `${data.maintUser.user_name} (${data.maintUser.user_id})`;
+            const maintUser = data.maintUser;
+            const maintUpdate = data.maint_update;
+
+            if (!maintUser && !maintUpdate) {
+              return '접수 대기중';
+            } else if (maintUser && !maintUpdate) {
+              return `진행중 (${maintUser.user_name})`;
+            } else if (maintUser && maintUpdate) {
+              return `${maintUpdate} (${maintUser.user_name}) 완료`;
             }
-            return '없음';
-          }
-        },
-        {
-          title: '처리 날짜',
-          data: 'maint_update',
-          render: function (data) {
-            if (data === null || data === '') {
-              return '<button class="btn btn-primary check-btn">확인하기</button>';
-            }
-            return data;
           }
         }
       ],
-      destroy: true // DataTable을 다시 초기화할 수 있도록 설정
+      columnDefs: [
+        { targets: 7, width: '15%' }, // 요청 날짜의 너비를 15%로 설정
+        { targets: 8, width: '18%' }// 상태 컬럼의 너비를 18%로 설정
+
+      ],
+      destroy: true // DataTable을 다시 초기화
     });
 
     setTableInstance(table);
-
-    // "확인하기" 버튼 클릭
-    $(document).on('click', '.check-btn', function () {
-      const button = $(this);
-      const row = button.closest('tr');
-      const rowData = table.row(row).data();
-
-      $('#userSelectModal').data('maint_idx', rowData.maint_idx);
-      $('#userSelectModal').modal('show');
-    });
-
-    // 개별 체크박스 선택
-    $(document).on('change', '.select-checkbox', function () {
-      const checkbox = $(this);
-      const maint_idx = checkbox.data('id');
-      if (checkbox.is(':checked')) {
-        setSelectedMaints((prev) => [...prev, maint_idx]);
-      } else {
-        setSelectedMaints((prev) => prev.filter((id) => id !== maint_idx));
-      }
-    });
-
-    // 전체 선택 체크박스
-    $(document).on('change', '#select-all', function () {
-      const isChecked = $(this).is(':checked');
-      $('.select-checkbox').prop('checked', isChecked).trigger('change');
-    });
   }
-
-  // 유지보수 번호를 서버로 보내 처리 업데이트
-  const handleConfirm = (maint_idx, maint_user_id) => {
-    axios.post('http://localhost:8089/qrancae/updatemaint', null, {
-      params: {
-        maintIdx: maint_idx,
-        userId: maint_user_id
-      }
-    })
-      .then((res) => {
-        console.log(`유지보수 번호 ${maint_idx} 업데이트 성공:`, res);
-        alert('확인되었습니다');
-        getData(); // 데이터 새로 고침
-      })
-      .catch((err) => {
-        console.log('업데이트 에러:', err);
-      });
-  };
-
-  // 선택된 모든 유지보수 번호를 서버로 보내기
-  const handleBatchConfirm = () => {
-    if (selectedMaints.length === 0) {
-      alert('선택된 항목이 없습니다.');
-      return;
-    }
-    if (window.confirm('선택된 항목을 모두 확인 하시겠습니까?')) {
-      selectedMaints.forEach((maint_idx) => handleConfirm(maint_idx));
-    }
-  };
-
-  // 작업자 선택 후 요청하기
-  const handleUserSelect = () => {
-    const selectedUserId = $('#userSelect').val();
-    const maint_idx = $('#userSelectModal').data('maint_idx');
-
-    if (!selectedUserId) {
-      alert('작업자를 선택하세요.');
-      return;
-    }
-
-    handleConfirm(maint_idx, selectedUserId);
-    $('#userSelectModal').modal('hide');
-  };
 
   return (
     <div className="wrapper">
@@ -205,9 +117,6 @@ const Maintenance = () => {
                 <div className="card">
                   <div className="card-header">
                     <h4 className="card-title">유지보수 내역</h4>
-                    <button className="btn btn-success" onClick={handleBatchConfirm}>
-                      선택 항목 확인하기
-                    </button>
                   </div>
                   <div className="card-body">
                     <div className="table-responsive">
@@ -217,7 +126,6 @@ const Maintenance = () => {
                       >
                         <thead>
                           <tr>
-                            <th><input type="checkbox" id="select-all" /></th>
                             <th>요청 작업자</th>
                             <th>케이블</th>
                             <th>랙 위치</th>
@@ -226,8 +134,7 @@ const Maintenance = () => {
                             <th>케이블 상태</th>
                             <th>전원 공급 상태</th>
                             <th>요청 날짜</th>
-                            <th>처리 작업자</th>
-                            <th>처리 날짜</th>
+                            <th>상태</th>
                           </tr>
                         </thead>
                         <tbody></tbody>
@@ -239,39 +146,7 @@ const Maintenance = () => {
             </div>
           </div>
         </div>
-
         <Footer />
-      </div>
-
-      {/* 작업자 선택 창 추가 */}
-      <div className="modal fade" id="userSelectModal" tabIndex="-1" role="dialog" aria-labelledby="userSelectModalLabel" aria-hidden="true">
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="userSelectModalLabel">작업자 선택</h5>
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label htmlFor="userSelect">작업자 선택</label>
-                <select id="userSelect" className="form-control">
-                  <option value="">작업자를 선택하세요</option>
-                  {users.map(user => (
-                    <option key={user.user_id} value={user.user_id}>
-                      {user.user_name} ({user.user_id})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-dismiss="modal">닫기</button>
-              <button type="button" className="btn btn-primary" onClick={handleUserSelect}>요청하기</button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

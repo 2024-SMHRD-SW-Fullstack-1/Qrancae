@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.qrancae.model.Maint;
 import com.qrancae.model.User;
@@ -24,13 +25,19 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
    List<User> findAllUsers();
    
    // 처리 작업자, 날짜 업데이트
+//   @Modifying
+//   @Transactional
+//   @Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_update = :maintUpdate "
+//         + "WHERE m.maint_idx = :maintIdx")
+//   int updateMaint(@Param("maintIdx") int maintIdx, 
+//                  @Param("userId") String userId, 
+//                  @Param("maintUpdate") LocalDateTime maintUpdate);
+   
+   // 유지보수에 처리 작업자 추가하기
    @Modifying
    @Transactional
-   @Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_update = :maintUpdate "
-         + "WHERE m.maint_idx = :maintIdx")
-   int updateMaint(@Param("maintIdx") int maintIdx, 
-                  @Param("userId") String userId, 
-                  @Param("maintUpdate") LocalDateTime maintUpdate);
+   @Query("UPDATE Maint m SET m.maintUser.user_id = :userId WHERE m.maint_idx = :maintIdx")
+   int updateMaintUser(@Param("maintIdx") int maintIdx, @Param("userId") String userId);
    
    // '추천'인 경우 maint_advice 필드를 업데이트하는 메소드
    @Modifying

@@ -1,59 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import AIModal from './AIModal';
 
 const AIButton = () => {
-    const [adviceData, setAdviceData] = useState([]);  // 여러 개의 데이터를 담기 위한 배열
-    const [showPopup, setShowPopup] = useState(false); // 팝업 표시 여부
+  const [recommendations, setRecommendations] = useState([]);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // 로딩 상태 추가
+  const [loadingText, setLoadingText] = useState('Loading'); // 로딩 텍스트 상태 추가
 
-    const handleClick = () => {
-        axios.get('/qrancae/api/getMaintenanceAdvice')
-            .then(response => {
-                const data = response.data;
-                // 예상되는 응답 형태: [{ cable_idx: 1, maint_advice: '추천' }, { cable_idx: 2, maint_advice: '비추천' }]
-                setAdviceData(data);
-                setShowPopup(true);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the maintenance advice!", error);
-            });
-    };
+  const handleClick = async () => {
+    setLoading(true); // API 요청 전 로딩 상태를 true로 설정
+    try {
+      const response = await axios.get('http://localhost:5000/runMaintenanceAdvisor');
+      setRecommendations(response.data);
+      setModalIsOpen(true);
+    } catch (error) {
+      console.error("API 요청 실패: ", error);
+    } finally {
+      setLoading(false); // API 응답이 끝나면 로딩 상태를 false로 설정
+    }
+  };
 
-    const handleClosePopup = () => {
-        setShowPopup(false);
-    };
+  // 로딩 텍스트 애니메이션 효과
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setLoadingText(prev => {
+          if (prev === 'Loading....') return 'Loading';
+          return prev + '.';
+        });
+      }, 500); // 0.5초 간격으로 텍스트 변경
+      return () => clearInterval(interval); // 클린업
+    }
+  }, [loading]);
 
-    return (
-        <div>
-            <button onClick={handleClick} className="ai-button">AI</button>
-            
-            {showPopup && (
-                <div className="popup">
-                    <div className="popup-content">
-                        <h2>점검 추천 결과</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Cable Index</th>
-                                    <th>Recommendation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {adviceData.map((item, index) => (
-                                    <tr key={index}>
-                                        <td>{item.cable_idx}</td>
-                                        <td>{item.maint_advice}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button onClick={handleClosePopup} className="btn btn-secondary">
-                            닫기
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
+  return (
+    <div>
+      <button onClick={handleClick} disabled={loading}>
+        AI
+      </button>
+      {loading && <div className="loading-text">{loadingText}</div>} {/* 로딩 중일 때 로딩 텍스트 표시 */}
+      <AIModal
+        isOpen={modalIsOpen}
+        onClose={() => setModalIsOpen(false)}
+        recommendations={recommendations}
+      />
+    </div>
+  );
 };
 
 export default AIButton;

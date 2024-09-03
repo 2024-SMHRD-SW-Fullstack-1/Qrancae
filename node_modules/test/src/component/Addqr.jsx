@@ -6,6 +6,7 @@ import Header from './Header';
 import Footer from './Footer';
 import 'datatables.net';
 import * as xlsx from 'xlsx';
+import ModalPopup from './popups/ModalPopup';
 
 const Addqr = () => {
   // 로딩중인지 확인
@@ -249,16 +250,11 @@ const Addqr = () => {
         )}
 
         {showQrPopup && (
-          <div className="popup-overlay">
-            <div className="popup-content">
-              <div className='popup-body'>
-                QR 코드 등록이 완료되었습니다.
-              </div>
-              <div className="popup-buttons">
-                <button onClick={closeQrPopup} className="btn btn-primary">확인</button>
-              </div>
-            </div>
-          </div>
+          <ModalPopup
+            isOpen={showQrPopup}
+            onClose={closeQrPopup}
+            message="QR 코드 등록이 완료되었습니다."
+          />
         )}
 
         <div className="container">

@@ -9,7 +9,7 @@ const Sidebar = () => {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
   const navigate = useNavigate();
-
+  //const userId = Cookies.get('userId');
   const handleLogout = () => {
     // 서버에 로그아웃 요청을 보내어 세션 무효화
     axios.post('http://localhost:8089/qrancae/api/logout', {}, { withCredentials: true })
@@ -37,10 +37,10 @@ const Sidebar = () => {
     { name: '로그 내역', path: '/log', icon: 'fas fa-clipboard-list' },
     { name: '유지보수 내역', path: '/maint', icon: 'fas fa-clipboard-check' },
     { name: '사용자 관리', path: '/user', icon: 'fas fa-user-cog' },
+    { name: '설정', path: '/admin/me', icon: 'fas fa-cog' }, // 설정 메뉴 추가
   ];
 
   const subMenus = [
-    { name: '설정', path: '/setting', icon: 'fas fa-cog' },
     {
       name: '로그아웃',
       path: '#', // 로그아웃은 페이지 이동이 아닌 함수 호출이므로 #으로 설정
@@ -76,7 +76,7 @@ const Sidebar = () => {
       </div>
       <div className="sidebar-wrapper scrollbar scrollbar-inner">
         <div className="sidebar-content">
-          <ul className="nav nav-secondary">
+        <ul className="nav nav-secondary">
             {menus.map((menu) => {
               return (
                 <li key={menu.path} className={`nav-item ${isActive(menu.path) ? 'active' : ''}`}>
@@ -90,12 +90,12 @@ const Sidebar = () => {
           </ul>
           <hr />
           <ul className="nav nav-secondary">
-            {subMenus.map((menu) => (
+          {subMenus.map((menu) => (
               <li key={menu.name} className={`nav-item ${isActive(menu.path) ? 'active' : ''}`}>
-                <a href={menu.path} onClick={menu.action ? menu.action : null}>
+                <Link to={menu.path} onClick={menu.action ? menu.action : null}>
                   <i className={menu.icon}></i>
                   <p>{menu.name}</p>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

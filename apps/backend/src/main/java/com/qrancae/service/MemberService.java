@@ -46,4 +46,9 @@ public class MemberService {
         memberRepository.deleteById(userId);
     }
     
+// // 현재 로그인한 관리자 정보 수정
+//    public Member updateAdmin(Member admin) {
+//        return memberRepository.save(admin);
+//    }
+    
 }
