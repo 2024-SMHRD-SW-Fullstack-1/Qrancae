@@ -38,18 +38,18 @@ const User = () => {
             <div className={styles.pageHeader}>
               <h3 className="fw-bold mb-3">사용자 관리</h3>
               {/* 작업자 등록 버튼을 오른쪽 상단으로 이동 */}
-              <button
-                className={`btn btn-primary ${styles.btnRegister}`}
+              <label
+                className={`btn btn-label-primary btn-round ${styles.btnRegister}`}
                 onClick={handleRegisterClick}>
                 작업자 등록
-              </button>
+              </label>
             </div>
 
             <div className="row">
               {users.map((user, index) => (
                 <div className="col-md-3" key={index}>
                   <div className="card card-profile">
-                    <div className="card-body">
+                    <div className="card-body user-card-body">
                       <div className="user-profile text-center">
                         <div className="name">{user.userName}</div>
                         <div className="job">{user.userId}</div>
@@ -60,12 +60,13 @@ const User = () => {
                             className="btn btn-primary btn-border btn-round"
                           > */}
                           <div className="view-profile">
-                            <button
+                            <label
                               className="btn btn-primary btn-border btn-round"
                               onClick={() => navigate(`/user/${user.userId}`)}
+                              style={{ marginTop: '30px' }}
                             >
                               작업자 정보 수정
-                            </button>
+                            </label>
                           </div>
                           {/* </a> */}
                         </div>

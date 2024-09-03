@@ -175,46 +175,45 @@ const Maintenance = () => {
             <div className="row">
               <div className="col-md-12">
                 <div className="card">
-                  <div className="card-header">
+                  <div className="card-header d-flex justify-content-between align-items-center">
                     <h4 className="card-title">유지보수 내역</h4>
-                  </div>
-                  <div className="card-body">
-                    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                        <div style={{ marginRight: '20px' }}>
-                          <label style={{ marginRight: '10px' }}>조회 일자</label>
-                          <DatePicker
-                            locale={ko}
-                            selected={dateRange[0]}
-                            onChange={dates => { setDateRange(dates); }}
-                            startDate={dateRange[0]}
-                            endDate={dateRange[1]}
-                            selectsRange
-                            dateFormat="yyyy/MM/dd"
-                            placeholderText="날짜 범위를 선택하세요."
-                          />
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                          <label style={{ marginRight: '10px' }}>작업자</label>
-                          <select
-                            value={selectedUser}
-                            onChange={e => {
-                              setSelectedUser(e.target.value);
-                              filterData();
-                            }}
-                            style={{ display: 'block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
-                          >
-                            <option value="All">전체</option>
-                            {generateUserOptions(users)}
-                          </select>
-                        </div>
-                        <button onClick={handleReset} style={{ marginLeft: '10px' }}>초기화</button>
+                    <div className="common-labels" style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ display: 'inline-block', marginRight: '20px' }}>
+                        <label style={{ marginRight: '5px' }}>조회 일자</label>
+                        <DatePicker
+                          locale={ko}
+                          selected={dateRange[0]}
+                          onChange={dates => { setDateRange(dates); }}
+                          startDate={dateRange[0]}
+                          endDate={dateRange[1]}
+                          selectsRange
+                          dateFormat="yyyy/MM/dd"
+                          placeholderText="날짜 범위를 선택하세요."
+                          className='date-picker'
+                        />
+                      </div>
+                      <div style={{ display: 'inline-block', marginRight: '10px' }}>
+                        <label style={{ marginRight: '5px' }}>작업자</label>
+                        <select
+                          value={selectedUser}
+                          onChange={e => {
+                            setSelectedUser(e.target.value);
+                            filterData();
+                          }}
+                          style={{ display: 'inline-block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        >
+                          <option value="All">전체</option>
+                          {generateUserOptions(users)}
+                        </select>
+                        <label className='btn btn-label-primary btn-round btn-sm' onClick={handleReset} style={{ marginLeft: '10px' }}>선택 초기화</label>
                       </div>
                     </div>
+                  </div>
+                  <div className="card-body">
                     <div className="table-responsive">
                       <table
                         id="basic-mainttables"
-                        className="display table table-striped table-hover"
+                        className="display table table-head-bg-info table-striped table-hover"
                         style={{ width: '100%' }}
                       >
                         <thead>

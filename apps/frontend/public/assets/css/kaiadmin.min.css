@@ -6530,7 +6530,9 @@ label.error {
 
 .btn-border:focus,
 .btn-border:hover {
-  background: 0 0 !important;
+  background: #1D3557;
+  color: #fff !important;
+  opacity: 1;
 }
 
 .btn-border.btn-white {
@@ -6544,7 +6546,7 @@ label.error {
 }
 
 .btn-border.btn-primary {
-  color: #1D3557 !important;
+  /* color: #1D3557 !important; */
   border: 1px solid #1D3557 !important;
 }
 
@@ -10900,7 +10902,7 @@ body[data-background-color='dark'] .jvm-zoom-btn {
 }
 
 .color-option.selected {
-  border-color: #000;
+  border-color: #1D3557;
 }
 
 .check-allday {
@@ -11261,4 +11263,17 @@ input[type="checkbox"]:checked::before {
 tr.input-datas {
   background-color: #1D3557;
   color: white;
+}
+
+.date-picker {
+  width: 110%;
+  text-align: center;
+  padding: 3px;
+  font-size: 14px;
+  border: 1px solid rgb(204, 204, 204);
+  border-radius: 4px;
+}
+
+.user-card-body {
+  padding: 60px !important;
 }

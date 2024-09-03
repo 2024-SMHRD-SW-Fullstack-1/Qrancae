@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -10,7 +11,6 @@ import Header from './Header';
 import Footer from './Footer';
 import AddEventPopup from './popups/AddEventPopup';
 import EditEventPopup from './popups/EditEventPopup';
-import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import LineChart from './charts/LineChart';
 import PieChart from './charts/PieChart';
@@ -94,6 +94,10 @@ const Home = () => {
       console.log('오늘의 점검', res.data);
       setRepairCnt(res.data);
     });
+  }
+
+  const handleRepairClick = () => {
+    navigate('/repair');
   }
 
   useEffect(() => {
@@ -259,20 +263,45 @@ const Home = () => {
 
         <div className="container">
           <div className="page-inner">
-            <div className="row h-100">
+            <div className="row">
               <div className="col-md-12">
-                <div className="common-labels outside-card-labels">
-                  <label className="btn btn-label-primary btn-round btn-sm" onClick={handleReportDownload}>
-                    <span className="btn-label">
-                      <i className="fas fa-print icon-spacing"></i>
-                    </span>
-                    다운로드
-                  </label>
+                <div className="card card-round">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <div className="card-title">메인</div>
+                    <div className="common-labels">
+                      <label className='btn btn-primary btn-border btn-round' onClick={handleRepairClick}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 'bold' }}>
+                          <div>오늘의 점검</div>
+                          <div>|</div>
+                          <div style={{ color: '#0DB624' }}>신규 접수</div>
+                          <div>{repairCnt.cntNewRepair}건</div>
+                          <div style={{ color: '#939393' }}>진행 중</div>
+                          <div>{repairCnt.cntInProgressRepair}건</div>
+                          <div style={{ color: '#EE38AE' }}>보수 완료</div>
+                          <div>{repairCnt.cntCompleteRepair}건</div>
+                        </div>
+                      </label>
+                      <label
+                        className="btn btn-label-primary btn-round btn-sm"
+                        onClick={handleReportDownload}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px'
+                        }}>
+                        <span className="btn-label">
+                          <i className="fas fa-file-excel icon-spacing"></i>
+                        </span>
+                        보고서 다운로드
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="col-md-5 d-flex flex-column">
-                <div className="card card-round flex-grow-1">
+              <div className="col-md-4">
+                <div className="card card-round">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <div className="card-title">일정</div>
                     <label className="btn btn-primary btn-border btn-round btn-sm" onClick={handleOpenPopup}>
@@ -358,67 +387,25 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-7">
-                <div className="flex-container">
-                  <div className='col-md-4 flex-grow-1'>
-                    <div className="card card-round">
-                      <div className="card-header">
-                        <div className="card-head-row">
-                          <div className="card-title">오늘의 점검</div>
-                        </div>
-                      </div>
-                      <div className="card-body text-center">
-                        <div className='today-repair text-center'>
-                          <div className="col-3">
-                            <i className="fas fa-server repair-i"></i>
-                          </div>
-                          <div className="col-9 col-stats text-center">
-                            <h5 style={{ margin: '0' }}>신규 접수</h5>
-                            <p className="repair-num">{repairCnt.cntNewRepair}</p>
-                          </div>
-                        </div>
-                        <div className='today-repair'>
-                          <div className="col-3">
-                            <i className="fas fa-wrench repair-i"></i>
-                          </div>
-                          <div className="col-9 col-stats text-center">
-                            <h5 style={{ margin: '0' }}>진행 중</h5>
-                            <p className="repair-num">{repairCnt.cntInProgressRepair}</p>
-                          </div>
-                        </div>
-                        <div className='today-repair'>
-                          <div className="col-3">
-                            <i className="far fa-check-circle repair-i"></i>
-                          </div>
-                          <div className="col-9 col-stats text-center">
-                            <h5 style={{ margin: '0' }}>보수 완료</h5>
-                            <p className="repair-num">{repairCnt.cntCompleteRepair}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              <div className="col-md-8">
+                <div className="card card-round">
+                  <div className="card-header">
+                    <div className="card-title">로그 내역</div>
+                    <select
+                      className="form-select input-fixed"
+                      id="notify_state"
+                      value={selectedYear}
+                      onChange={handleYearChange}
+                    >
+                      <option value="2024">2024</option>
+                      <option value="2023">2023</option>
+                    </select>
                   </div>
-                  <div className='col-md-8 flex-grow-1'>
-                    <div className="card card-round">
-                      <div className="card-header">
-                        <div className="card-title">로그 내역</div>
-                        <select
-                          className="form-select input-fixed"
-                          id="notify_state"
-                          value={selectedYear}
-                          onChange={handleYearChange}
-                        >
-                          <option value="2024">2024</option>
-                          <option value="2023">2023</option>
-                        </select>
-                      </div>
-                      <div className="card-body">
-                        <LineChart year={selectedYear} />
-                      </div>
-                    </div>
+                  <div className="card-body">
+                    <LineChart year={selectedYear} />
                   </div>
                 </div>
-                <div className="card card-round mt-3">
+                <div className="card card-round">
                   <div className="card-header">
                     <div className="card-title">케이블 불량률</div>
                     <div className="select-container">

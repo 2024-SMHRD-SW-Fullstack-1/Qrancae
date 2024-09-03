@@ -59,6 +59,7 @@ const Qr = () => {
 
     const table = $('#basic-datatables').DataTable({
       responsive: true,
+      autoWidth: true,
       columns: [
         {
           title: '<input type="checkbox" id="select-all" checked>',
@@ -108,6 +109,7 @@ const Qr = () => {
           updateSelectedCableIds();
         }, 0)
       },
+      destroy: true,
     });
 
     // 테이블 그리기 후 선택된 ID 업데이트
@@ -180,6 +182,7 @@ const Qr = () => {
         {`
             table.dataTable {
               text-align: center;
+              white-space: nowrap;
             }
 
             table.dataTable thead th:first-child .sorting::before,
@@ -199,14 +202,11 @@ const Qr = () => {
 
         <div className="container">
           <div className="page-inner">
-            <div className="page-header">
-              <h3 className="fw-bold mb-3">QR코드 관리</h3>
-            </div>
             <div className="row">
               <div className="col-md-12">
                 <div className="card">
                   <div className="card-header d-flex justify-content-between align-items-center">
-                    <h4 className="card-title">케이블 목록</h4>
+                    <h4 className="card-title">QR 코드 관리 / 케이블 목록</h4>
                     <div className="common-labels">
                       <label className="btn btn-label-primary btn-round btn-sm" onClick={handleDeleteSelected}>
                         <span className="btn-label">

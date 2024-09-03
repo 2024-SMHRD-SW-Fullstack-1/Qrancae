@@ -10,9 +10,13 @@ import axios from 'axios';
 
 // 날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
-  }).replace(',', '');
+  const date = new Date(dateString);
+  let formattedDate = date.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
+  formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
+
+  return formattedDate.replace(',', '');
 };
 
 // 로그 테이블의 열 설정
@@ -63,8 +67,8 @@ const Log = () => {
         columns: tableColumns,
         destroy: true,
         paging: true,
-        searching: false,
-        lengthChange: false
+        searching: true,
+        lengthChange: true
       });
     }
   }, [filteredData]);
@@ -110,6 +114,14 @@ const Log = () => {
 
   return (
     <div className="wrapper">
+      <style>
+        {`
+          table.dataTable {
+            text-align: center;
+            white-space: nowrap;
+          }
+        `}
+      </style>
       <Sidebar />
 
       <div className="main-panel">
@@ -120,13 +132,11 @@ const Log = () => {
             <div className="row">
               <div className="col-md-12">
                 <div className="card">
-                  <div className="card-header">
+                  <div className="card-header d-flex justify-content-between align-items-center" >
                     <h4 className="card-title">로그 내역</h4>
-                  </div>
-                  <div className="card-body">
-                    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px' }}>
-                      <div style={{ marginRight: '20px', marginBottom: '10px' }}>
-                        <label style={{ marginRight: '10px' }}>조회일자:</label>
+                    <div className="common-labels" style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ display: 'inline-block', marginRight: '20px' }}>
+                        <label style={{ marginRight: '5px' }}>조회일자:</label>
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
@@ -136,20 +146,12 @@ const Log = () => {
                           selectsRange
                           dateFormat="yyyy/MM/dd"
                           placeholderText="날짜 범위를 선택하세요."
-                          style={{ marginRight: '10px' }}
+                          className='date-picker'
                         />
                       </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                        <label style={{ marginRight: '10px' }}>작업자:</label>
-                        <select
-                          value={selectedUser}
-                          onChange={e => {
-                            setSelectedUser(e.target.value);
-                            filterData();
-                          }}
-                          style={{ display: 'block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
-                        >
+                      <div style={{ display: 'inline-block', marginRight: '10px' }}>
+                        <label style={{ marginRight: '5px' }}>작업자:</label>
+                        <select value={selectedUser} onChange={e => { setSelectedUser(e.target.value); filterData(); }} style={{ display: 'inline-block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}>
                           <option value="All">전체</option>
                           {users.map(user => (
                             <option key={user.user_id} value={user.user_id}>
@@ -157,13 +159,15 @@ const Log = () => {
                             </option>
                           ))}
                         </select>
-                        <button onClick={handleReset} style={{ marginLeft: '10px' }}>초기화</button>
+                        <label className='btn btn-label-primary btn-round btn-sm' onClick={handleReset} style={{ marginLeft: '10px' }}>선택 초기화</label>
                       </div>
                     </div>
+                  </div>
+                  <div className="card-body">
                     <div className="table-responsive">
                       <table
                         id="basic-logtables"
-                        className="display table table-striped table-hover"
+                        className="display table table-head-bg-info table-striped table-hover"
                         style={{ width: '100%' }}
                       >
                         <thead>

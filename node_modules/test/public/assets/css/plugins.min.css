@@ -6263,7 +6263,7 @@ table.dataTable {
   clear: both;
   margin-top: 15px !important;
   margin-bottom: 15px !important;
-  max-width: none !important;
+  max-width: 100% !important;
   border-collapse: separate !important;
 }
 

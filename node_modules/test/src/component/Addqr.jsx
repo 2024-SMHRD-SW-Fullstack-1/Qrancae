@@ -250,14 +250,11 @@ const Addqr = () => {
 
         <div className="container">
           <div className="page-inner">
-            <div className="page-header">
-              <h3 className="fw-bold mb-3">QR코드 관리</h3>
-            </div>
             <div className="row">
               <div className="col-md-12">
                 <div className="card">
                   <div className="card-header d-flex justify-content-between align-items-center">
-                    <h4 className="card-title">케이블 등록</h4>
+                    <h4 className="card-title">QR 코드 관리 / 케이블 등록</h4>
                     <div className="cable-btns">
                       <label
                         className="btn btn-label-primary btn-round btn-sm"
