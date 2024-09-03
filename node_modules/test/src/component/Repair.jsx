@@ -132,16 +132,14 @@ const Repair = () => {
                     title: '요청 날짜',
                     data: 'maint_date',
                     render: function (data) {
-                        if (data === null || data === '') {
-                            return '';
-                        }
-                        return formatDate(data);
+                        return data ? formatDate(data) : '';
                     }
                 }
             ],
             pageLength: 5,
             lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
-            destroy: true
+            destroy: true,
+            responsive: true
         });
 
         // 전체 선택/해제
@@ -202,7 +200,7 @@ const Repair = () => {
                         return errorMessages.length > 0 ? errorMessages.join('<br>') : '양호';
                     }
                 },
-                { title: '요청 날짜', data: 'maint_date', render: data => formatDate(data) },
+                { title: '요청 날짜', data: 'maint_date', render: data => formatDate(data) || '없음' },
                 {
                     title: '처리 작업자',
                     data: null,
@@ -210,7 +208,7 @@ const Repair = () => {
                         if (data.maintUser) {
                             return `${data.maintUser.user_name} (${data.maintUser.user_id})`;
                         }
-
+                        return ''
                     }
                 },
                 {
@@ -250,7 +248,8 @@ const Repair = () => {
             ],
             pageLength: 5,
             lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
-            destroy: true
+            destroy: true,
+            responsive: true
         });
 
         setTableInstance({ repairTable, repairingTable });
@@ -341,7 +340,7 @@ const Repair = () => {
                 alert('서버와의 통신 오류가 발생했습니다.');
             });
     };
-
+    // 알림창
     const handleUserChange = (event) => {
         setSelectedUser(event.target.value);
     };
