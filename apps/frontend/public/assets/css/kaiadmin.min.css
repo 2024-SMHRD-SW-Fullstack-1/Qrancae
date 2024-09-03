@@ -6195,7 +6195,7 @@ label.error {
   font-size: 1rem;
   font-weight: 500;
   opacity: 1;
-  border-radius: 3px;
+  /* border-radius: 3px; */
 }
 
 .btn:focus,
@@ -6428,15 +6428,16 @@ label.error {
 }
 
 .btn-label-primary {
-  background: rgba(21, 114, 232, 0.1);
-  color: #1572e8 !important;
+  background: rgba(29, 53, 87, 0.1);
+  color: #1D3557 !important;
   border-color: transparent;
 }
 
+.select-btn-label,
 .btn-label-primary:disabled,
 .btn-label-primary:focus,
 .btn-label-primary:hover {
-  background: #1572e8;
+  background: #1D3557;
   color: #fff !important;
   opacity: 1;
 }

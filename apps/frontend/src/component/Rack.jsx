@@ -36,25 +36,18 @@ const Rack = ({ highlightPosition }) => {
         return filledPorts[portNumber] ? portNumber : '';
     };
 
-    // 클릭된 케이블의 포트 번호로 해당 포트를 채우는 함수
-    const fillPort = () => {
+    // 컴포넌트가 렌더링될 때 포트를 채우는 로직
+    useEffect(() => {
         if (highlightPosition) {
             const { rackNumber, portNumber } = highlightPosition;
             const rowIndex = getRowIndex(parseInt(rackNumber, 10));
             const colIndex = getColIndex(parseInt(portNumber, 10));
             const portNum = calculatePortNumber(rowIndex, colIndex);
 
-            setFilledPorts((prev) => {
-                const updatedPorts = { ...prev, [portNum]: true };
-                //console.log(`선택된 포트: Rack ${rackNumber}, Port ${portNumber}, Row ${rowIndex}, Col ${colIndex}`);
-                return updatedPorts;
-            });
+            setFilledPorts({ [portNum]: true }); // 이전 정보 제거
+        } else {
+            setFilledPorts({});
         }
-    };
-
-    // 컴포넌트가 렌더링될 때 포트를 채우는 로직
-    useEffect(() => {
-        fillPort();
     }, [highlightPosition]);
 
     return (

@@ -9,7 +9,12 @@ import axios from 'axios';
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '');
+    let formattedDate = date.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
+    formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
+
+    return formattedDate.replace(',', '');
 };
 
 const Repair = () => {
@@ -24,6 +29,7 @@ const Repair = () => {
     const [rackLocationInfo, setRackLocationInfo] = useState(''); // 랙 위치
     const [highlightPosition, setHighlightPosition] = useState(null); // 보여줄 위치 저장
     const [selectedMaintsInfo, setSelectedMaintsInfo] = useState([]); // 선택된 유지보수 내역 정보
+    const [selectedBtn, setSelectedBtn] = useState("전체");
 
     useEffect(() => {
         getData();
@@ -125,6 +131,8 @@ const Repair = () => {
                     }
                 }
             ],
+            pageLength: 5,
+            lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
             destroy: true
         });
 
@@ -165,7 +173,7 @@ const Repair = () => {
                         return `${data.user.user_name} (${data.user.user_id})`;
                     }
                 },
-                { title: '케이블', data: 'cable.cable_idx' },
+                { title: '케이블', data: 'cable.cable_idx', width: '15%' },
                 {
                     title: '오류 내용',
                     data: null,
@@ -203,7 +211,7 @@ const Repair = () => {
                     render: function (data) {
                         if (data.maintUser) {
                             if (data.maint_update) {
-                                return `완료(${formatDate(data.maint_date)})`
+                                return `완료<br>(${formatDate(data.maint_date)})`
                             }
                             return '진행중'
                         }
@@ -232,6 +240,8 @@ const Repair = () => {
                 [6, 'asc'], // '상태 정렬' 열을 기준으로 정렬
                 [4, 'asc'], // '처리 작업자' 열이 없는 항목 먼저 정렬
             ],
+            pageLength: 5,
+            lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
             destroy: true
         });
 
@@ -251,6 +261,7 @@ const Repair = () => {
         $('#tab-today').on('click', function () {
             const filteredData = filterFaultyMaints(maints).filter(item => item.maint_date.startsWith(today));
             repairingTable.clear().rows.add(filteredData).draw();
+            setSelectedBtn("오늘");
         });
         // 진행
         $('#tab-in-progress').on('click', function () {
@@ -258,6 +269,7 @@ const Repair = () => {
                 item.maintUser !== null && item.maint_update === null
             );
             repairingTable.clear().rows.add(filteredData).draw();
+            setSelectedBtn("진행중");
         });
         // 완료
         $('#tab-completed').on('click', function () {
@@ -265,11 +277,13 @@ const Repair = () => {
                 item.maintUser !== null && item.maint_update !== null
             );
             repairingTable.clear().rows.add(filteredData).draw();
+            setSelectedBtn("완료");
         });
         // 전체
         $('#tab-all').on('click', function () {
             const filteredData = filterFaultyMaints(maints);
             repairingTable.clear().rows.add(filteredData).draw();
+            setSelectedBtn("전체");
         });
 
 
@@ -337,102 +351,102 @@ const Repair = () => {
     };
 
     return (
-        <div className="App">
-            <div className="wrapper">
-                <Sidebar />
-                <div className="main-panel">
-                    <Header />
-                    <div className="container">
-                        <div className="page-inner">
-                            <div className="page-header">
-                                <h3 className="fw-bold mb-3">점검 관리</h3>
-                            </div>
-                            <div className="row">
-                                <div className="col-md-4 d-flex flex-column">
-                                    <div className="card card-round flex-grow-1">
-                                        <div className="card-header">
-                                            <div className="card-head-row">
-                                                <div className="card-title">케이블 위치 확인</div>
-                                                {rackLocationInfo && (
-                                                    <div className="card-tools">
-                                                        <h6>랙 위치 : {rackLocationInfo}</h6>
-                                                    </div>
-                                                )}
+        <div className="wrapper">
+            <style>
+                {`
+                    table.dataTable {
+                        text-align: center;
+                        white-space: nowrap;
+                    `}
+            </style>
+            <Sidebar />
+            <div className="main-panel">
+                <Header />
+                <div className="container">
+                    <div className="page-inner">
+                        <div className="page-header">
+                            <h3 className="fw-bold mb-3">점검 관리</h3>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-4">
+                                <div className="card card-round">
+                                    <div className="card-header">
+                                        <div className="card-title">케이블 위치 확인</div>
+                                        {rackLocationInfo && (
+                                            <div className="card-tools">
+                                                <h6 style={{ margin: 0 }}>랙 위치 : {rackLocationInfo}</h6>
                                             </div>
-                                        </div>
-                                        <div className="card-body" style={{ height: '100%', overflowY: 'auto' }}>
-                                            <Rack highlightPosition={highlightPosition} />
+                                        )}
+                                    </div>
+                                    <div className="card-body" style={{ height: '100%', overflowY: 'auto' }}>
+                                        <Rack highlightPosition={highlightPosition} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-8">
+                                <div className="card card-round">
+                                    <div className="card-header">
+                                        <div className="card-title">점검 대상 케이블</div>
+                                        <label className="btn btn-label-primary btn-round btn-sm" onClick={maintUserSelectClick}>작업자 선택</label>
+                                    </div>
+                                    <div className="card-body" style={{ height: '50%', overflowY: 'auto' }}>
+                                        <div className="table-responsive">
+                                            <table
+                                                id="repair-table"
+                                                className="display table table-head-bg-info table-striped table-bordered table-hover"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" id="select-all" /></th>
+                                                        <th>요청 작업자</th>
+                                                        <th>케이블</th>
+                                                        <th>오류 내용</th>
+                                                        <th>요청 날짜</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-md-8 d-flex flex-column">
-                                    <div className="card card-round flex-grow-1 mb-2">
-                                        <div className="card-header">
-                                            <div className="card-head-row">
-                                                <div className="card-title">점검 대상 케이블</div>
-                                                <button className="btn btn-primary" onClick={maintUserSelectClick}>작업자 선택</button>
-                                            </div>
-                                        </div>
-                                        <div className="card-body" style={{ height: '50%', overflowY: 'auto' }}>
-                                            <div className="table-responsive">
-                                                <table
-                                                    id="repair-table"
-                                                    className="display table table-striped table-bordered table-hover"
-                                                >
-                                                    <thead>
-                                                        <tr>
-                                                            <th><input type="checkbox" id="select-all" /></th>
-                                                            <th>요청 작업자</th>
-                                                            <th>케이블</th>
-                                                            <th>오류 내용</th>
-                                                            <th>요청 날짜</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
+                                <div className="card card-round">
+                                    <div className="card-header">
+                                        <div className="card-title">케이블 점검 현황</div>
+                                        <div>
+                                            <label id="tab-all" className={`btn btn-label-primary btn-sm ${selectedBtn === "전체" ? 'select-btn-label' : ''}`}>전체</label>
+                                            <label id="tab-today" className={`btn btn-label-primary btn-sm ${selectedBtn === "오늘" ? 'select-btn-label' : ''}`}>오늘</label>
+                                            <label id="tab-in-progress" className={`btn btn-label-primary btn-sm ${selectedBtn === "진행중" ? 'select-btn-label' : ''}`}>진행중</label>
+                                            <label id="tab-completed" className={`btn btn-label-primary btn-sm ${selectedBtn === "완료" ? 'select-btn-label' : ''}`}>완료</label>
                                         </div>
                                     </div>
-                                    <div className="card card-round flex-grow-1 mb-2">
-                                        <div className="card-header">
-                                            <div className="card-head-row">
-                                                <div className="card-title">케이블 점검 현황</div>
-                                                <div>
-                                                    <button id="tab-today">오늘</button>
-                                                    <button id="tab-in-progress">진행중</button>
-                                                    <button id="tab-completed">완료</button>
-                                                    <button id="tab-all">전체</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="card-body" style={{ height: '50%', overflowY: 'auto' }}>
-                                            <div className="table-responsive">
-                                                <table
-                                                    id="repairing-table"
-                                                    className="display table table-striped table-bordered table-hover"
-                                                >
-                                                    <thead>
-                                                        <tr>
-                                                            <th>요청 작업자</th>
-                                                            <th>케이블</th>
-                                                            <th>오류 내용</th>
-                                                            <th>요청 날짜</th>
-                                                            <th>처리 작업자</th>
-                                                            <th>상태</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
+                                    <div className="card-body" style={{ height: '50%', overflowY: 'auto' }}>
+                                        <div className="table-responsive">
+                                            <table
+                                                id="repairing-table"
+                                                className="display table table-head-bg-info table-striped table-bordered table-hover"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th>요청 작업자</th>
+                                                        <th>케이블</th>
+                                                        <th>오류 내용</th>
+                                                        <th>요청 날짜</th>
+                                                        <th>처리 작업자</th>
+                                                        <th>상태</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <Footer />
                 </div>
+                <Footer />
             </div>
+
 
             {/* 작업자 선택 모달 */}
             <div className={`modal fade ${modalIsOpen ? 'show d-block' : ''}`} id="userSelectModal" tabIndex="-1" role="dialog" aria-labelledby="userSelectModalLabel" aria-hidden={!modalIsOpen}>
@@ -495,7 +509,6 @@ const Repair = () => {
                 </div>
             </div>
 
-            {/* 최종 확인 모달 */}
             <div className={`modal fade ${confirmModalIsOpen ? 'show d-block' : ''}`} id="confirmModal" tabIndex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden={!confirmModalIsOpen}>
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">

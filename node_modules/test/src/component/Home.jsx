@@ -262,13 +262,7 @@ const Home = () => {
             <div className="row h-100">
               <div className="col-md-12">
                 <div className="common-labels outside-card-labels">
-                  <label className="btn btn-primary btn-border btn-round btn-sm">
-                    <span className="btn-label">
-                      <i className="fas fa-print icon-spacing"></i>
-                    </span>
-                    출력
-                  </label>
-                  <label className="btn btn-primary btn-border btn-round btn-sm" onClick={handleReportDownload}>
+                  <label className="btn btn-label-primary btn-round btn-sm" onClick={handleReportDownload}>
                     <span className="btn-label">
                       <i className="fas fa-print icon-spacing"></i>
                     </span>
@@ -475,31 +469,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-
-        <table>
-          <tbody>
-            <tr>
-              <td>작업자명</td>
-              <td>총 점검</td>
-              <td>상세</td>
-              <td>점검 완료</td>
-            </tr>
-            <tr>
-              <td rowSpan={3}>작업자 이름</td>
-              <td rowSpan={3}>총 점검 개수</td>
-              <td>QR 불량</td>
-              <td>3</td>
-            </tr>
-            <tr>
-              <td>케이블 불량</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>전력공급 불량</td>
-              <td>2</td>
-            </tr>
-          </tbody>
-        </table>
 
         <Footer />
       </div>
