@@ -1,14 +1,21 @@
 package com.qrancae.app.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.qrancae.app.model.CableApp;
 import com.qrancae.app.model.MaintApp;
 import com.qrancae.app.model.MaintenanceData;
+import com.qrancae.app.model.MaintenanceTask;
 import com.qrancae.app.repository.MaintenanceRepository;
+import com.qrancae.app.repository.AlarmRepositoryApp;
+import com.qrancae.app.repository.CableRepositoryApp;
 
 @Service
 public class MaintenanceService {
@@ -16,34 +23,70 @@ public class MaintenanceService {
     @Autowired
     private MaintenanceRepository maintenanceRepository;
 
+    @Autowired
+    private AlarmRepositoryApp alarmRepository;
+
+    @Autowired
+    private CableRepositoryApp cableRepository;
+
+    public String getAlarmMessage(Integer maintIdx, String userId) {
+        Optional<MaintApp> optionalMaintApp = maintenanceRepository.findById(maintIdx);
+
+        if (optionalMaintApp.isPresent()) {
+            MaintApp maintApp = optionalMaintApp.get();
+
+            if ("진행중".equals(maintApp.getMaintStatus())) {
+                return "점검 중인 케이블입니다.";
+            } else if (userId.equals(maintApp.getUserId())) {
+                return maintApp.getMaintMsg() != null ? maintApp.getMaintMsg() : "전달 사항이 없습니다.";
+            } else {
+                return "지시사항";
+            }
+        } else {
+            return "전달 사항이 없습니다.";
+        }
+    }
+
     public void saveMaintenance(MaintenanceData maintenanceData) {
         Optional<MaintApp> existingMaintApp = maintenanceRepository.findFirstByCableIdxOrderByMaintDateDesc(maintenanceData.getCableIdx());
 
         if (existingMaintApp.isPresent()) {
-            // 기존 maint_user_id와 새로 들어온 user_id가 같은 경우 업데이트
             MaintApp existingMaint = existingMaintApp.get();
-            if (existingMaint.getUserId().equals(maintenanceData.getUserId()) && 
-                "보수완료".equals(maintenanceData.getMaintStatus())) {
-                
-                // 기존 항목을 업데이트
-                existingMaint.setMaintCable(maintenanceData.getMaintCable());
-                existingMaint.setMaintPower(maintenanceData.getMaintPower());
-                existingMaint.setMaintQr(maintenanceData.getMaintQr());
-                existingMaint.setMaintMsg(maintenanceData.getMaintMsg());
-                existingMaint.setMaintStatus(maintenanceData.getMaintStatus());
-                existingMaint.setMaintUpdate(LocalDateTime.now());
 
-                maintenanceRepository.save(existingMaint);
+            if ("보수완료".equals(existingMaint.getMaintStatus())) {
+                MaintApp newMaintApp = convertToMaintApp(maintenanceData);
+                maintenanceRepository.save(newMaintApp);
+            } else if (maintenanceData.getUserId().equals(existingMaint.getMaintUserId())) {
+                updateExistingMaintenance(existingMaint, maintenanceData);
             } else {
-                // 기존 데이터가 없거나 다른 사용자로 인해 새 항목 생성
-                MaintApp maintApp = convertToMaintApp(maintenanceData);
-                maintenanceRepository.save(maintApp);
+                MaintApp newMaintApp = convertToMaintApp(maintenanceData);
+                maintenanceRepository.save(newMaintApp);
             }
         } else {
-            // 유지보수 항목이 없으면 새로 생성
-            MaintApp maintApp = convertToMaintApp(maintenanceData);
-            maintenanceRepository.save(maintApp);
+            MaintApp newMaintApp = convertToMaintApp(maintenanceData);
+            maintenanceRepository.save(newMaintApp);
         }
+    }
+
+    private void updateExistingMaintenance(MaintApp existingMaint, MaintenanceData maintenanceData) {
+        if ("보수완료".equals(maintenanceData.getMaintStatus())) {
+            existingMaint.setMaintStatus("보수완료");
+            existingMaint.setMaintUpdate(LocalDateTime.now());
+        } else {
+            if (maintenanceData.getMaintCable() != null) {
+                existingMaint.setMaintCable(maintenanceData.getMaintCable());
+            }
+            if (maintenanceData.getMaintPower() != null) {
+                existingMaint.setMaintPower(maintenanceData.getMaintPower());
+            }
+            if (maintenanceData.getMaintQr() != null) {
+                existingMaint.setMaintQr(maintenanceData.getMaintQr());
+            }
+            existingMaint.setMaintMsg(maintenanceData.getMaintMsg());
+            existingMaint.setMaintStatus(maintenanceData.getMaintStatus());
+            existingMaint.setMaintUpdate(LocalDateTime.now());
+        }
+        maintenanceRepository.save(existingMaint);
     }
 
     public Integer getOrCreateMaintIdx(String userId, Integer cableIdx, boolean forceCreate) {
@@ -91,5 +134,54 @@ public class MaintenanceService {
         maintApp.setMaintMsg(maintenanceData.getMaintMsg());
 
         return maintApp;
+    }
+    
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public List<MaintenanceTask> getMaintenanceTasks(String userId, String status, String sortBy) {
+        List<MaintApp> maintApps;
+
+        if (status.equals("전체")) {
+            // 우선순위를 고려한 정렬 처리
+            if (sortBy.equals("new")) {
+                maintApps = maintenanceRepository.findAllByUserWithPriorityDesc(userId);
+            } else {
+                maintApps = maintenanceRepository.findAllByUserWithPriorityAsc(userId);
+            }
+        } else if (status.equals("신규접수")) {
+            maintApps = (sortBy.equals("new")) ?
+                    maintenanceRepository.findByUserIdAndMaintStatusOrderByMaintDateDesc(userId, status) :
+                    maintenanceRepository.findByUserIdAndMaintStatusOrderByMaintDateAsc(userId, status);
+        } else {
+            // "진행중" 및 "보수 완료" 상태 처리
+            maintApps = (sortBy.equals("new")) ?
+                    maintenanceRepository.findByMaintUserIdAndMaintStatusOrderByMaintDateDesc(userId, status) :
+                    maintenanceRepository.findByMaintUserIdAndMaintStatusOrderByMaintDateAsc(userId, status);
+        }
+
+        return maintApps.stream().map(maintApp -> {
+            String alarmMsg = alarmRepository.findAlarmMsgByMaintIdx(maintApp.getMaintIdx());
+            LocalDateTime alarmDate = alarmRepository.findAlarmDateByMaintIdx(maintApp.getMaintIdx());
+            CableApp cableApp = cableRepository.findById(maintApp.getCableIdx()).orElse(null);
+
+            MaintenanceTask task = new MaintenanceTask();
+            task.setMaintCable(maintApp.getMaintCable());
+            task.setMaintQr(maintApp.getMaintQr());
+            task.setMaintPower(maintApp.getMaintPower());
+            task.setStatus(maintApp.getMaintStatus());
+
+            // LocalDateTime을 String으로 변환
+            task.setMaintDate(maintApp.getMaintDate().format(formatter));
+            task.setAlarmDate(alarmDate != null ? alarmDate.format(formatter) : null);
+
+            task.setAlarmMsg(alarmMsg);
+            if (cableApp != null) {
+                task.setSRackNumber(cableApp.getSRackNumber());
+                task.setSRackLocation(cableApp.getSRackLocation());
+            }
+            task.setCableIdx(maintApp.getCableIdx().toString());
+
+            return task;
+        }).collect(Collectors.toList());
     }
 }

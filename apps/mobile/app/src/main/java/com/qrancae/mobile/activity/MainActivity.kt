@@ -16,6 +16,9 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
+
+    private val TAG = "MainActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -25,41 +28,46 @@ class MainActivity : ComponentActivity() {
         val userName = sharedPref.getString("userName", "사용자") // 기본값을 "사용자"로 설정
         val userId = sharedPref.getString("userId", "") // UserId도 불러오기
 
+        Log.d(TAG, "UserName: $userName, UserId: $userId")
+
         val welcomeTextView: TextView = findViewById(R.id.welcome_text)
         welcomeTextView.text = "안녕하세요\n$userName 님!"
 
         // 유지보수 현황 건수 불러오기
-        if (userId != null && userId.isNotEmpty()) {  // 수정된 부분
+        if (userId != null && userId.isNotEmpty()) {
+            Log.d(TAG, "Loading maintenance status for UserId: $userId")
             loadMaintenanceStatus(userId)
+        } else {
+            Log.e(TAG, "UserId is null or empty")
         }
 
         // 알림 버튼 클릭 리스너 설정
-        val alarmbutton: ImageButton = findViewById(R.id.btn_alarm)
-        alarmbutton.setOnClickListener {
+        val alarmButton: ImageButton = findViewById(R.id.btn_alarm)
+        alarmButton.setOnClickListener {
             openAlarm()
         }
 
         // 세팅 버튼 클릭 리스너 설정
-        val settingbutton: ImageButton = findViewById(R.id.btn_setting)
-        settingbutton.setOnClickListener {
+        val settingButton: ImageButton = findViewById(R.id.btn_setting)
+        settingButton.setOnClickListener {
             openSetting()
         }
 
         // 진행 현황 뷰 클릭 리스너 설정
-        val maintbutton: CardView = findViewById(R.id.progress_card)
-        maintbutton.setOnClickListener {
+        val maintButton: CardView = findViewById(R.id.progress_card)
+        maintButton.setOnClickListener {
             openMaint()
         }
 
         // QR 코드 스캔 버튼 클릭 리스너 설정
-        val qrbutton: Button = findViewById(R.id.qr_scan_button)
-        qrbutton.setOnClickListener {
+        val qrButton: Button = findViewById(R.id.qr_scan_button)
+        qrButton.setOnClickListener {
             openQRScanner()
         }
 
         // 로그아웃 버튼 클릭 리스너 설정
-        val logoutbutton: TextView = findViewById(R.id.tv_Logout)
-        logoutbutton.setOnClickListener {
+        val logoutButton: TextView = findViewById(R.id.tv_Logout)
+        logoutButton.setOnClickListener {
             logout()
         }
     }
@@ -75,12 +83,17 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openMaint() {
-        // 메인 화면에서 "신규 접수" 텍스트를 가져와서 숫자만 추출
         val newEntryCountText = findViewById<TextView>(R.id.new_entry_count).text.toString()
-        val newEntryCount = newEntryCountText.replace("건","").toIntOrNull() ?: 0
+        val newEntryCount = newEntryCountText.replace("건", "").toIntOrNull() ?: 0
+
+        val inProgressCountText = findViewById<TextView>(R.id.in_progress_count).text.toString()
+        val inProgressCount = inProgressCountText.replace("건", "").toIntOrNull() ?: 0
+
+        Log.d(TAG, "Opening maintenance list with New Entry Count: $newEntryCount")
 
         val intent = Intent(this, MaintListActivity::class.java).apply {
             putExtra("NEW_ENTRY_COUNT", newEntryCount)
+            putExtra("IN_PROGRESS_COUNT", inProgressCount)
         }
         startActivity(intent)
     }
@@ -91,29 +104,20 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun logout() {
-        // SharedPreferences 초기화 (사용자 정보 삭제)
+        Log.d(TAG, "Logging out and clearing user data")
         val sharedPref = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
         with(sharedPref.edit()) {
             clear()
             apply()
         }
 
-        // 로그인 페이지로 이동
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-
-        //현재 액티비티 종료
         finish()
     }
 
     private fun loadMaintenanceStatus(userId: String) {
-        // 먼저 UI 요소를 초기화
-        findViewById<TextView>(R.id.new_entry_count).text = "0건"
-        findViewById<TextView>(R.id.in_progress_count).text = "0건"
-        findViewById<TextView>(R.id.completed_count).text = "0건"
-
-        // API 호출
         RetrofitClient.apiService.getMaintenanceStatus(userId)
             .enqueue(object : Callback<MaintStatusResponse> {
                 override fun onResponse(
@@ -123,21 +127,33 @@ class MainActivity : ComponentActivity() {
                     if (response.isSuccessful) {
                         val status = response.body()
                         if (status != null) {
-                            // 받은 데이터를 UI에 반영
-                            findViewById<TextView>(R.id.new_entry_count).text =
-                                "${status.newEntryCount}건"
-                            findViewById<TextView>(R.id.in_progress_count).text =
-                                "${status.inProgressCount}건"
-                            findViewById<TextView>(R.id.completed_count).text =
-                                "${status.completedCount}건"
+                            // 건수를 SharedPreferences에 저장
+                            val sharedPref = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
+                            with(sharedPref.edit()) {
+                                putInt("NEW_ENTRY_COUNT", status.newEntryCount)
+                                putInt("IN_PROGRESS_COUNT", status.inProgressCount)
+                                apply()
+                            }
+                            // UI 업데이트
+                            findViewById<TextView>(R.id.new_entry_count).text = "${status.newEntryCount}건"
+                            findViewById<TextView>(R.id.in_progress_count).text = "${status.inProgressCount}건"
+                            findViewById<TextView>(R.id.completed_count).text = "${status.completedCount}건"
+
+                            // 아이콘 변경 로직
+                            val alarmButton: ImageButton = findViewById(R.id.btn_alarm)
+                            if (status.inProgressCount > 0) {
+                                alarmButton.setImageResource(R.drawable.ic_notifications_unread)
+                            } else {
+                                alarmButton.setImageResource(R.drawable.ic_notifications)
+                            }
                         }
                     } else {
-                        Log.e("MainActivity", "Failed to load maintenance status: ${response.errorBody()?.string()}")
+                        Log.e(TAG, "Failed to load maintenance status: ${response.errorBody()?.string()}")
                     }
                 }
 
                 override fun onFailure(call: Call<MaintStatusResponse>, t: Throwable) {
-                    Log.e("MainActivity", "Error in fetching maintenance status", t)
+                    Log.e(TAG, "Error in fetching maintenance status", t)
                 }
             })
     }

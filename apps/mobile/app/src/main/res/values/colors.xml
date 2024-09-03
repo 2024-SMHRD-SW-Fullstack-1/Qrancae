@@ -7,4 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- 기본 텍스트 색상 (검정색) -->
+    <color name="default_text_color">#000000</color>
+
+    <!-- 선택된 탭의 색상 (핑크색) -->
+    <color name="selected_tab_color">#EE38AE</color>
+
+    <color name="gray">#7C7C7C</color>
+    <color name="purple">#EE38AE</color>
+    <color name="green">#4CAF50</color>
+
 </resources>

@@ -4,18 +4,18 @@ import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 
 data class AlarmData(
-    @SerializedName("alarm_idx")
+    @SerializedName("alarmIdx")
     val alarmIdx: Long,
 
-    @SerializedName("user_id")
+    @SerializedName("userId")
     val userId: String,
 
-    @SerializedName("maint_idx")
+    @SerializedName("maintIdx")
     val maintIdx: Long,
 
-    @SerializedName("alarm_msg")
+    @SerializedName("alarmMsg")
     val alarmMsg: String,
 
-    @SerializedName("alarm_date")
-    val alarmDate: LocalDateTime
+    @SerializedName("alarmDate")
+    val alarmDate: String // LocalDateTime 대신 String으로 변경
 )

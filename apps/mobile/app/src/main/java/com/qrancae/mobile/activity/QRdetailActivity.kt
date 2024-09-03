@@ -9,26 +9,24 @@ import android.view.MotionEvent
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.qrancae.mobile.R
 import com.qrancae.mobile.model.CableData
 import com.qrancae.mobile.network.RetrofitClient
-import org.w3c.dom.Text
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 
 class QRdetailActivity : AppCompatActivity() {
 
     private val TAG = "QRdetailActivity"
     private lateinit var qrData: String
     private var cableIdx: Long = 0L
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -43,7 +41,6 @@ class QRdetailActivity : AppCompatActivity() {
         // QR 데이터에서 케이블 인덱스 추출
         cableIdx = extractCableIdxFromQR(qrData)
 
-
         // 홈 버튼 클릭 리스너
         val homeButton: ImageButton = findViewById(R.id.btn_home)
         setButtonAnimation(homeButton) {
@@ -53,7 +50,7 @@ class QRdetailActivity : AppCompatActivity() {
         // 점검 버튼 클릭 리스너
         val repairButton: ImageButton = findViewById(R.id.btn_repair)
         setButtonAnimation(repairButton) {
-            openRepair()
+            openRepair(cableIdx)  // 점검 페이지로 이동
         }
 
         // 케이블 유지보수내역 버튼 클릭 리스너
@@ -62,13 +59,10 @@ class QRdetailActivity : AppCompatActivity() {
             openList()
         }
 
-        // qrData가 null이 아닌지 확인 후 데이터 분리
+        // QR 데이터를 분리하여 화면에 표시
         qrData?.let {
             val dataParts = it.split(",")
             Log.d(TAG, "Parsed QR Data Parts: $dataParts")
-
-            val cableIdx = dataParts.getOrNull(0)?.toLongOrNull()
-            Log.d(TAG, "Cable Index: $cableIdx")
 
             cableIdx?.let { idx ->
                 fetchAndDisplayCableDate(idx)
@@ -100,28 +94,24 @@ class QRdetailActivity : AppCompatActivity() {
     }
 
     private fun openHome() {
-        // MainActivity로 이동
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }
 
     private fun extractCableIdxFromQR(qrData: String): Long {
-        // qrData에서 케이블 인덱스 추출 로직 구현
         val dataParts = qrData.split(",")
         return dataParts.getOrNull(0)?.toLongOrNull() ?: 0L
     }
+
     private fun getCableIdx(): Long {
         return cableIdx
     }
 
-    private fun openRepair() {
-        val cableIdx = getCableIdx()  // QR 코드에서 얻은 케이블 인덱스
+    private fun openRepair(cableIdx: Long) {
         val intent = Intent(this, CableMaintAddActivity::class.java)
         intent.putExtra("CABLE_IDX", cableIdx)
-        // intent.putExtra("CREATE_MAINT_IDX", false)  // maint_idx 생성을 억제 (추가)
         startActivity(intent)
     }
-
 
     private fun openList() {
         val intent = Intent(this, CableMaintListActivity::class.java)
@@ -203,5 +193,9 @@ class QRdetailActivity : AppCompatActivity() {
             elasedDateTextView.text = "N/A"
         }
     }
-}
 
+    private fun getUserId(): String {
+        val sharedPref = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
+        return sharedPref.getString("userId", "") ?: ""
+    }
+}

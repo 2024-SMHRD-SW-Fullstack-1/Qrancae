@@ -1,5 +1,6 @@
 package com.qrancae.mobile.activity
 
+import android.content.ContentValues.TAG
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.qrancae.mobile.R
+import com.qrancae.mobile.model.MaintStatusResponse
 import com.qrancae.mobile.network.RetrofitClient
 import com.qrancae.mobile.model.MaintenanceData
 import retrofit2.Call
@@ -44,12 +46,19 @@ class CableMaintAddActivity : AppCompatActivity() {
         tvNotice = findViewById(R.id.tv_notice)
         cableIdx = getCableIdx()
 
-//        fetchMaintIdxAndCheckForAlarm()
+        // 전달된 maint_idx가 있는지 확인
+        maintIdx = intent.getLongExtra("MAINT_IDX", 0L)
 
-        val currentDate = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd(E)", Locale.KOREA)
-        val formattedDate = currentDate.format(formatter)
-        findViewById<TextView>(R.id.tv_date).text = formattedDate
+        if (maintIdx == 0L && intent.getBooleanExtra("CREATE_MAINT_IDX", false)) {
+            // maint_idx가 없고, 새로 생성해야 하는 경우에만 생성
+            fetchMaintIdxAndFetchAlarmMessage()
+        } else if (maintIdx != 0L) {
+            // 기존 유지보수 항목이 있는 경우 알림 메시지를 가져옴
+            checkMaintStatusAndFetchMessage(maintIdx)
+        } else {
+            // 초기화: 알림 메시지를 지우기
+            clearNotice()
+        }
 
         btnCable = findViewById(R.id.btn_cable)
         btnPower = findViewById(R.id.btn_power)
@@ -67,31 +76,97 @@ class CableMaintAddActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener { submitMaintenance() }
     }
 
-//    private fun fetchMaintIdxAndCheckForAlarm() {
-//        val userId = getUserId()
-//
-//        RetrofitClient.apiService.getMaintIdx(userId, cableIdx.toInt(), true).enqueue(object : Callback<Int> {
-//            override fun onResponse(call: Call<Int>, response: Response<Int>) {
-//                if (response.isSuccessful) {
-//                    maintIdx = response.body()?.toLong() ?: 0L
-//                    if (maintIdx != 0L) {
-//                        Log.d("CableMaintAddActivity", "유지보수 ID : $maintIdx")
-//                        checkForAdminAlarm()
-//                    } else {
-//                        Log.d("CableMaintAddActivity", "유지보수 ID를 찾지 못했습니다.")
-//                    }
-//                } else {
-//                    Log.e("CableMaintAddActivity", "유지보수 ID 가져오기 실패: ${response.errorBody()?.string()}")
-//                    tvNotice.text = "유지보수 ID를 가져오지 못했습니다."
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<Int>, t: Throwable) {
-//                Log.e("CableMaintAddActivity", "유지보수 ID 가져오기 실패", t)
-//                tvNotice.text = "유지보수 ID 가져오기 실패"
-//            }
-//        })
-//    }
+    private fun fetchAlarmMessage() {
+        Log.d(TAG, "Fetching Alarm Message for MaintIdx: $maintIdx")
+        RetrofitClient.apiService.getAlarmByMaintIdx(maintIdx, getUserId()).enqueue(object : Callback<Map<String, String>> {
+            override fun onResponse(call: Call<Map<String, String>>, response: Response<Map<String, String>>) {
+                if (response.isSuccessful) {
+                    val message = response.body()?.get("message") ?: "전달 사항이 없습니다."
+                    Log.d(TAG, "Fetched message: $message")
+                    tvNotice.text = message
+                } else {
+                    Log.e(TAG, "Failed to fetch Alarm Message: ${response.errorBody()?.string()}")
+                    tvNotice.text = "알림 메시지를 가져오지 못했습니다."
+                }
+            }
+
+            override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
+                Log.e(TAG, "Error in fetching Alarm Message", t)
+                tvNotice.text = "알림 메시지를 가져오는 중 오류가 발생했습니다."
+            }
+        })
+    }
+
+    private fun checkMaintStatusAndFetchMessage(maintIdx: Long) {
+        val userId = getUserId()
+        RetrofitClient.apiService.getMaintenanceStatus(userId).enqueue(object : Callback<MaintStatusResponse> {
+            override fun onResponse(call: Call<MaintStatusResponse>, response: Response<MaintStatusResponse>) {
+                if (response.isSuccessful) {
+                    val maintStatusResponse = response.body()
+
+                    // 케이블이 진행 중인 상태인지 확인
+                    val isInProgress = maintStatusResponse?.inProgressCount ?: 0 > 0
+
+                    if (isInProgress) {
+                        tvNotice.text = "점검 중인 케이블입니다."
+                    } else {
+                        fetchAlarmMessage() // 지시사항을 확인하여 메시지 표시
+                    }
+                } else {
+                    Toast.makeText(this@CableMaintAddActivity, "유지보수 상태를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<MaintStatusResponse>, t: Throwable) {
+                Toast.makeText(this@CableMaintAddActivity, "서버 오류로 유지보수 상태를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun fetchMaintIdxAndFetchAlarmMessage() {
+        val userId = getUserId()
+
+        RetrofitClient.apiService.getMaintenanceStatus(userId).enqueue(object : Callback<MaintStatusResponse> {
+            override fun onResponse(call: Call<MaintStatusResponse>, response: Response<MaintStatusResponse>) {
+                if (response.isSuccessful) {
+                    val maintStatusResponse = response.body()
+
+                    // 이전 점검이 완료된 경우에만 새로운 maint_idx를 생성
+                    val forceCreateNewMaintIdx = maintStatusResponse?.completedCount ?: 0 > 0
+
+                    // 새로운 maint_idx를 생성하거나, 기존의 것을 사용할지 결정
+                    RetrofitClient.apiService.getMaintIdx(userId, cableIdx.toInt(), forceCreateNewMaintIdx).enqueue(object : Callback<Int> {
+                        override fun onResponse(call: Call<Int>, response: Response<Int>) {
+                            if (response.isSuccessful) {
+                                maintIdx = response.body()?.toLong() ?: 0L
+                                if (maintIdx != 0L) {
+                                    fetchAlarmMessage()  // 유지보수 항목을 가져옴
+                                } else {
+                                    clearNotice()  // 알림 초기화
+                                }
+                            } else {
+                                Toast.makeText(this@CableMaintAddActivity, "유지보수 ID 가져오기 실패.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Int>, t: Throwable) {
+                            Toast.makeText(this@CableMaintAddActivity, "서버 오류로 유지보수 ID를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                } else {
+                    Toast.makeText(this@CableMaintAddActivity, "유지보수 상태를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<MaintStatusResponse>, t: Throwable) {
+                Toast.makeText(this@CableMaintAddActivity, "서버 오류로 유지보수 상태를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun clearNotice() {
+        tvNotice.text = "전달 받은 안내 사항이 없습니다."
+    }
 
     private fun toggleButtonState(button: Button) {
         val isChecked = button.tag as? Boolean ?: false
@@ -107,14 +182,8 @@ class CableMaintAddActivity : AppCompatActivity() {
             button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_check, 0, 0, 0)
         }
 
-        // 만약 버튼이 처음 눌렸을 때 기본값으로 초기화되지 않았다면 여기에 기본값 설정 코드 추가
-        if (button.tag == null) {
-            button.tag = false
-        }
-
         validateSelection()
     }
-
 
     private fun toggleNoIssuesState() {
         val isChecked = btnNoIssues.tag as? Boolean ?: false
@@ -154,7 +223,6 @@ class CableMaintAddActivity : AppCompatActivity() {
         }
     }
 
-    // submitMaintenance 함수 수정
     @RequiresApi(Build.VERSION_CODES.O)
     private fun submitMaintenance() {
         val isCableChecked = btnCable.tag as? Boolean == true
@@ -176,17 +244,23 @@ class CableMaintAddActivity : AppCompatActivity() {
         val cableIdx = getCableIdx()
         val maintDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
-        // 각 항목에 대해 "불량" 또는 "양호" 값을 설정
-        val maintCable = if (isCableChecked) "불량" else "양호"
-        val maintPower = if (isPowerChecked) "불량" else "양호"
-        val maintQr = if (isQrChecked) "불량" else "양호"
-        val maintMsg = editTextMemo.text.toString()
+        val maintenanceData: MaintenanceData
 
-        Log.d("CableMaintAddActivity", "maintCable: $maintCable, maintPower: $maintPower, maintQr: $maintQr")
+        if (isNoIssuesChecked) {
+            maintenanceData = MaintenanceData(
+                userId, cableIdx, null.toString(), null.toString(),
+                null.toString(), maintDate, null.toString(), "보수완료"
+            )
+        } else {
+            val maintCable = if (isCableChecked) "불량" else "양호"
+            val maintPower = if (isPowerChecked) "불량" else "양호"
+            val maintQr = if (isQrChecked) "불량" else "양호"
+            val maintMsg = editTextMemo.text.toString()
 
-        val maintenanceData = MaintenanceData(
-            userId, cableIdx, maintCable, maintPower, maintQr, maintDate, maintMsg, maintStatus
-        )
+            maintenanceData = MaintenanceData(
+                userId, cableIdx, maintCable, maintPower, maintQr, maintDate, maintMsg, "신규접수"
+            )
+        }
 
         sendMaintenanceData(maintenanceData)
     }
@@ -208,32 +282,6 @@ class CableMaintAddActivity : AppCompatActivity() {
                 Toast.makeText(this@CableMaintAddActivity, "서버 오류: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
-    }
-
-    private fun checkForAdminAlarm() {
-        val userId = getUserId()
-        if (maintIdx != 0L) {
-            RetrofitClient.apiService.getAlarmByMaintIdx(maintIdx, userId).enqueue(object : Callback<Map<String, String>> {
-                override fun onResponse(call: Call<Map<String, String>>, response: Response<Map<String, String>>) {
-                    if (response.isSuccessful) {
-                        val alarmMsg = response.body()?.get("message")
-                        if (!alarmMsg.isNullOrEmpty()) {
-                            tvNotice.text = alarmMsg
-                        } else {
-                            tvNotice.text = "전달 받은 안내 사항이 없습니다."
-                        }
-                    } else {
-                        Log.e("CableMaintAddActivity", "알림 메시지 불러오기 실패: ${response.errorBody()?.string()}")
-                        tvNotice.text = "알림 메시지 불러오기 실패"
-                    }
-                }
-
-                override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-                    Log.e("CableMaintAddActivity", "알림 메시지 불러오기 실패", t)
-                    tvNotice.text = "알림 메시지 불러오기 실패"
-                }
-            })
-        }
     }
 
     private fun getUserId(): String {

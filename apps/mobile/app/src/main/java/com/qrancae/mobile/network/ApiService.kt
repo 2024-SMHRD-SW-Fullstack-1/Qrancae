@@ -5,6 +5,7 @@ import com.qrancae.mobile.model.CableData
 import com.qrancae.mobile.model.LogData
 import com.qrancae.mobile.model.MaintStatusResponse
 import com.qrancae.mobile.model.MaintenanceData
+import com.qrancae.mobile.model.MaintenanceTask
 import com.qrancae.mobile.model.User
 import retrofit2.Call
 import retrofit2.http.Body
@@ -29,6 +30,9 @@ interface ApiService {
     @POST("app/api/maintenance/submit")
     fun submitMaintenance(@Body maintenanceData: MaintenanceData): Call<Void>
 
+    @GET("app/api/alarm/list")
+    fun getAlarms(@Query("userId") userId: String): Call<List<AlarmData>>
+
     @GET("app/api/alarm/message")
     fun getAlarmByMaintIdx(
         @Query("maintIdx") maintIdx: Long,
@@ -43,6 +47,12 @@ interface ApiService {
         @Query("forceCreate") forceCreate: Boolean
     ): Call<Int>
 
+    @GET("app/api/maintenance/tasks")
+    fun getMaintenanceTasks(
+        @Query("userId") userId: String,  // userId를 쿼리 파라미터로 전달
+        @Query("status") status: String,  // status를 쿼리 파라미터로 전달
+        @Query("sortBy") sortBy: String   // sortBy를 쿼리 파라미터로 전달
+    ): Call<List<MaintenanceTask>>
 
 
 }

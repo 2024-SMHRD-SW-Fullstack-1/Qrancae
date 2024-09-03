@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="신규 접수 총 0건 입니다"
+        android:text="현재 진행 중인 작업은 총 X건,\n신규 접수는 Y건입니다."
         android:textColor="#000000"
         android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -113,7 +113,7 @@
 
         <TextView
             android:id="@+id/btn_new"
-            android:layout_width="80dp"
+            android:layout_width="60dp"
             android:layout_height="40dp"
             android:gravity="center"
             android:padding="8dp"
@@ -124,7 +124,7 @@
 
         <TextView
             android:id="@+id/btn_old"
-            android:layout_width="80dp"
+            android:layout_width="60dp"
             android:layout_height="40dp"
             android:gravity="center"
             android:padding="8dp"
@@ -149,9 +149,10 @@
         app:layout_constraintGuide_percent="0.10183875" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/view_content"
+        android:id="@+id/recycler_view_maintenance_tasks"
         android:layout_width="358dp"
         android:layout_height="462dp"
+        android:layout_marginBottom="-10dp"
         android:background="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -160,11 +161,11 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="36dp"
-        android:layout_marginBottom="36dp"
+        android:id="@+id/btn_qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/rounded_button"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"

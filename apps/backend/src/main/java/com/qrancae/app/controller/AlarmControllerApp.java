@@ -1,12 +1,14 @@
 package com.qrancae.app.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.qrancae.app.model.AlarmData;
 import com.qrancae.app.service.AlarmServiceApp;
 
 @RestController
@@ -16,18 +18,9 @@ public class AlarmControllerApp {
     @Autowired
     private AlarmServiceApp alarmService;
 
-    @GetMapping("/message")
-    public ResponseEntity<Map<String, String>> getAlarmMessage(
-            @RequestParam Long maintIdx, @RequestParam String userId) {
-        String alarmMsg = alarmService.getAlarmMessage(maintIdx, userId);
-
-        Map<String, String> response = new HashMap<>();
-        if (alarmMsg != null) {
-            response.put("message", alarmMsg);
-            return ResponseEntity.ok(response);
-        } else {
-            response.put("message", "알림 메시지가 없습니다.");
-            return ResponseEntity.ok(response);
-        }
+    @GetMapping("/list")
+    public ResponseEntity<List<AlarmData>> getAlarmList(@RequestParam String userId) {
+        List<AlarmData> alarms = alarmService.getInProgressAlarms(userId);
+        return ResponseEntity.ok(alarms);
     }
 }
