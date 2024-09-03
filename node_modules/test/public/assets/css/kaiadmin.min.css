@@ -11256,3 +11256,8 @@ input[type="checkbox"]:checked::before {
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
+
+tr.input-datas {
+  background-color: #1D3557;
+  color: white;
+}

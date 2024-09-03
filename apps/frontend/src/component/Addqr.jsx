@@ -47,14 +47,14 @@ const Addqr = () => {
             return '<input type="checkbox" class="row-select">';
           },
         },
-        { title: '소스 랙 번호', data: 's_rack_number' },
-        { title: '소스 랙 위치', data: 's_rack_location' },
-        { title: '소스 서버 이름', data: 's_server_name' },
-        { title: '소스 포트 번호', data: 's_port_number' },
-        { title: '목적지 랙 번호', data: 'd_rack_number' },
-        { title: '목적지 랙 위치', data: 'd_rack_location' },
-        { title: '목적지 서버 이름', data: 'd_server_name' },
-        { title: '목적지 포트 번호', data: 'd_port_number' },
+        { title: '랙 번호', data: 's_rack_number' },
+        { title: '랙 위치', data: 's_rack_location' },
+        { title: '서버 이름', data: 's_server_name' },
+        { title: '포트 번호', data: 's_port_number' },
+        { title: '랙 번호', data: 'd_rack_number' },
+        { title: '랙 위치', data: 'd_rack_location' },
+        { title: '서버 이름', data: 'd_server_name' },
+        { title: '포트 번호', data: 'd_port_number' },
       ],
       columnDefs: [
         {
@@ -317,10 +317,10 @@ const Addqr = () => {
                     <div className="table-responsive">
                       <table
                         id="basic-datatables1"
-                        className="display table table-head-bg-info table-striped table-bordered table-hover"
+                        className="display table table-striped table-bordered table-hover"
                       >
                         <thead>
-                          <tr className='input-datas'>
+                          <tr>
                             <th>
                               <label
                                 className="btn btn-label-primary btn-round btn-sm"
@@ -418,7 +418,7 @@ const Addqr = () => {
                               />
                             </th>
                           </tr>
-                          <tr>
+                          <tr className='input-datas'>
                             <th rowSpan="2">
                               <input
                                 type="checkbox"
@@ -433,7 +433,7 @@ const Addqr = () => {
                             <th colSpan="4">
                               <i className="fas fa-sign-in-alt" style={{ color: '#1572e8', marginRight: '.5rem' }}></i> 도착점 (End)</th>
                           </tr>
-                          <tr>
+                          <tr className='input-datas'>
                             <th>랙 번호</th>
                             <th>랙 위치</th>
                             <th>서버 이름</th>
