@@ -65,14 +65,6 @@ const Addqr = () => {
             return '<input type="checkbox">';
           },
         },
-        {
-          targets: [1, 2, 3, 4],
-          className: 'source-data',
-        },
-        {
-          targets: [5, 6, 7, 8],
-          className: 'destination-data',
-        },
       ],
       initComplete: function () {
         $('#select-all').on('click', function () {

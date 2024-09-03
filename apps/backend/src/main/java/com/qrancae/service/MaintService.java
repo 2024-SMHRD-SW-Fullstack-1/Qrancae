@@ -141,4 +141,15 @@ public class MaintService {
 	    return defectCounts;
 	}
    
+   /* 작업자별 점검 현황 */
+   public int userRepairThisMonth(String user_id, String status) {
+	   List<Maint> maintList = maintRepository.countRepairThisMonthForUser(user_id);
+	   
+	   long count = maintList.stream()
+               .filter(m -> status.equals(m.getMaint_status()))
+               .count();
+	   
+	   return (int) count;
+   }
+   
 }

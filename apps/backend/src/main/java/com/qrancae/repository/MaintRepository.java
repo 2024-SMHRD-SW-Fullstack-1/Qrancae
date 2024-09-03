@@ -93,4 +93,11 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	@Query("SELECT m FROM Maint m WHERE m.cable = :cable")
 	Maint findByCable(@Param("cable") Cable cable);
 
+	/* 작업자별 점검 현황 */
+	@Query("SELECT m FROM Maint m " +
+		       "WHERE m.user.user_id = :user_id " +
+		       "AND FUNCTION('MONTH', m.maint_date) = FUNCTION('MONTH', CURRENT_DATE) " +
+		       "AND FUNCTION('YEAR', m.maint_date) = FUNCTION('YEAR', CURRENT_DATE)")
+	List<Maint> countRepairThisMonthForUser(@Param("user_id") String userId);
+
 }
