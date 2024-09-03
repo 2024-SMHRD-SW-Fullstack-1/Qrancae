@@ -28,20 +28,6 @@ const tableColumns = [
   { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
 ];
 
-// 연도, 월, 일 선택 옵션 생성
-const generateOptions = (type) => {
-  const currentYear = new Date().getFullYear();
-  const options = type === 'year'
-    ? [...Array(10).keys()].map(i => currentYear - i)
-    : type === 'month'
-      ? [...Array(12).keys()].map(i => i + 1)
-      : [...Array(31).keys()].map(i => i + 1);
-
-  return options.map(value => (
-    <option key={value} value={value}>{value}</option>
-  ));
-};
-
 const Log = () => {
   const [logdata, setLogdata] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -49,7 +35,6 @@ const Log = () => {
   const [year, setYear] = useState('All');
   const [month, setMonth] = useState('All');
   const [day, setDay] = useState('All');
-  const [searchMode, setSearchMode] = useState(false);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All');
 
@@ -123,10 +108,6 @@ const Log = () => {
     setFilteredData(logdata);
   };
 
-  useEffect(() => {
-    handleReset();
-  }, [searchMode]);
-
   return (
     <div className="wrapper">
       <Sidebar />
@@ -141,81 +122,43 @@ const Log = () => {
                 <div className="card">
                   <div className="card-header">
                     <h4 className="card-title">로그 내역</h4>
-                    <button
-                      onClick={() => setSearchMode(prev => !prev)}
-                      style={{ marginBottom: '20px' }}
-                    >
-                      {searchMode ? '기본 검색' : '세부 검색'}
-                    </button>
                   </div>
                   <div className="card-body">
                     <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px' }}>
-                      {!searchMode ? (
-                        <>
-                          <div style={{ marginRight: '20px', marginBottom: '10px' }}>
-                            <label style={{ marginRight: '10px' }}>조회일자:</label>
-                            <DatePicker
-                              locale={ko}
-                              selected={dateRange[0]}
-                              onChange={dates => { setDateRange(dates); filterData(); }}
-                              startDate={dateRange[0]}
-                              endDate={dateRange[1]}
-                              selectsRange
-                              dateFormat="yyyy/MM/dd"
-                              placeholderText="날짜 범위를 선택하세요."
-                              style={{ marginRight: '10px' }}
-                            />
-                            <button onClick={handleReset}>초기화</button>
-                          </div>
+                      <div style={{ marginRight: '20px', marginBottom: '10px' }}>
+                        <label style={{ marginRight: '10px' }}>조회일자:</label>
+                        <DatePicker
+                          locale={ko}
+                          selected={dateRange[0]}
+                          onChange={dates => { setDateRange(dates); filterData(); }}
+                          startDate={dateRange[0]}
+                          endDate={dateRange[1]}
+                          selectsRange
+                          dateFormat="yyyy/MM/dd"
+                          placeholderText="날짜 범위를 선택하세요."
+                          style={{ marginRight: '10px' }}
+                        />
+                      </div>
 
-                          {dateRange[0] && dateRange[1] && (
-                            <div style={{ marginBottom: '20px' }}>
-                              <strong>선택된 날짜 범위:</strong> {dateRange[0].toLocaleDateString()} - {dateRange[1].toLocaleDateString()}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          {['year', 'month', 'day'].map((type) => (
-                            <div key={type} style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                              <label style={{ marginRight: '10px' }}>
-                                {type === 'year' ? '년' : type === 'month' ? '월' : '일'}:
-                              </label>
-                              <select
-                                value={type === 'year' ? year : type === 'month' ? month : day}
-                                onChange={e => {
-                                  const value = e.target.value;
-                                  type === 'year' ? setYear(value) : type === 'month' ? setMonth(value) : setDay(value);
-                                  filterData();
-                                }}
-                                style={{ display: 'block', width: '100px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
-                              >
-                                <option value="All">전체</option>
-                                {generateOptions(type).map(option => option)}
-                              </select>
-                            </div>
+                      <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
+                        <label style={{ marginRight: '10px' }}>작업자:</label>
+                        <select
+                          value={selectedUser}
+                          onChange={e => {
+                            setSelectedUser(e.target.value);
+                            filterData();
+                          }}
+                          style={{ display: 'block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        >
+                          <option value="All">전체</option>
+                          {users.map(user => (
+                            <option key={user.user_id} value={user.user_id}>
+                              {user.user_name} ({user.user_id})
+                            </option>
                           ))}
-                          <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                            <label style={{ marginRight: '10px' }}>작업자:</label>
-                            <select
-                              value={selectedUser}
-                              onChange={e => {
-                                setSelectedUser(e.target.value);
-                                filterData();
-                              }}
-                              style={{ display: 'block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
-                            >
-                              <option value="All">전체</option>
-                              {users.map(user => (
-                                <option key={user.user_id} value={user.user_id}>
-                                  {user.user_name} ({user.user_id})
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <button onClick={handleReset}>초기화</button>
-                        </div>
-                      )}
+                        </select>
+                        <button onClick={handleReset} style={{ marginLeft: '10px' }}>초기화</button>
+                      </div>
                     </div>
                     <div className="table-responsive">
                       <table
