@@ -108,6 +108,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadMaintenanceStatus(userId: String) {
+        // 먼저 UI 요소를 초기화
+        findViewById<TextView>(R.id.new_entry_count).text = "0건"
+        findViewById<TextView>(R.id.in_progress_count).text = "0건"
+        findViewById<TextView>(R.id.completed_count).text = "0건"
+
+        // API 호출
         RetrofitClient.apiService.getMaintenanceStatus(userId)
             .enqueue(object : Callback<MaintStatusResponse> {
                 override fun onResponse(
@@ -117,6 +123,7 @@ class MainActivity : ComponentActivity() {
                     if (response.isSuccessful) {
                         val status = response.body()
                         if (status != null) {
+                            // 받은 데이터를 UI에 반영
                             findViewById<TextView>(R.id.new_entry_count).text =
                                 "${status.newEntryCount}건"
                             findViewById<TextView>(R.id.in_progress_count).text =
@@ -125,10 +132,7 @@ class MainActivity : ComponentActivity() {
                                 "${status.completedCount}건"
                         }
                     } else {
-                        Log.e(
-                            "MainActivity",
-                            "Failed to load maintenance status: ${response.errorBody()?.string()}"
-                        )
+                        Log.e("MainActivity", "Failed to load maintenance status: ${response.errorBody()?.string()}")
                     }
                 }
 

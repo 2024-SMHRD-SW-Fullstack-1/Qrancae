@@ -26,9 +26,29 @@ public class MaintApp {
     @Column(name = "maint_status", nullable = false, length = 20)
     private String maintStatus;
     
-    @Column(name = "maint_user_id", nullable = false, length = 50)
+    @Column(name = "maint_user_id", length = 50)
     private String maintUserId;
     
     @Column(name = "maint_date", nullable = false)
     private LocalDateTime maintDate = LocalDateTime.now();
+    
+    @Column(name = "cable_idx", nullable = false)
+    private Integer cableIdx;  // cableIdx 추가
+    
+    @Column(name = "maint_update")
+    private LocalDateTime maintUpdate;
+
+    @Column(name = "maint_cable", length = 2)
+    private String maintCable;
+
+    @Column(name = "maint_power", length = 2)
+    private String maintPower;
+
+    @Column(name = "maint_qr", length = 2)
+    private String maintQr;
+
+    @Column(name = "maint_msg", length = 100)
+    private String maintMsg;
+
+    
 }

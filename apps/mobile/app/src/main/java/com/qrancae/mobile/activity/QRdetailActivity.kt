@@ -26,6 +26,9 @@ import java.util.Locale
 class QRdetailActivity : AppCompatActivity() {
 
     private val TAG = "QRdetailActivity"
+    private lateinit var qrData: String
+    private var cableIdx: Long = 0L
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -34,8 +37,12 @@ class QRdetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_qrdetail)
 
         // QRCodeScanActivity에서 전달된 QR 데이터 받아오기
-        val qrData = intent.getStringExtra("QR_DATA")
+        qrData = intent.getStringExtra("QR_DATA") ?: ""
         Log.d(TAG, "QR Data: $qrData")
+
+        // QR 데이터에서 케이블 인덱스 추출
+        cableIdx = extractCableIdxFromQR(qrData)
+
 
         // 홈 버튼 클릭 리스너
         val homeButton: ImageButton = findViewById(R.id.btn_home)
@@ -98,10 +105,23 @@ class QRdetailActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun extractCableIdxFromQR(qrData: String): Long {
+        // qrData에서 케이블 인덱스 추출 로직 구현
+        val dataParts = qrData.split(",")
+        return dataParts.getOrNull(0)?.toLongOrNull() ?: 0L
+    }
+    private fun getCableIdx(): Long {
+        return cableIdx
+    }
+
     private fun openRepair() {
+        val cableIdx = getCableIdx()  // QR 코드에서 얻은 케이블 인덱스
         val intent = Intent(this, CableMaintAddActivity::class.java)
+        intent.putExtra("CABLE_IDX", cableIdx)
+        // intent.putExtra("CREATE_MAINT_IDX", false)  // maint_idx 생성을 억제 (추가)
         startActivity(intent)
     }
+
 
     private fun openList() {
         val intent = Intent(this, CableMaintListActivity::class.java)
