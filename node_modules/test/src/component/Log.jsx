@@ -136,7 +136,7 @@ const Log = () => {
                     <h4 className="card-title">로그 내역</h4>
                     <div className="common-labels" style={{ display: 'flex', alignItems: 'center' }}>
                       <div style={{ display: 'inline-block', marginRight: '20px' }}>
-                        <label style={{ marginRight: '5px' }}>조회일자:</label>
+                        <label style={{ marginRight: '5px' }}>조회 일자</label>
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
@@ -150,7 +150,7 @@ const Log = () => {
                         />
                       </div>
                       <div style={{ display: 'inline-block', marginRight: '10px' }}>
-                        <label style={{ marginRight: '5px' }}>작업자:</label>
+                        <label style={{ marginRight: '5px' }}>작업자</label>
                         <select value={selectedUser} onChange={e => { setSelectedUser(e.target.value); filterData(); }} style={{ display: 'inline-block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}>
                           <option value="All">전체</option>
                           {users.map(user => (

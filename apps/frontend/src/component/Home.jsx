@@ -304,7 +304,7 @@ const Home = () => {
                 <div className="card card-round">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <div className="card-title">일정</div>
-                    <label className="btn btn-primary btn-border btn-round btn-sm" onClick={handleOpenPopup}>
+                    <label className="btn btn-label-primary btn-round btn-sm" onClick={handleOpenPopup}>
                       <span className="btn-label">
                         <i className="far fa-calendar-plus icon-spacing"></i>
                       </span>
