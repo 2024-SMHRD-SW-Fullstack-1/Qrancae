@@ -396,7 +396,7 @@ public class MainController {
 		userDetailSheet.createRow(rowUserNum++);
 		userDetailSheet.createRow(rowUserNum++);
 
-		// 작업자별 점검 현황 시트
+		// 작업자별 점검 현황
 		Row userTitleRow = userDetailSheet.createRow(rowUserNum++);
 		String userTitle = "작업자별 점검 현황";
 		Cell userTitleCell = userTitleRow.createCell(0);

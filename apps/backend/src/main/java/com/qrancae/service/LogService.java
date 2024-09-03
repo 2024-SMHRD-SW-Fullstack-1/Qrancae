@@ -73,4 +73,28 @@ public class LogService {
            default: return "Unknown";
        }
    }
+   
+   // 오늘 로그
+   public int getCntLogToday() {
+	   return logRepository.countLogsToday();
+   }
+   
+   // 이번주 로그
+   public int getCntLogWeek() {
+	   return logRepository.countLogsThisWeek();
+   }
+   
+   // 이번달 로그
+   public int getCntLogMonth() {
+	   return logRepository.countLogsThisMonth();
+   }
+   
+   // 해당 작업자의 이번달 로그 횟수
+   public int countLogsForUserThisMonth(String userId) {
+       return logRepository.countLogsForUserThisMonth(userId);
+   }
+   
+   public List<Log> getLogListToday() {
+	   return logRepository.findAllLogsToday();
+   }
 }

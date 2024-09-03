@@ -11,5 +11,9 @@ import com.qrancae.model.Qr;
 import jakarta.transaction.Transactional;
 
 public interface QrRepository extends JpaRepository<Qr, Integer> {
-
+	
+	@Modifying
+    @Transactional
+    @Query("UPDATE Qr q SET q.qr_status = 'O' WHERE q.cable_idx IN :cableIdxList")
+    void updateQrStatusToComplete(List<Integer> cableIdxList);
 }

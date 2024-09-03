@@ -143,6 +143,11 @@ public class QrController {
 		return qrImgList;
 	}
 	
+	@PostMapping("/printComplete")
+	public void printComplete(@RequestBody List<Integer> cableIdxList) {
+		qrService.printCompleteIdx(cableIdxList);
+	}
+	
 	// 선택된 케이블 정보 삭제
 	@PostMapping("/deleteQr")
 	public String deleteQr(@RequestBody List<Integer> cableIdxList) {

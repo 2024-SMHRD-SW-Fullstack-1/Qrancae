@@ -176,6 +176,15 @@ const Qr = () => {
     );
   };
 
+  const handlePrintComplete = () => {
+    axios.post('http://localhost:8089/qrancae/printComplete', Array.from(selectedCableIds), {
+      headers: { 'Content-Type': 'application/json' }
+    }).then((res) => {
+      console.log("프린트 완료 시 상태 변환", res);
+      window.location.reload();
+    });
+  };
+
   return (
     <div className="wrapper">
       <style>
@@ -232,6 +241,7 @@ const Qr = () => {
                           </label>
                         )}
                         content={() => printRef.current}
+                        onAfterPrint={handlePrintComplete}
                       />
                     </div>
                   </div>
