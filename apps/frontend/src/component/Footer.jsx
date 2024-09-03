@@ -1,4 +1,5 @@
 import React from 'react';
+import Chatgpt from './Chatgpt';
 
 const Footer = () => {
   return (
@@ -23,10 +24,13 @@ const Footer = () => {
                 Licenses{' '}
               </a>
             </li>
+            <li>
+              <Chatgpt/>
+            </li>
           </ul>
         </nav>
         <div className="copyright">
-          2024, made with <i className="fa fa-heart heart text-danger"></i> by
+          QR코드 기반 케이블 관리자 시스템<i className="fa fa-heart heart text-danger"></i> by
           <a href="http://www.themekita.com">ThemeKita</a>
         </div>
         <div>

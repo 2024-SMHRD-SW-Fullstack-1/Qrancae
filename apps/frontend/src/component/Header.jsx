@@ -1,12 +1,16 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate 임포트 추가
-import Cookies from 'js-cookie'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
+import Cookies from 'js-cookie';
 import Timer from './Timer';
+import AIButton from './AIButton'; 
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const Header = () => {
-
   const [adminName, setAdminName] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+  const [advice, setAdvice] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,9 +18,18 @@ const Header = () => {
     if (storedAdminName) {
       setAdminName(storedAdminName);
     } else {
-      navigate('/login'); // userId 쿠키가 없으면 로그인 페이지로 이동
+      navigate('/login');
     }
   }, [navigate]);
+
+  const handleAIButtonClick = (advice) => {
+    setAdvice(advice);
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
 
   return (
     <div className="main-header">
@@ -52,6 +65,9 @@ const Header = () => {
             </li>
           </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
+            <li className="nav-item">
+              <AIButton onAIButtonClick={handleAIButtonClick} />
+            </li>
             <li className="nav-item topbar-icon dropdown hidden-caret">
               <a
                 className="nav-link dropdown-toggle"
@@ -198,6 +214,22 @@ const Header = () => {
           </ul>
         </div>
       </nav>
+      {/* 팝업 창 */}
+      {showPopup && (
+        <Modal
+          isOpen={showPopup}
+          onRequestClose={handleClosePopup}
+          contentLabel="점검 추천"
+          className="popup-content"
+          overlayClassName="popup-overlay"
+        >
+          <h2>점검 추천</h2>
+          <p>{advice}</p>
+          <button onClick={handleClosePopup} className="btn btn-secondary">
+            닫기
+          </button>
+        </Modal>
+      )}
     </div>
   );
 };

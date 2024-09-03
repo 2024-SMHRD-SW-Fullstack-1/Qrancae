@@ -11375,3 +11375,8 @@ text {
 .dt-layout-cell.dt-layout-end {
   display: none;
 }
+
+table.dataTable {
+  width: 100% !important;
+  table-layout: auto;
+}
