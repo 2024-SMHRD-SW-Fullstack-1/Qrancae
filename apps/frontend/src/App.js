@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Navigate 추가
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Qr from './component/Qr';
 import Home from './component/Home';
 import './App.css';
@@ -11,7 +11,6 @@ import Addqr from './component/Addqr';
 import Repair from './component/Repair';
 import Register from './component/Register';
 import UserDetail from './component/UserDetail';
-
 
 function App() {
   return (
@@ -34,3 +33,4 @@ function App() {
 }
 
 export default App;
+
