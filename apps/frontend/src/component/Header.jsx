@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import Timer from './Timer';
-import AIButton from './AIButton'; 
+import AIButton from './AIButton';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root'); // Modal의 접근성 설정
@@ -68,6 +68,7 @@ const Header = () => {
             <li className="nav-item">
               <AIButton onAIButtonClick={handleAIButtonClick} />
             </li>
+            {/* 알림 드롭다운 메뉴 */}
             <li className="nav-item topbar-icon dropdown hidden-caret">
               <a
                 className="nav-link dropdown-toggle"
@@ -78,8 +79,8 @@ const Header = () => {
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <i className="fa fa-bell"></i>
-                <span className="notification">4</span>
+                <i className="fa fa-bell"></i>{/* 알림 아이콘 */}
+                <span className="notification">4</span>{/* 알림 개수 표시 */}
               </a>
               <ul
                 className="dropdown-menu notif-box animated fadeIn"
@@ -87,12 +88,13 @@ const Header = () => {
               >
                 <li>
                   <div className="dropdown-title">
-                    You have 4 new notification
+                    You have 4 new notification{/* 알림 제목 */}
                   </div>
                 </li>
                 <li>
                   <div className="notif-scroll scrollbar-outer">
                     <div className="notif-center">
+                      {/* 개별 알림 항목들 */}
                       <a href="#">
                         <div className="notif-icon notif-primary">
                           <i className="fa fa-user-plus"></i>
@@ -146,6 +148,7 @@ const Header = () => {
                 </li>
               </ul>
             </li>
+            {/* 사용자 프로필 드롭다운 메뉴 */}
             <li className="nav-item topbar-user dropdown hidden-caret">
               <a
                 className="dropdown-toggle profile-pic"
@@ -177,13 +180,13 @@ const Header = () => {
                         />
                       </div>
                       <div className="u-text">
-                        <h4>Hizrian</h4>
-                        <p className="text-muted">hello@example.com</p>
+                        <h4>Hizrian</h4>{/* 사용자 이름 */}
+                        <p className="text-muted">hello@example.com</p>{/* 사용자 이메일 */}
                         <a
                           href="profile.html"
                           className="btn btn-xs btn-secondary btn-sm"
                         >
-                          View Profile
+                          View Profile{/* 프로필 보기 버튼 */}
                         </a>
                       </div>
                     </div>
