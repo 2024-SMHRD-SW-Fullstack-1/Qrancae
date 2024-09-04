@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.qrancae.model.Cable;
 import com.qrancae.model.Log;
+import com.qrancae.model.User;
 import com.qrancae.repository.LogRepository;
 
 @Service
@@ -73,4 +74,9 @@ public class LogService {
            default: return "Unknown";
        }
    }
+   
+   public int countLogsByUser(User user) {
+	   return logRepository.countLogsByUser(user);
+   }
+   
 }

@@ -30,13 +30,18 @@ const Timer = () => {
         return () => clearInterval(intervalId.current);
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         axios.post('http://localhost:8089/qrancae/api/logout', {}, { withCredentials: true })
-            .then(response => {
+            .then(async (response) => {
                 if (response.data === '로그아웃 성공') {
                     Cookies.remove('userId');
-                    alert('로그인 시간이 만료되어 로그아웃 되었습니다.');
                     navigate('/login');
+    
+                    // 1초 대기 (sleep 기능)
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+                    // 1초 후에 alert 표시
+                    alert('로그인 시간이 만료되어 로그아웃 되었습니다.');
                 } else {
                     alert('로그아웃 실패');
                 }

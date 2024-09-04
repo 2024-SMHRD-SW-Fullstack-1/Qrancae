@@ -99,5 +99,8 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 		       "AND FUNCTION('MONTH', m.maint_date) = FUNCTION('MONTH', CURRENT_DATE) " +
 		       "AND FUNCTION('YEAR', m.maint_date) = FUNCTION('YEAR', CURRENT_DATE)")
 	List<Maint> countRepairThisMonthForUser(@Param("user_id") String userId);
-
+	
+	// 보수 완료된 작업 내역을 해당 작업자의 user_id로 카운트
+    @Query("SELECT COUNT(m) FROM Maint m WHERE m.maintUser.user_id = :userId AND m.maint_status = '보수완료'")
+    int countCompletedMaintenanceByUser(@Param("userId") String userId);
 }

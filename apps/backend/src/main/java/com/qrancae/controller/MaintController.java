@@ -72,5 +72,11 @@ public class MaintController {
           return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
        }
    }
-
+   
+// 특정 사용자(user_id)의 보수 완료 내역 수를 반환하는 API
+   @GetMapping("/api/maint/count/{userId}")
+   public ResponseEntity<Integer> getCompletedMaintenanceCountByUser(@PathVariable String userId) {
+       int completedCount = maintService.countCompletedMaintenanceByUser(userId);
+       return ResponseEntity.ok(completedCount);
+   }
 }

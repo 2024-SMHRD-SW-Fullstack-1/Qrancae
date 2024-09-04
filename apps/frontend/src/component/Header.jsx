@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import Timer from './Timer';
+// import Timer from './Timer';
 import AIButton from './AIButton';
 import Modal from 'react-modal';
-
+import axios from 'axios'; //(sun)
 Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const Header = () => {
@@ -14,9 +14,18 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedAdminName = Cookies.get('userId');
-    if (storedAdminName) {
-      setAdminName(storedAdminName);
+    const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
+    if (storedUserId) {
+      // userId로 사용자 이름을 가져오는 API 호출
+      axios.get(`http://localhost:8089/qrancae/api/users/${storedUserId}`)
+        .then(response => {
+          const userName = response.data.userName; // 서버에서 받은 사용자 이름
+          setAdminName(userName); // 사용자 이름을 저장
+        })
+        .catch(error => {
+          console.error('사용자 정보 가져오기 실패:', error);
+          navigate('/login'); // 실패 시 로그인 페이지로 이동
+        });
     } else {
       navigate('/login');
     }
@@ -59,10 +68,10 @@ const Header = () => {
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div className="container-fluid">
           <ul className="navbar-nav topbar-nav align-items-center">
-            {/* Timer 컴포넌트를 좌측에 배치 */}
-            <li className="nav-item">
-              <Timer />
-            </li>
+            
+            {/* <li className="nav-item">
+              
+            </li> */}
           </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
             <li className="nav-item">

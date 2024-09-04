@@ -152,4 +152,9 @@ public class MaintService {
 	   return (int) count;
    }
    
+// 보수 완료 내역을 사용자 ID로 카운트
+   public int countCompletedMaintenanceByUser(String userId) {
+       return maintRepository.countCompletedMaintenanceByUser(userId);
+   }
+   
 }

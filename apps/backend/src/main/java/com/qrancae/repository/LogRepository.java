@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.qrancae.model.Cable;
 import com.qrancae.model.Log;
+import com.qrancae.model.User;
 
 @Repository
 public interface LogRepository extends JpaRepository<Log, Integer> {
@@ -23,4 +24,8 @@ public interface LogRepository extends JpaRepository<Log, Integer> {
    
    @Query("SELECT l FROM Log l WHERE l.cable = :cable")
    Log findByCable(@Param("cable") Cable cable);
+   
+// 사용자 객체로 로그 수를 계산하는 쿼리
+   @Query("SELECT COUNT(l) FROM Log l WHERE l.user = :user")
+   int countLogsByUser(@Param("user") User user);
 }

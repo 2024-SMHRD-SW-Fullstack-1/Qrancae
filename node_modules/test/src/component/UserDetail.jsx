@@ -10,11 +10,12 @@ const UserDetail = () => {
     const [userPw, setUserPw] = useState('');
     const [confirmPw, setConfirmPw] = useState('');
     const [userName, setUserName] = useState('');
+    const [errors, setErrors] = useState({}); // 오류 메시지를 저장할 state
 
     useEffect(() => {
         // 초기 로드 시 사용자 정보를 가져옵니다.
         axios.get(`http://localhost:8089/qrancae/api/users/${userId}`)
-            .then(({ data }) => { // destructuring을 통해 data를 바로 사용
+            .then(({ data }) => {
                 const user = data;
                 setUserPw(user.userPw);
                 setUserName(user.userName);
@@ -25,16 +26,24 @@ const UserDetail = () => {
     }, [userId]);
 
     const handleUpdate = () => {
-        if (userPw !== confirmPw) {
-            alert("비밀번호 불일치!");
-            return;
+        let newErrors = {};
+
+        // 유효성 검사
+        if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
+        if (userPw !== confirmPw) newErrors.confirmPw = '*비밀번호가 일치하지 않습니다.';
+        if (!userName) newErrors.userName = '*이름을 입력해주세요.';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return; // 오류가 있으면 업데이트를 중단
         }
 
         axios.put(`http://localhost:8089/qrancae/api/users/${userId}`, {
             userPw: userPw,
             userName: userName
         })
-            .then(() => { // response 변수를 사용하지 않음
+            .then(() => {
                 alert('작업자 정보가 수정되었습니다.');
                 navigate('/user');
             })
@@ -46,7 +55,7 @@ const UserDetail = () => {
     const handleDelete = () => {
         if (window.confirm('정말로 이 작업자를 삭제하시겠습니까?')) {
             axios.delete(`http://localhost:8089/qrancae/api/users/${userId}`)
-                .then(() => { // response 변수를 사용하지 않음
+                .then(() => {
                     alert('작업자 정보가 삭제되었습니다.');
                     navigate('/user');
                 })
@@ -70,6 +79,7 @@ const UserDetail = () => {
                 onChange={(e) => setUserPw(e.target.value)}
                 placeholder="비밀번호를 입력하세요."
             /><br />
+            {errors.userPw && <div style={{ color: 'red' }}>{errors.userPw}</div>}
 
             <label>비밀번호 재입력</label>
             <input
@@ -78,6 +88,7 @@ const UserDetail = () => {
                 onChange={(e) => setConfirmPw(e.target.value)}
                 placeholder="비밀번호를 다시 입력하세요."
             /><br />
+            {errors.confirmPw && <div style={{ color: 'red' }}>{errors.confirmPw}</div>}
 
             <label>이름</label>
             <input
@@ -86,6 +97,7 @@ const UserDetail = () => {
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="이름을 입력하세요."
             /><br />
+            {errors.userName && <div style={{ color: 'red' }}>{errors.userName}</div>}
 
             <button className={styles.updateButton} onClick={handleUpdate}>작업자 정보 수정</button>
             <button className={styles.deleteButton} onClick={handleDelete}>작업자 정보 삭제</button>

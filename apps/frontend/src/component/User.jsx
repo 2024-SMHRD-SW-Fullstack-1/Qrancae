@@ -19,7 +19,30 @@ const User = () => {
   useEffect(() => {
     axios.get('http://localhost:8089/qrancae/api/users')
       .then(response => {
-        setUsers(response.data);
+        const userData = response.data;
+        const logRequests = userData.map(user => 
+          axios.get(`http://localhost:8089/qrancae/api/logs/count/${user.userId}`)
+        );
+        const maintRequests = userData.map(user => 
+          axios.get(`http://localhost:8089/qrancae/api/maint/count/${user.userId}`)
+        );
+
+        // 모든 로그 및 수리 요청을 병렬로 처리
+        Promise.all([...logRequests, ...maintRequests])
+          .then(responses => {
+            const logResponses = responses.slice(0, userData.length);
+            const maintResponses = responses.slice(userData.length);
+
+            const updatedUsers = userData.map((user, index) => ({
+              ...user,
+              logCount: logResponses[index].data,
+              maintCount: maintResponses[index].data
+            }));
+            setUsers(updatedUsers);
+          })
+          .catch(error => {
+            console.error('정보 가져오기 실패!', error);
+          });
       })
       .catch(error => {
         console.error('유저 정보 가져오기 실패!', error);
@@ -55,10 +78,6 @@ const User = () => {
                         <div className="job">{user.userId}</div>
                         <div className="desc">{user.joinedAt}</div>
                         <div className="view-profile">
-                          {/* <a
-                            href="#"
-                            className="btn btn-primary btn-border btn-round"
-                          > */}
                           <div className="view-profile">
                             <label
                               className="btn btn-primary btn-border btn-round"
@@ -68,23 +87,18 @@ const User = () => {
                               작업자 정보 수정
                             </label>
                           </div>
-                          {/* </a> */}
                         </div>
                       </div>
                     </div>
                     <div className="card-footer">
                       <div className="row user-stats text-center">
                         <div className="col">
-                          <div className="number">온라인 여부</div>
-                          <div className="title">🟢</div>
-                        </div>
-                        <div className="col">
                           <div className="number">로그 내역</div>
-                          <div className="title">12</div>
+                          <div className="title">{user.logCount || 0}</div>
                         </div>
                         <div className="col">
                           <div className="number">수리 내역</div>
-                          <div className="title">03</div>
+                          <div className="title">{user.maintCount || 0}</div>
                         </div>
                       </div>
                     </div>
