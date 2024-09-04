@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Navigate 추가
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Qr from './component/Qr';
 import Home from './component/Home';
 import './App.css';
@@ -11,7 +11,7 @@ import Addqr from './component/Addqr';
 import Repair from './component/Repair';
 import Register from './component/Register';
 import UserDetail from './component/UserDetail';
-
+import AdminDetail from './component/AdminDetail'; // AdminDetail 컴포넌트를 임포트
 
 function App() {
   return (
@@ -27,6 +27,7 @@ function App() {
       <Route path="/maint" element={<Maintenance />} />
       <Route path="/user" element={<User />} />
       <Route path="/user/:userId" element={<UserDetail />} />
+      <Route path="/admin/me" element={<AdminDetail />} />
       <Route path="/form" element={<Form />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
@@ -34,3 +35,4 @@ function App() {
 }
 
 export default App;
+

@@ -1,0 +1,76 @@
+2024-09-02 20:41:39,839 - INFO - Starting maintenance advisor process.
+2024-09-02 20:41:39,839 - INFO - Loading machine learning model...
+2024-09-02 20:41:39,840 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:39,840 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:40,811 - INFO - Starting maintenance advisor process.
+2024-09-02 20:41:40,812 - INFO - Loading machine learning model...
+2024-09-02 20:41:40,812 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:40,814 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:41,636 - INFO - Starting maintenance advisor process.
+2024-09-02 20:41:41,636 - INFO - Loading machine learning model...
+2024-09-02 20:41:41,636 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:41,636 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:42,478 - INFO - Starting maintenance advisor process.
+2024-09-02 20:41:42,478 - INFO - Loading machine learning model...
+2024-09-02 20:41:42,478 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:42,478 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:43,361 - INFO - Starting maintenance advisor process.
+2024-09-02 20:41:43,361 - INFO - Loading machine learning model...
+2024-09-02 20:41:43,361 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:41:43,361 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:42:33,076 - INFO - Starting maintenance advisor process.
+2024-09-02 20:42:33,076 - INFO - Loading machine learning model...
+2024-09-02 20:42:33,076 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:42:33,076 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:47:32,142 - INFO - Starting maintenance advisor process.
+2024-09-02 20:47:32,142 - INFO - Loading machine learning model...
+2024-09-02 20:47:32,142 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:47:32,142 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:49:43,730 - INFO - Starting maintenance advisor process.
+2024-09-02 20:49:43,730 - INFO - Loading machine learning model...
+2024-09-02 20:49:43,730 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-02 20:49:43,730 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 05:55:29,277 - INFO - Starting maintenance advisor process.
+2024-09-03 05:55:29,277 - INFO - Loading machine learning model...
+2024-09-03 05:55:29,277 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 05:55:29,277 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 08:59:33,211 - INFO - Starting maintenance advisor process.
+2024-09-03 08:59:33,211 - INFO - Loading machine learning model...
+2024-09-03 08:59:33,211 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 08:59:33,211 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 08:59:44,731 - INFO - Starting maintenance advisor process.
+2024-09-03 08:59:44,732 - INFO - Loading machine learning model...
+2024-09-03 08:59:44,732 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 08:59:44,732 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 08:59:47,583 - INFO - Starting maintenance advisor process.
+2024-09-03 08:59:47,583 - INFO - Loading machine learning model...
+2024-09-03 08:59:47,583 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 08:59:47,583 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:00:05,547 - INFO - Starting maintenance advisor process.
+2024-09-03 09:00:05,547 - INFO - Loading machine learning model...
+2024-09-03 09:00:05,547 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:00:05,547 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:00:33,775 - INFO - Starting maintenance advisor process.
+2024-09-03 09:00:33,775 - INFO - Loading machine learning model...
+2024-09-03 09:00:33,775 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:00:33,775 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:02:09,660 - INFO - Starting maintenance advisor process.
+2024-09-03 09:02:09,660 - INFO - Loading machine learning model...
+2024-09-03 09:02:09,660 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:02:09,660 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:02:16,387 - INFO - Starting maintenance advisor process.
+2024-09-03 09:02:16,387 - INFO - Loading machine learning model...
+2024-09-03 09:02:16,387 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:02:16,387 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:17:28,277 - INFO - Starting maintenance advisor process.
+2024-09-03 09:17:28,277 - INFO - Loading machine learning model...
+2024-09-03 09:17:28,277 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:17:28,277 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:17:35,128 - INFO - Starting maintenance advisor process.
+2024-09-03 09:17:35,128 - INFO - Loading machine learning model...
+2024-09-03 09:17:35,129 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:17:35,129 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:18:02,424 - INFO - Starting maintenance advisor process.
+2024-09-03 09:18:02,424 - INFO - Loading machine learning model...
+2024-09-03 09:18:02,426 - ERROR - Error loading model: [Errno 2] No such file or directory: 'ai_model/model.pkl'
+2024-09-03 09:18:02,426 - ERROR - Process failed: [Errno 2] No such file or directory: 'ai_model/model.pkl'

@@ -54,5 +54,8 @@ public class Maint {
    
    @Column(name = "maint_status", length = 20)
    private String maint_status;
+   
+   @Column(name = "maint_advice", length = 10)
+   private String maintAdvice;
 
 }

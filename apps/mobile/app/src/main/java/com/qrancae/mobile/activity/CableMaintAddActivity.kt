@@ -1,6 +1,7 @@
 package com.qrancae.mobile.activity
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -45,6 +47,11 @@ class CableMaintAddActivity : AppCompatActivity() {
 
         tvNotice = findViewById(R.id.tv_notice)
         cableIdx = getCableIdx()
+
+        val backbutton: ImageView = findViewById(R.id.iv_back)
+        backbutton.setOnClickListener {
+            openback()
+        }
 
         // 전달된 maint_idx가 있는지 확인
         maintIdx = intent.getLongExtra("MAINT_IDX", 0L)
@@ -95,6 +102,11 @@ class CableMaintAddActivity : AppCompatActivity() {
                 tvNotice.text = "알림 메시지를 가져오는 중 오류가 발생했습니다."
             }
         })
+    }
+
+    private fun openback() {
+        val intent = Intent(this, QRdetailActivity::class.java)
+        startActivity(intent)
     }
 
     private fun checkMaintStatusAndFetchMessage(maintIdx: Long) {
