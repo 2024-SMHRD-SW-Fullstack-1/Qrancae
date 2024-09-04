@@ -5,12 +5,17 @@ import Cookies from 'js-cookie';
 import AIButton from './AIButton';
 import Modal from 'react-modal';
 import axios from 'axios'; //(sun)
+//import SockJS from 'sockjs-client';
+//import { Client } from '@stomp/stompjs';
+
 Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [adminName, setAdminName] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [advice, setAdvice] = useState('');
+  //  const [notifications, setNotifications] = useState([]); // 알림을 저장할 상태
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +36,38 @@ const Header = () => {
     }
   }, [navigate]);
 
+  /* useEffect(() => {
+    const socket = new SockJS('http://localhost:8089/qrancae/ws');
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      connectHeaders: {
+        login: 'user',
+        passcode: 'password',
+      },
+      debug: function (str) {
+        console.log(str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        stompClient.subscribe('/topic/notifications', (message) => {
+          const notification = JSON.parse(message.body);
+          console.log("메시지", notification);
+          setNotifications((prevNotifications) => [...prevNotifications, notification]);
+        });
+      },
+    });
+
+    stompClient.activate();
+
+    return () => {
+      if (stompClient) {
+        stompClient.deactivate();
+      }
+    };
+  }, []); */
+
   const handleAIButtonClick = (advice) => {
     setAdvice(advice);
     setShowPopup(true);
@@ -38,6 +75,10 @@ const Header = () => {
 
   const handleClosePopup = () => {
     setShowPopup(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
@@ -74,6 +115,15 @@ const Header = () => {
             </li> */}
           </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
+            <a href="#">
+              <div className="notif-icon notif-primary">
+                <i className="fa fa-user-plus"></i>
+              </div>
+              <div className="notif-content">
+                <span className="block"></span>
+                <span className="time">just now</span>
+              </div>
+            </a>
             <li className="nav-item">
               <AIButton onAIButtonClick={handleAIButtonClick} />
             </li>
@@ -86,18 +136,19 @@ const Header = () => {
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
-                aria-expanded="false"
+                aria-expanded={isOpen}
+                onClick={toggleDropdown}
               >
                 <i className="fa fa-bell"></i>{/* 알림 아이콘 */}
-                <span className="notification">4</span>{/* 알림 개수 표시 */}
+                <span className="notification">3</span>{/* 알림 개수 표시 */}
               </a>
               <ul
-                className="dropdown-menu notif-box animated fadeIn"
+                className={`dropdown-menu notif-box animated fadeIn ${isOpen ? 'show' : ''}`}
                 aria-labelledby="notifDropdown"
               >
                 <li>
                   <div className="dropdown-title">
-                    You have 4 new notification{/* 알림 제목 */}
+                    You have 3 new notification{/* 알림 제목 */}
                   </div>
                 </li>
                 <li>
@@ -109,42 +160,8 @@ const Header = () => {
                           <i className="fa fa-user-plus"></i>
                         </div>
                         <div className="notif-content">
-                          <span className="block"> New user registered </span>
-                          <span className="time">5 minutes ago</span>
-                        </div>
-                      </a>
-                      <a href="#">
-                        <div className="notif-icon notif-success">
-                          <i className="fa fa-comment"></i>
-                        </div>
-                        <div className="notif-content">
-                          <span className="block">
-                            Rahmad commented on Admin
-                          </span>
-                          <span className="time">12 minutes ago</span>
-                        </div>
-                      </a>
-                      <a href="#">
-                        <div className="notif-img">
-                          <img
-                            src="assets/img/profile2.jpg"
-                            alt="Img Profile"
-                          />
-                        </div>
-                        <div className="notif-content">
-                          <span className="block">
-                            Reza send messages to you
-                          </span>
-                          <span className="time">12 minutes ago</span>
-                        </div>
-                      </a>
-                      <a href="#">
-                        <div className="notif-icon notif-danger">
-                          <i className="fa fa-heart"></i>
-                        </div>
-                        <div className="notif-content">
-                          <span className="block"> Farrah liked Admin </span>
-                          <span className="time">17 minutes ago</span>
+                          <span className="block"></span>
+                          <span className="time">just now</span>
                         </div>
                       </a>
                     </div>

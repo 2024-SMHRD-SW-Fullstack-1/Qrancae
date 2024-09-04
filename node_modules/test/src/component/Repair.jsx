@@ -363,9 +363,6 @@ const Repair = () => {
                 <Header />
                 <div className="container">
                     <div className="page-inner">
-                        <div className="page-header">
-                            <h3 className="fw-bold mb-3">점검 관리</h3>
-                        </div>
                         <div className="row">
                             <div className="col-md-4">
                                 <div className="card card-round">

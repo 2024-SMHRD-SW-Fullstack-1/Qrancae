@@ -65,6 +65,10 @@ const LineChart = ({ year }) => {
                             labels: {
                                 padding: 10,
                                 color: '#1D3557',
+                                font: {
+                                    size: 16,
+                                    family: "'NanumSquareNeo'",
+                                },
                             },
                         },
                         tooltip: {
@@ -79,6 +83,26 @@ const LineChart = ({ year }) => {
                     },
                     layout: {
                         padding: { left: 15, right: 15, top: 15, bottom: 15 },
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12, // x축 텍스트 크기 설정
+                                },
+                            },
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 12, // y축 텍스트 크기 설정
+                                },
+                            },
+                        },
+                    },
+                    font: {
+                        family: "'NanumSquareNeo'",
+                        size: 12,
                     },
                 },
             });

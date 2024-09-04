@@ -54,12 +54,12 @@ const Sidebar = () => {
     <div className="sidebar" data-background-color="dark">
       <div className="sidebar-logo">
         <div className="logo-header" data-background-color="dark">
-          <Link to="/" className="logo">
+          <Link to="/" className="logo" style={{ marginLeft: '3px' }}>
             <img
-              src="assets/img/kaiadmin/logo_light.svg"
+              src="assets/img/logo_white.png"
               alt="navbar brand"
               className="navbar-brand"
-              height="20"
+              height="30"
             />
           </Link>
           <div className="nav-toggle">
@@ -77,7 +77,7 @@ const Sidebar = () => {
       </div>
       <div className="sidebar-wrapper scrollbar scrollbar-inner">
         <div className="sidebar-content">
-        <ul className="nav nav-secondary">
+          <ul className="nav nav-secondary">
             {menus.map((menu) => {
               return (
                 <li key={menu.path} className={`nav-item ${isActive(menu.path) ? 'active' : ''}`}>
@@ -91,7 +91,7 @@ const Sidebar = () => {
           </ul>
           <hr />
           <ul className="nav nav-secondary">
-          {subMenus.map((menu) => (
+            {subMenus.map((menu) => (
               <li key={menu.name} className={`nav-item ${isActive(menu.path) ? 'active' : ''}`}>
                 <Link to={menu.path} onClick={menu.action ? menu.action : null}>
                   <i className={menu.icon}></i>
