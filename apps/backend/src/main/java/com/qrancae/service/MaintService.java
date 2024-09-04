@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,35 @@ public class MaintService {
    UserRepository userRepository;
    @Autowired
    AlarmRepository alarmRepository;
+   @Autowired
+   SimpMessagingTemplate messagingTemplate;
+   
+   private LocalDateTime lastCheckTime = LocalDateTime.now();
+
+   @Scheduled(fixedRate = 5000) // 5초마다 실행
+   public void checkForNewMaints() {
+       System.out.println("마지막 체크 타임: " + lastCheckTime);
+       
+       // 마지막 체크 시간 이후에 업데이트된 Maint 목록 조회
+       List<Maint> newMaints = maintRepository.findByMaintUpdateAfter(lastCheckTime);
+
+       if (!newMaints.isEmpty()) {
+           // 새로운 Maint가 있는 경우, 알림 내용 생성 및 전송
+           for (Maint maint : newMaints) {
+        	   String notificationMessage = "{ \"message\": \"New maintenance alert: " + maint.getMaint_msg() + "\" }";;
+               System.out.println(notificationMessage);
+               // 웹소켓을 통해 알림 전송
+               messagingTemplate.convertAndSend("/topic/notifications", notificationMessage);
+           }
+           
+           // 최신 maint_update로 lastCheckTime 업데이트
+           lastCheckTime = newMaints.stream()
+                                    .map(Maint::getMaint_update)
+                                    .filter(Objects::nonNull) // null 값을 필터링
+                                    .max(LocalDateTime::compareTo)
+                                    .orElse(lastCheckTime);
+       }
+   }
    
    // 해당 케이블의 모든 유지보수 내역
    public Maint findByCable(Cable cable) {

@@ -100,4 +100,8 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 		       "AND FUNCTION('YEAR', m.maint_date) = FUNCTION('YEAR', CURRENT_DATE)")
 	List<Maint> countRepairThisMonthForUser(@Param("user_id") String userId);
 
+	// 5초마다 한번씩 maint에 새로운게 올라왔는지 확인
+	@Query("SELECT m FROM Maint m WHERE m.maint_date > :lastCheckTime")
+	List<Maint> findByMaintUpdateAfter(LocalDateTime lastCheckTime);
+
 }
