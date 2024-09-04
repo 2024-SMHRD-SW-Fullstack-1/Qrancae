@@ -165,6 +165,14 @@ const Maintenance = () => {
 
   return (
     <div className="wrapper">
+      <style>
+        {`
+          table.dataTable {
+            text-align: center;
+            white-space: nowrap;
+          }
+        `}
+      </style>
       <Sidebar />
 
       <div className="main-panel">
