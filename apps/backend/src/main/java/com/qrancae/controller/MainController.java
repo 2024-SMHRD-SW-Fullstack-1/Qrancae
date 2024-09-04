@@ -163,7 +163,7 @@ public class MainController {
 		Workbook workbook = new XSSFWorkbook();
 
 		// 날짜 포맷 설정
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd(EEE)");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 (EEE)", java.util.Locale.KOREAN);
 
 		// 보고서 시트 작성
 		Sheet reportSheet = workbook.createSheet("요약");

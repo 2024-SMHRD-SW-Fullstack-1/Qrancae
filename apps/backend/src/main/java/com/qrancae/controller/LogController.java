@@ -63,7 +63,7 @@ public class LogController {
 		Workbook workbook = new XSSFWorkbook();
 
 		// 날짜 포맷 설정
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd(EEE)");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 (EEE)", java.util.Locale.KOREAN);
 		DateTimeFormatter dateFormatterMonth = DateTimeFormatter.ofPattern("yyyy.MM");
 
 		// 보고서 시트 작성
@@ -145,7 +145,7 @@ public class LogController {
 		String today = LocalDate.now().format(dateFormatter);
 		String week = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).format(dateFormatter)
 				+ " ~ " + LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).format(dateFormatter);
-		String month = LocalDate.now().format(dateFormatterMonth);
+		String month = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy년 M월"));
 
 		String[] cntLogDateHeaders = { today, week, month };
 		Row cntLogDateRow = reportSheet.createRow(rowNum++);
@@ -280,23 +280,6 @@ public class LogController {
 		response.setContentLength(excelContent.length);
 
 		response.getOutputStream().write(excelContent);
-	}
-
-	// 병합된 셀 스타일
-	private void setCellBorders(Sheet sheet, CellRangeAddress region, CellStyle style) {
-		for (int i = region.getFirstRow(); i <= region.getLastRow(); i++) {
-			Row row = sheet.getRow(i);
-			if (row == null) {
-				row = sheet.createRow(i);
-			}
-			for (int j = region.getFirstColumn(); j <= region.getLastColumn(); j++) {
-				Cell cell = row.getCell(j);
-				if (cell == null) {
-					cell = row.createCell(j);
-				}
-				cell.setCellStyle(style);
-			}
-		}
 	}
 
 }
