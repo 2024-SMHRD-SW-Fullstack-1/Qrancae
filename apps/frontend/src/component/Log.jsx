@@ -118,11 +118,23 @@ const Log = () => {
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
+      // 날짜 포맷
+      const getFormattedDate = () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+
+        return `${year}${month}${day}`;
+      };
+
+      const filename = `log_${getFormattedDate()}.xlsx`;
+
       // Blob을 사용하여 파일 다운로드 처리
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'report.xlsx'); // 파일 이름 지정
+      link.setAttribute('download', filename); // 파일 이름 지정
       document.body.appendChild(link);
       link.click();
 

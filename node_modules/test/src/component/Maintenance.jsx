@@ -163,6 +163,37 @@ const Maintenance = () => {
     setFilteredData(maints);
   };
 
+  const handleReportDownload = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/reportMaint',
+      method: 'get',
+      responseType: 'blob',
+    }).then((res) => {
+      // 날짜 포맷
+      const getFormattedDate = () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+
+        return `${year}${month}${day}`;
+      };
+
+      const filename = `repair_${getFormattedDate()}.xlsx`;
+
+      // Blob을 사용하여 파일 다운로드 처리
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename); // 파일 이름 지정
+      document.body.appendChild(link);
+      link.click();
+
+      // 클릭 후 링크 제거
+      document.body.removeChild(link);
+    });
+  }
+
   return (
     <div className="wrapper">
       <style>
@@ -200,7 +231,7 @@ const Maintenance = () => {
                           className='date-picker'
                         />
                       </div>
-                      <div style={{ display: 'inline-block', marginRight: '10px' }}>
+                      <div style={{ display: 'inline-block' }}>
                         <label style={{ marginRight: '5px' }}>작업자</label>
                         <select
                           value={selectedUser}
@@ -215,6 +246,12 @@ const Maintenance = () => {
                         </select>
                         <label className='btn btn-label-primary btn-round btn-sm' onClick={handleReset} style={{ marginLeft: '10px' }}>선택 초기화</label>
                       </div>
+                      <label className="btn btn-label-primary btn-round btn-sm" onClick={handleReportDownload}>
+                        <span className="btn-label">
+                          <i className="fas fa-file-excel icon-spacing"></i>
+                        </span>
+                        보고서 다운로드
+                      </label>
                     </div>
                   </div>
                   <div className="card-body">

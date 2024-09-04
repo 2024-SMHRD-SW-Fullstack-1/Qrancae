@@ -81,8 +81,8 @@ public class QrController {
 	// QR 코드 등록
 	@PostMapping("/registerQr")
 	public String registerQr(@RequestBody List<Cable> cableList) throws WriterException, JsonProcessingException {
-		int width = 70;
-		int height = 70;
+		int width = 200;
+		int height = 200;
 
 		for (Cable c : cableList) {
 			try {
@@ -94,11 +94,11 @@ public class QrController {
 						+ c.getD_rack_location() + "," + c.getD_server_name() + "," + c.getD_port_number();
 
 				// AES 키
-				//SecretKey key = getFixedKey();
-				//String encryptedData = encrypt(data, key);
+				SecretKey key = getFixedKey();
+				String encryptedData = encrypt(Integer.toString(idx), key);
 
-				//BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
-				BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
+				BitMatrix encode = new MultiFormatWriter().encode(encryptedData, BarcodeFormat.QR_CODE, width, height);
+				//BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
 				
 				// 파일 경로 지정
 				Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
@@ -114,7 +114,7 @@ public class QrController {
 
 				Qr qr = new Qr();
 				qr.setCable_idx(idx);
-				qr.setQr_data(data);
+				qr.setQr_data(encryptedData);
 				qrService.insertQr(qr);
 
 			} catch (Exception e) {

@@ -15,9 +15,9 @@ public class CalendarService {
 	private CalendarRepository calendarRepository;
 	
 	// 캘린더 리스트
-	public List<Calendar> getCalendarList(String user_id) {
-		List<Calendar> calList = calendarRepository.findAllByUserIdOrderByCalendarIdxDesc(user_id);
-		return calList;
+	public List<Calendar> getCalendarList() {
+	    List<Calendar> calList = calendarRepository.findAllOrderByCalendarIdxDesc();
+	    return calList;
 	}
 	
 	// 해당 idx의 캘린더 내용 찾기

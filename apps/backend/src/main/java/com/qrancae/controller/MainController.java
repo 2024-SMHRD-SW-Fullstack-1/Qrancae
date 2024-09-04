@@ -56,12 +56,8 @@ public class MainController {
 	private MemberService memberService;
 
 	@PostMapping("/calendar")
-	public List<Calendar> calendar(@RequestBody String user_id) {
-		if (user_id.endsWith("=")) {
-			user_id = user_id.substring(0, user_id.length() - 1);
-		}
-
-		List<Calendar> calendarList = calendarService.getCalendarList(user_id);
+	public List<Calendar> calendar() {
+		List<Calendar> calendarList = calendarService.getCalendarList();
 
 		return calendarList;
 	}

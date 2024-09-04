@@ -3,11 +3,11 @@ import { Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const colors = [
-    '#D95319',
-    '#EDB120',
-    '#77AC30',
-    '#0072BD',
-    '#7E7E7E',
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56',
+    '#FF9F40',
+    '#4CAF50',
 ];
 
 const EditEventPopup = ({ isOpen, onClose, event, onSave, getCalendarList }) => {
