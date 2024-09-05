@@ -74,7 +74,7 @@ const User = () => {
             <div className={styles.pageHeader}>
               <h3 className="fw-bold mb-3">사용자 관리</h3>
               <button
-                className={`btn btn-label-primary btn-round ${styles.btnRegister}`}
+                className={`btn btn-label-primary btn-round`}
                 onClick={handleRegisterClick}>
                 <span className="btn-label">
                   <i className="fas fa-user-plus icon-spacing"></i>

@@ -211,7 +211,7 @@ const Header = () => {
               >
                 <li>
                   <div className="dropdown-title">
-                    {countMsg}개의 알림{countMsg > 1 ? '' : ''} {/* 알림 제목 */}
+                    {countMsg > 0 ? `${countMsg}개의 알림` : `${adminName}님 알림이 없습니다`} {/* 알림 제목 */}
                   </div>
                 </li>
                 <li>
