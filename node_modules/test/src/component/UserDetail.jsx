@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './UserDetail.module.css';
+import { Modal, Button } from 'react-bootstrap';
 
-const UserDetail = ({ userId, onClose }) => {
+const UserDetail = ({ userId, isOpen, onClose }) => {
   const [userPw, setUserPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [userName, setUserName] = useState('');
@@ -63,43 +63,59 @@ const UserDetail = ({ userId, onClose }) => {
   };
 
   return (
-    <div className={styles.userDetailForm}>
-      <button onClick={onClose} className={styles.closeButton}>X</button>
-      <h1>작업자 정보 수정</h1>
+    <Modal show={isOpen} onHide={onClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>작업자 정보 수정</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <label>아이디</label>
+        <input className="form-control input-full" type="text" value={userId} disabled /><br />
 
-      <label>아이디</label>
-      <input type="text" value={userId} disabled /><br />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label>비밀번호</label>
+          {errors.userPw && <div style={{ color: 'red' }}>{errors.userPw}</div>}
+        </div>
+        <input
+          className="form-control input-full"
+          type="password"
+          value={userPw}
+          onChange={(e) => setUserPw(e.target.value)}
+          placeholder="비밀번호를 입력하세요."
+        /><br />
 
-      <label>비밀번호</label>
-      <input
-        type="password"
-        value={userPw}
-        onChange={(e) => setUserPw(e.target.value)}
-        placeholder="비밀번호를 입력하세요."
-      /><br />
-      {errors.userPw && <div style={{ color: 'red' }}>{errors.userPw}</div>}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label>비밀번호 재입력</label>
+          {errors.confirmPw && <div style={{ color: 'red' }}>{errors.confirmPw}</div>}
+        </div>
+        <input
+          className="form-control"
+          type="password"
+          value={confirmPw}
+          onChange={(e) => setConfirmPw(e.target.value)}
+          placeholder="비밀번호를 다시 입력하세요."
+        /><br />
 
-      <label>비밀번호 재입력</label>
-      <input
-        type="password"
-        value={confirmPw}
-        onChange={(e) => setConfirmPw(e.target.value)}
-        placeholder="비밀번호를 다시 입력하세요."
-      /><br />
-      {errors.confirmPw && <div style={{ color: 'red' }}>{errors.confirmPw}</div>}
-
-      <label>이름</label>
-      <input
-        type="text"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-        placeholder="이름을 입력하세요."
-      /><br />
-      {errors.userName && <div style={{ color: 'red' }}>{errors.userName}</div>}
-
-      <button className={styles.updateButton} onClick={handleUpdate}>작업자 정보 수정</button>
-      <button className={styles.deleteButton} onClick={handleDelete}>작업자 정보 삭제</button>
-    </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label>이름</label>
+          {errors.userName && <div style={{ color: 'red' }}>{errors.userName}</div>}
+        </div>
+        <input
+          className="form-control input-full"
+          type="text"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          placeholder="이름을 입력하세요."
+        /><br />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleDelete}>
+          작업자 정보 삭제
+        </Button>
+        <Button variant="primary" onClick={handleUpdate}>
+          작업자 정보 수정
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

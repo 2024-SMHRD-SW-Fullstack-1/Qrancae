@@ -27,7 +27,7 @@ function App() {
       <Route path="/maint" element={<Maintenance />} />
       <Route path="/user" element={<User />} />
       <Route path="/user/:userId" element={<UserDetail />} />
-      <Route path="/admin/me" element={<AdminDetail />} />
+      <Route path="/admin" element={<AdminDetail />} />
       <Route path="/form" element={<Form />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
