@@ -21,8 +21,8 @@ const Header = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [advice, setAdvice] = useState('');
   const [notifications, setNotifications] = useState([]); // 알림을 저장할 상태
-  const [countMsg, setCountMsg] = useState(0); // 알림 개수
-  const [repairCnt, setRepairCnt] = useState([]);
+  const [countMsg, setCountMsg] = useState(0);
+  const [repairCnt, setRepairCnt] = useState([]);// 알림 개수
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +45,8 @@ const Header = () => {
 
   useEffect(() => {
     getTodayRepair();
+    getData(); // 데이터를 가져오는 함수 호출
+
 
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
@@ -84,6 +86,11 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // repairCnt가 업데이트될 때 countMsg를 업데이트
+    setCountMsg(repairCnt.cntNewRepair || 0);
+  }, [repairCnt]);
+
   const handleAIButtonClick = (advice) => {
     setAdvice(advice);
     setShowPopup(true);
@@ -108,7 +115,27 @@ const Header = () => {
     }).then((res) => {
       console.log('오늘의 점검', res.data);
       setRepairCnt(res.data);
+      setCountMsg(res.data.cntNewRepair || 0); // 알림 개수를 신규 접수 건수로 설정
     });
+
+  }
+  const getData = () => {
+    axios.get('http://localhost:8089/qrancae/getmaint')
+      .then((res) => {
+        // item.maintUser가 없는 항목만 필터링
+        const filteredData = res.data.filter(item => !item.maintUser);
+        const notifications = filteredData.map(item => ({
+          id: item.id, // 고유 ID 설정
+          message: item.user.user_name, // 알림 내용 설정
+          timestamp: item.maint_date, // 시간 설정 
+          type: 'info', // 알림 타입 설정 (기본값)
+          icon: 'fa-info-circle', // 알림 아이콘 설정 (기본값)
+        }));
+        setNotifications(notifications);
+      })
+      .catch((err) => {
+        console.log('maintData error:', err);
+      });
   }
 
   const handleRepairClick = () => {
@@ -142,7 +169,7 @@ const Header = () => {
         </div>
       </div>
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
-        <div className='today-repair'>
+        <div className='today-repair' style={{ border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '70%' }}>
           <label className='btn btn-primary btn-border btn-round' onClick={handleRepairClick}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 'bold' }}>
               <div>오늘의 점검</div>
@@ -205,17 +232,17 @@ const Header = () => {
                           </a>
                         ))
                       ) : (
-                        <p style={{ textAlign: 'center' }}>알림이 없습니다</p>
+                        <p style={{ textAlign: 'center' }}>새로운 알림이 없습니다</p>
                       )}
                     </div>
                   </div>
                 </li>
                 <li>
-                  <Link to='/repair'>
+                  <label onClick={handleRepairClick}>
                     <a className="see-all" href="javascript:void(0);">
                       자세히 보기
                     </a>
-                  </Link>
+                  </label>
                 </li>
               </ul>
             </li>
