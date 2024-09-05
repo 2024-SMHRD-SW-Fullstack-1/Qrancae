@@ -36,7 +36,9 @@ function Login() {
         Cookies.set('userId', userId, { expires: 7 }); // 쿠키에 사용자 아이디 저장 (7일 유효)
         setShowPopup(true);
       } else {
-        setMessage(response.data);
+        setMessage(
+          '아이디 또는 비밀번호가 잘못 되었습니다.'
+        );
       }
     } catch (error) {
       console.log('통신 실패', error);
@@ -66,7 +68,6 @@ function Login() {
           <label style={{ marginRight: '10px' }}>아이디</label>
           <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto' }}>
             {errors.userId && <div className={styles.error} style={{ marginBottom: '0' }}>{errors.userId}</div>}
-            {message && <div className={styles.error}>{message}</div>}
           </div>
         </div>
         <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)}
@@ -80,8 +81,16 @@ function Login() {
         </div>
         <input type="password" value={userPw} onChange={(e) => setUserPw(e.target.value)}
           placeholder='비밀번호를 입력하세요.' /><br />
-
-        <Button onClick={login} style={{ marginTop: '3rem' }}>로그인</Button>
+        <div>
+          <div style={{ marginBottom: '1rem' }}>
+            <Button onClick={login} style={{ marginTop: '3rem' }}>로그인</Button>
+          </div>
+          {message && (
+            <div style={{ textAlign: 'right', color: 'red' }}>
+              {message}
+            </div>
+          )}
+        </div>
       </div>
       {showPopup && (
         <ModalPopup

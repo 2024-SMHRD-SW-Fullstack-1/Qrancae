@@ -196,6 +196,37 @@ const Qr = () => {
     setShowNonePopup(false);
   };
 
+  const handleReportDownload = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/reportCable',
+      method: 'get',
+      responseType: 'blob',
+    }).then((res) => {
+      // 날짜 포맷
+      const getFormattedDate = () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+
+        return `${year}${month}${day}`;
+      };
+
+      const filename = `cable_history_${getFormattedDate()}.xlsx`;
+
+      // Blob을 사용하여 파일 다운로드 처리
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename); // 파일 이름 지정
+      document.body.appendChild(link);
+      link.click();
+
+      // 클릭 후 링크 제거
+      document.body.removeChild(link);
+    });
+  }
+
   return (
     <div className="wrapper">
       <style>
@@ -261,6 +292,20 @@ const Qr = () => {
                         content={() => printRef.current}
                         onAfterPrint={handlePrintComplete}
                       />
+                      <label
+                        className="btn btn-label-primary btn-round btn-sm"
+                        onClick={handleReportDownload}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px'
+                        }}>
+                        <span className="btn-label">
+                          <i className="fas fa-file-excel icon-spacing"></i>
+                        </span>
+                        보고서 다운로드
+                      </label>
                     </div>
                   </div>
                   <div className="card-body">

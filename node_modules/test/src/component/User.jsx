@@ -3,7 +3,6 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
-import { Modal } from 'react-bootstrap'; // 모달 추가 (React Bootstrap 사용)
 import UserDetail from './UserDetail'; // UserDetail 임포트
 import { useNavigate } from 'react-router-dom';
 import styles from './User.module.css';
@@ -124,11 +123,13 @@ const User = () => {
         <Footer />
 
         {/* 모달 영역 */}
-        <Modal show={isModalOpen} onHide={closeModal} centered> {/* 최소 구조 모달 */}
-          <Modal.Body className={styles.modalContent}> {/* 헤더와 푸터 없이 */}
-            <UserDetail userId={selectedUserId} onClose={closeModal} />
-          </Modal.Body>
-        </Modal>
+        {isModalOpen && (
+          <UserDetail
+            userId={selectedUserId}
+            isOpen={isModalOpen}
+            onClose={closeModal}
+          />
+        )}
       </div>
     </div>
   );
