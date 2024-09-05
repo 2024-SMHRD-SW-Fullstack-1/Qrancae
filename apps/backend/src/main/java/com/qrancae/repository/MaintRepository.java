@@ -126,11 +126,16 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	List<Maint> findByMaintUpdateAfter(LocalDateTime lastCheckTime);
 
 	// 보수 완료된 작업 내역을 해당 작업자의 user_id로 카운트
+
+
+	@Query("SELECT COUNT(m) FROM Maint m WHERE m.maintUser.user_id = :userId AND m.maint_status = '보수완료'")
+	int countCompletedMaintenanceByUser(@Param("userId") String userId);
+	
+
 	@Query("SELECT COUNT(m) FROM Maint m " +
 		       "WHERE m.maintUser.user_id = :userId " +
 		       "AND m.maint_status = '보수완료' " +
 		       "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
 	int countCompletedMaintenanceByUserWithDefectiveItems(@Param("userId") String userId);
-
 
 }

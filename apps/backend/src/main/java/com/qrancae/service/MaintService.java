@@ -27,7 +27,6 @@ import com.qrancae.repository.UserRepository;
 @Service
 public class MaintService {
 
-
 	@Autowired
 	MaintRepository maintRepository;
 	@Autowired
@@ -39,6 +38,8 @@ public class MaintService {
 
 	private LocalDateTime lastCheckTime = LocalDateTime.now();
 	private Set<LocalDateTime> checkedTimes = new HashSet<>(); // 중복 메시지 방지용
+
+
 
 //	@Scheduled(fixedRate = 5000) // 5초마다 실행
 //	public void checkForNewMaints() {

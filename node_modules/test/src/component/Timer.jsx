@@ -71,6 +71,7 @@ const Timer = () => {
     return (
         <div className={styles.timerContainer}>
             남은 로그인 시간: {formatTime(displayTime)}
+            <br></br>
             <button onClick={handleExtendTime} className={styles.extendTimeButton}>로그인 시간 연장</button>
             
             {showExtendPrompt && (
