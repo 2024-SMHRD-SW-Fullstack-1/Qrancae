@@ -12,7 +12,9 @@ Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return `${date.getHours()}:${date.getMinutes()}`;
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 };
 
 const Header = () => {
@@ -165,7 +167,7 @@ const Header = () => {
         </div>
       </div>
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
-        <div className='today-repair' style={{ border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'left', width: '70%' }}>
+        <div className='today-repair' style={{ border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '70%' }}>
           <label className='btn btn-primary btn-border btn-round' onClick={handleRepairClick}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 'bold' }}>
               <div>오늘의 점검</div>
