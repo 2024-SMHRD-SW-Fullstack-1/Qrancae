@@ -295,9 +295,9 @@ const Home = () => {
                 </label>
               </div>
             </div>
-            <div className="row" style={{ display: 'flex', flexWrap: 'nowrap' }}>
-              <div className="col-md-5" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="card card-round" style={{ flex: 1 }}>
+            <div className="row">
+              <div className="col-md-5">
+                <div className="card card-round">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <div className="card-title">일정</div>
                     <label className="btn btn-label-primary btn-round btn-sm" onClick={handleOpenPopup}>
@@ -307,7 +307,7 @@ const Home = () => {
                       일정 추가
                     </label>
                   </div>
-                  <div className="card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div className="card-body">
                     <FullCalendar
                       plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
                       initialView="dayGridMonth"
@@ -331,7 +331,7 @@ const Home = () => {
                         );
                       }}
                     />
-                    <div className="my-3" style={{ flex: 1, overflowY: 'auto' }}>
+                    <div className="my-3">
                       {filteredEvents.length > 0 ? (
                         <div className="event-list filtered-events">
                           <p>{selectedDate}</p>
@@ -383,9 +383,9 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-7" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div id="print-content" ref={printRef} style={{ flex: 1 }}>
-                  <div className="card card-round" style={{ flex: 1 }}>
+              <div className="col-md-7">
+                <div id="print-content" ref={printRef}>
+                  <div className="card card-round">
                     <div className="card-header">
                       <div className="card-title">로그 내역</div>
                       <select
@@ -398,11 +398,11 @@ const Home = () => {
                         <option value="2023">2023</option>
                       </select>
                     </div>
-                    <div className="card-body" style={{ flex: 1 }}>
+                    <div className="card-body">
                       <LineChart year={selectedYear} />
                     </div>
                   </div>
-                  <div className="card card-round" style={{ flex: 1 }}>
+                  <div className="card card-round">
                     <div className="card-header">
                       <div className="card-title">케이블 불량률</div>
                       <div className="select-container">
@@ -445,7 +445,7 @@ const Home = () => {
                         </select>
                       </div>
                     </div>
-                    <div className="card-body flex-card-body" style={{ flex: 1 }}>
+                    <div className="card-body flex-card-body">
                       <PieChart year={selectedDefectYear} month={selectedDefectMonth} range={selectedDefectRange} />
                     </div>
                   </div>
