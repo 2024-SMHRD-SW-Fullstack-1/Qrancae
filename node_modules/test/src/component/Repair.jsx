@@ -56,7 +56,6 @@ const Repair = () => {
     }, [maints]);
     // 처음 렌더링 될 때 첫 번째 줄 강조
     useEffect(() => {
-
         if (tableInstance && maints.length > 0) {
             const firstRow = tableInstance.repairTable.row(0).node();
             $(firstRow).css({
@@ -65,21 +64,25 @@ const Repair = () => {
             });
 
             const data = tableInstance.repairTable.row(firstRow).data();
-            const rackLocation = data.cable.s_rack_location;
-            const rackNumber = data.cable.s_rack_number;
-            const portNumber = data.cable.s_port_number;
+            if (data && data.cable) { // null 체크 추가
+                const rackLocation = data.cable.s_rack_location;
+                const rackNumber = data.cable.s_rack_number;
+                const portNumber = data.cable.s_port_number;
 
-            const extractNumber = (str) => {
-                const match = str.match(/\d+/);
-                return match ? parseInt(match[0], 10) : null;
-            };
+                const extractNumber = (str) => {
+                    const match = str.match(/\d+/);
+                    return match ? parseInt(match[0], 10) : null;
+                };
 
-            setHighlightPosition({
-                rackNumber: extractNumber(rackNumber),
-                portNumber: extractNumber(portNumber)
-            });
+                setHighlightPosition({
+                    rackNumber: extractNumber(rackNumber),
+                    portNumber: extractNumber(portNumber)
+                });
 
-            setRackLocationInfo(rackLocation);
+                setRackLocationInfo(rackLocation);
+            } else {
+                console.warn("데이터 정의 없음");
+            }
         }
     }, [tableInstance, maints]);
 
@@ -243,10 +246,7 @@ const Repair = () => {
                     title: '처리 작업자',
                     data: null,
                     render: function (data) {
-                        if (data.maintUser) {
-                            return `${data.maintUser.user_name} (${data.maintUser.user_id})`;
-                        }
-                        return '';
+                        return data.maintUser ? `${data.maintUser.user_name} (${data.maintUser.user_id})` : '요청중';
                     }
                 },
                 {
@@ -259,6 +259,7 @@ const Repair = () => {
                             }
                             return '진행중'
                         }
+                        return '접수 대기중'
 
 
                     }
@@ -380,13 +381,19 @@ const Repair = () => {
                     );
                 };
                 const updatedRepairingData = filterFaultyMaints(updatedData).filter(item => item.maintUser !== null);
-                tableInstance.repairingTable.clear().rows.add(updatedRepairingData).draw();
 
-                setRackLocationInfo('');
+                // 테이블 인스턴스가 존재하는 경우
+                if (tableInstance) {
+                    // 비동기적으로 테이블을 새로고침
+                    setTimeout(() => {
+                        tableInstance.repairingTable.clear().rows.add(updatedRepairingData).draw();
+                    }, 100); // 100ms의 지연 후 테이블 갱신
+                }
+
             })
             .catch((err) => {
                 console.log('처리 작업자 선택 오류:', err);
-                alert('서버와의 통신 오류가 발생했습니다.');
+                alert('통신 오류가 발생했습니다. 다시 시도해주세요');
             });
     };
     // 알림창

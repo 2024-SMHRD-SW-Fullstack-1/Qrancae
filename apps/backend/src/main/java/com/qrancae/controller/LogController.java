@@ -58,7 +58,7 @@ public class LogController {
 	public List<Log> getLog() {
 
 		List<Log> logs = logService.getLogResult();
-		// System.out.println("로그데이터"+logs.toString());
+		//System.out.println("로그데이터"+logs.toString());
 
 		return logs;
 	}
