@@ -6,6 +6,25 @@ import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
 import styles from './User.module.css'; // 모듈 CSS를 불러옵니다.
 
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  let formattedDate = date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  // 연도를 두 자리로 변환
+  const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
+  formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
+
+  return formattedDate.replace(',', '');
+};
+
 const User = () => {
   const [users, setUsers] = useState([]);
 
@@ -20,10 +39,10 @@ const User = () => {
     axios.get('http://localhost:8089/qrancae/api/users')
       .then(response => {
         const userData = response.data;
-        const logRequests = userData.map(user => 
+        const logRequests = userData.map(user =>
           axios.get(`http://localhost:8089/qrancae/api/logs/count/${user.userId}`)
         );
-        const maintRequests = userData.map(user => 
+        const maintRequests = userData.map(user =>
           axios.get(`http://localhost:8089/qrancae/api/maint/count/${user.userId}`)
         );
 
@@ -76,7 +95,7 @@ const User = () => {
                       <div className="user-profile text-center">
                         <div className="name">{user.userName}</div>
                         <div className="job">{user.userId}</div>
-                        <div className="desc">{user.joinedAt}</div>
+                        <div className="desc">{formatDate(user.joinedAt)}</div>
                         <div className="view-profile">
                           <div className="view-profile">
                             <label

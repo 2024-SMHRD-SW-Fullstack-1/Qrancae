@@ -7,6 +7,7 @@ import Footer from './Footer';
 import 'datatables.net';
 import * as xlsx from 'xlsx';
 import ModalPopup from './popups/ModalPopup';
+import { Button } from 'react-bootstrap';
 
 const Addqr = () => {
   // 로딩중인지 확인
@@ -16,9 +17,11 @@ const Addqr = () => {
   const [popupItemSelected, setPopupItemSelected] = useState(true);
   // qr 코드 등록 완료 팝업 상태
   const [showQrPopup, setShowQrPopup] = useState(false);
+  const [showNoneQrPopup, setShowNoneQrPopup] = useState(false);
   // 테이블에 표시할 json 데이터
   const [jsonData, setJsonData] = useState([]);
   // 케이블 하나 추가할 때
+  const [showNoneCablePopup, setShowNoneCablePopup] = useState(false);
   const [inputs, setInputs] = useState({
     s_rack_number: '',
     s_rack_location: '',
@@ -130,7 +133,7 @@ const Addqr = () => {
     e.preventDefault();
     for (const key in inputs) {
       if (inputs[key].trim() === '') {
-        alert('케이블의 모든 정보를 입력해주세요.');
+        setShowNoneCablePopup(true);
         return;
       }
     }
@@ -178,6 +181,12 @@ const Addqr = () => {
 
   // 전체 케이블 QR코드로 등록
   const registerQr = () => {
+    const selectedRows = $('#basic-datatables1 .row-select:checked').length;
+    if (selectedRows === 0) {
+      setShowNoneQrPopup(true); // 선택된 케이블이 없을 때 팝업
+      return;
+    }
+
     setLoading(true);
     axios({
       url: 'http://localhost:8089/qrancae/registerQr',
@@ -196,6 +205,14 @@ const Addqr = () => {
   const closeQrPopup = () => {
     setShowQrPopup(false); // QR 코드 등록 완료 팝업 닫기
     navigate('/qr'); // 케이블 목록 페이지로 이동
+  };
+
+  const closeNoneQrPopup = () => {
+    setShowNoneQrPopup(false);
+  };
+
+  const closeNoneCablePopup = () => {
+    setShowNoneCablePopup(false);
   };
 
   return (
@@ -229,11 +246,11 @@ const Addqr = () => {
               <div className="popup-buttons">
                 {popupItemSelected ? (
                   <>
-                    <button onClick={closePopup} className="btn btn-primary btn-border">취소</button>
+                    <Button variant="secondary" onClick={closePopup}>취소</Button>
                     <button onClick={() => { handleDeleteSelected(); closePopup(); }} className="btn btn-primary">확인</button>
                   </>
                 ) : (
-                  <button onClick={closePopup} className="btn btn-primary">확인</button>
+                  <Button variant="primary" onClick={closePopup} className="btn btn-primary">확인</Button>
                 )}
               </div>
             </div>
@@ -245,6 +262,20 @@ const Addqr = () => {
             isOpen={showQrPopup}
             onClose={closeQrPopup}
             message="QR 코드 등록이 완료되었습니다."
+          />
+        )}
+        {showNoneQrPopup && (
+          <ModalPopup
+            isOpen={showNoneQrPopup}
+            onClose={closeNoneQrPopup}
+            message="등록할 케이블을 선택해주세요."
+          />
+        )}
+        {showNoneCablePopup && (
+          <ModalPopup
+            isOpen={showNoneCablePopup}
+            onClose={closeNoneCablePopup}
+            message="케이블의 모든 정보를 입력해주세요."
           />
         )}
 

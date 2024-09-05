@@ -130,7 +130,9 @@ public class MainController {
 		Map<String, Double> defectRates = new HashMap<>();
 		for (String rackLocation : defectCounts.keySet()) {
 			Integer defectCount = defectCounts.get(rackLocation);
+			System.out.println("불량 개수 : " + defectCount);
 			Integer totalCableCount = cableByRackCounts.get(rackLocation);
+			System.out.println("랙의 전체 케이블 개수 : " + totalCableCount);
 
 			if (totalCableCount != null && totalCableCount > 0) {
 				double defectRate = (double) defectCount / totalCableCount;

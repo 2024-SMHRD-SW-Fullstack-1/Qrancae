@@ -98,16 +98,18 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	int countDistinctMaintUserIdsForCompletedMaintenanceMonth();
 
 	/* 케이블 불량률 */
-	// s_rack_location 불량 수
-	@Query("SELECT c.s_rack_location AS rackLocation, COUNT(m) AS defectCount " + "FROM Maint m JOIN m.cable c "
-			+ "WHERE m.maint_qr = '불량' " + "AND YEAR(m.maint_date) = :year " + "AND MONTH(m.maint_date) = :month "
-			+ "GROUP BY c.s_rack_location")
+	// 케이블을 하나로 카운트하여 s_rack_location의 불량 수 체크
+	@Query("SELECT c.s_rack_location AS rackLocation, COUNT(DISTINCT m.cable.cable_idx) AS defectCount "
+			+ "FROM Maint m JOIN m.cable c "
+			+ "WHERE (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량') "
+			+ "AND YEAR(m.maint_date) = :year " + "AND MONTH(m.maint_date) = :month " + "GROUP BY c.s_rack_location")
 	List<Object[]> countDefectsBySourceRackLocation(@Param("year") Integer year, @Param("month") Integer month);
 
 	// d_rack_location 불량 수
-	@Query("SELECT c.d_rack_location AS rackLocation, COUNT(m) AS defectCount " + "FROM Maint m JOIN m.cable c "
-			+ "WHERE m.maint_qr = '불량' " + "AND YEAR(m.maint_date) = :year " + "AND MONTH(m.maint_date) = :month "
-			+ "GROUP BY c.d_rack_location")
+	@Query("SELECT c.d_rack_location AS rackLocation, COUNT(DISTINCT m.cable.cable_idx) AS defectCount "
+			+ "FROM Maint m JOIN m.cable c "
+			+ "WHERE (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량') "
+			+ "AND YEAR(m.maint_date) = :year " + "AND MONTH(m.maint_date) = :month " + "GROUP BY c.d_rack_location")
 	List<Object[]> countDefectsByDestinationRackLocation(@Param("year") Integer year, @Param("month") Integer month);
 
 	@Query("SELECT m FROM Maint m WHERE m.cable = :cable")
@@ -118,13 +120,18 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 			+ "AND FUNCTION('MONTH', m.maint_date) = FUNCTION('MONTH', CURRENT_DATE) "
 			+ "AND FUNCTION('YEAR', m.maint_date) = FUNCTION('YEAR', CURRENT_DATE)")
 	List<Maint> countRepairThisMonthForUser(@Param("user_id") String userId);
-	
+
 	// 5초마다 한번씩 maint에 새로운게 올라왔는지 확인
 	@Query("SELECT m FROM Maint m WHERE m.maint_date > :lastCheckTime")
 	List<Maint> findByMaintUpdateAfter(LocalDateTime lastCheckTime);
-	
-	// 보수 완료된 작업 내역을 해당 작업자의 user_id로 카운트
-    @Query("SELECT COUNT(m) FROM Maint m WHERE m.maintUser.user_id = :userId AND m.maint_status = '보수완료'")
-    int countCompletedMaintenanceByUser(@Param("userId") String userId);
 
+	// 보수 완료된 작업 내역을 해당 작업자의 user_id로 카운트
+	@Query("SELECT COUNT(m) FROM Maint m WHERE m.maintUser.user_id = :userId AND m.maint_status = '보수완료'")
+	int countCompletedMaintenanceByUser(@Param("userId") String userId);
+	
+	@Query("SELECT COUNT(m) FROM Maint m " +
+		       "WHERE m.maintUser.user_id = :userId " +
+		       "AND m.maint_status = '보수완료' " +
+		       "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
+	int countCompletedMaintenanceByUserWithDefectiveItems(@Param("userId") String userId);
 }

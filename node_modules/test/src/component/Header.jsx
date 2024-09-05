@@ -8,7 +8,6 @@ import Modal from 'react-modal';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
-
 Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const formatDate = (dateString) => {
@@ -23,6 +22,7 @@ const Header = () => {
   const [advice, setAdvice] = useState('');
   const [notifications, setNotifications] = useState([]); // 알림을 저장할 상태
   const [countMsg, setCountMsg] = useState(0); // 알림 개수
+  const [repairCnt, setRepairCnt] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,8 +43,9 @@ const Header = () => {
     }
   }, [navigate]);
 
-
   useEffect(() => {
+    getTodayRepair();
+
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
       webSocketFactory: () => socket,
@@ -100,6 +101,20 @@ const Header = () => {
     }
   };
 
+  const getTodayRepair = () => {
+    axios({
+      url: 'http://localhost:8089/qrancae/todayRepair',
+      method: 'get',
+    }).then((res) => {
+      console.log('오늘의 점검', res.data);
+      setRepairCnt(res.data);
+    });
+  }
+
+  const handleRepairClick = () => {
+    navigate('/repair');
+  }
+
   return (
     <div className="main-header">
       <div className="main-header-logo">
@@ -112,7 +127,6 @@ const Header = () => {
               className="navbar-brand"
               height="20"
             />
-
           </Link>
           <div className="nav-toggle">
             <button className="btn btn-toggle toggle-sidebar">
@@ -128,19 +142,24 @@ const Header = () => {
         </div>
       </div>
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+        <div className='today-repair'>
+          <label className='btn btn-primary btn-border btn-round' onClick={handleRepairClick}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 'bold' }}>
+              <div>오늘의 점검</div>
+              <div>|</div>
+              <div style={{ color: '#0DB624' }}>신규 접수</div>
+              <div>{repairCnt.cntNewRepair}건</div>
+              <div style={{ color: '#939393' }}>진행 중</div>
+              <div>{repairCnt.cntInProgressRepair}건</div>
+              <div style={{ color: '#EE38AE' }}>보수 완료</div>
+              <div>{repairCnt.cntCompleteRepair}건</div>
+            </div>
+          </label>
+        </div>
         <div className="container-fluid">
           <ul className="navbar-nav topbar-nav align-items-center">
-
             {/* Timer 컴포넌트를 좌측에 배치 */}
-            <li className="nav-item">
-
-            </li>
-
-
-            {/* <li className="nav-item">
-              
-            </li> */}
-
+            <li className="nav-item"></li>
           </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
             <li className="nav-item">

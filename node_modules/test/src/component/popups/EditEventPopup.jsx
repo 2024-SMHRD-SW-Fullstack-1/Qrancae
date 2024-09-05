@@ -163,10 +163,10 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave, getCalendarList }) => 
                         </div>
                     </div>
                     <div>
-                        <label onClick={handleDelete} className='btn btn-label-primary' style={{ marginRight: '0.5rem' }}>
+                        <Button variant="secondary" onClick={handleDelete} style={{ marginRight: '0.5rem' }}>
                             삭제
-                        </label>
-                        <Button onClick={handleSave} className='btn btn-primary'>
+                        </Button>
+                        <Button variant="primary" onClick={handleSave} className='btn btn-primary'>
                             수정
                         </Button>
                     </div>
