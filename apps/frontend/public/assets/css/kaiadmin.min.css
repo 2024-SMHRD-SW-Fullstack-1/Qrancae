@@ -6328,16 +6328,16 @@ label.error {
 }
 
 .btn-secondary {
-  background: #6861ce !important;
-  border-color: #6861ce !important;
+  background: #4574C4 !important;
+  border-color: #4574C4 !important;
 }
 
 .btn-secondary:disabled,
 .btn-secondary:focus,
 .btn-secondary:hover {
   color: #fff !important;
-  background: #6861ce !important;
-  border-color: #6861ce !important;
+  background: #4574C4 !important;
+  border-color: #4574C4 !important;
 }
 
 .btn-info {

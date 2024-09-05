@@ -5,6 +5,8 @@ import Header from './Header';
 import Footer from './Footer';
 import 'datatables.net';
 import axios from 'axios';
+import ModalPopup from './popups/ModalPopup';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
@@ -38,6 +40,10 @@ const Repair = () => {
     const [highlightPosition, setHighlightPosition] = useState(null); // 보여줄 위치 저장
     const [selectedMaintsInfo, setSelectedMaintsInfo] = useState([]); // 선택된 유지보수 내역 정보
     const [selectedBtn, setSelectedBtn] = useState("전체");
+
+    // 팝업
+    const [showNonePopup, setShowNonePopup] = useState(false); // 작업자 선택한게 없을 때
+    const [showCompletePopup, setShowCompletePopup] = useState(false); // 유지보수 업데이트 완료
 
     useEffect(() => {
         getData();
@@ -338,7 +344,7 @@ const Repair = () => {
             setSelectedMaintsInfo(selectedMaintsInfo);
             setModalIsOpen(true);
         } else {
-            alert('선택된 항목이 없습니다.');
+            setShowNonePopup(true);
         }
     };
 
@@ -361,8 +367,8 @@ const Repair = () => {
             alarmMsg: alarmMsg
         })
             .then(() => {
-                alert('유지보수 내역이 업데이트되었습니다.');
                 setConfirmModalIsOpen(false); // 최종 확인 모달 닫기
+                setShowCompletePopup(true);
                 // 유지보수 내역 업데이트
                 const updatedData = maints.map(item => {
                     if (selectedMaintIdxs.includes(item.maint_idx)) {
@@ -405,6 +411,16 @@ const Repair = () => {
         setAlarmMsg(event.target.value);
     };
 
+    // 작업자 선택안된 팝업 닫기
+    const closeNonePopup = () => {
+        setShowNonePopup(false); // 팝업닫기
+    };
+
+    // 유지보수 업데이트 완료 팝업 닫기
+    const closeCompletePopup = () => {
+        setShowCompletePopup(false); // 팝업닫기
+    };
+
     return (
         <div className="wrapper">
             <style>
@@ -417,6 +433,20 @@ const Repair = () => {
             <Sidebar />
             <div className="main-panel">
                 <Header />
+                {showNonePopup && (
+                    <ModalPopup
+                        isOpen={showNonePopup}
+                        onClose={closeNonePopup}
+                        message="선택된 작업자가 없습니다."
+                    />
+                )}
+                {showCompletePopup && (
+                    <ModalPopup
+                        isOpen={showCompletePopup}
+                        onClose={closeCompletePopup}
+                        message="유지보수 내역이 업데이트되었습니다."
+                    />
+                )}
                 <div className="container">
                     <div className="page-inner">
                         <div className="row">
@@ -500,101 +530,96 @@ const Repair = () => {
 
 
             {/* 작업자 선택 모달 */}
-            <div className={`modal fade ${modalIsOpen ? 'show d-block' : ''}`} id="userSelectModal" tabIndex="-1" role="dialog" aria-labelledby="userSelectModalLabel" aria-hidden={!modalIsOpen}>
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="userSelectModalLabel">작업자 선택</h5>
-                            <button type="button" className="close" onClick={() => setModalIsOpen(false)} aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                            {selectedMaintsInfo.length > 0 && (
-                                <>
-                                    <div className="form-group">
-                                        <label htmlFor="userSelect">작업자</label>
-                                        <select id="userSelect" className="form-control" value={selectedUser} onChange={handleUserChange}>
-                                            <option value="">작업자를 선택하세요</option>
-                                            {users.map(user => (
-                                                <option key={user.user_id} value={user.user_id}>
-                                                    {user.user_name} ({user.user_id})
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="form-group mt-3">
-                                        <label htmlFor="alarmMsg">추가 요청사항</label>
-                                        <textarea
-                                            id="alarmMsg"
-                                            className="form-control"
-                                            value={alarmMsg}
-                                            onChange={handleAlarmMsgChange}
-                                            placeholder="추가 요청사항을 입력해주세요"
-                                        />
-                                    </div>
-                                    <div className="mt-4">
-                                        <h5>선택된 유지보수 내역</h5>
-                                        <ul>
-                                            {selectedMaintsInfo.map((item) => (
-                                                <li key={item.maint_idx} style={{ textAlign: 'left' }}>
-                                                    <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
-                                                    <strong>오류 내용</strong><br />
-                                                    <div style={{ marginLeft: '10px' }}>
-                                                        {item.maint_qr === '불량' && <div>- QR 상태: <span style={{ color: 'red' }}>{item.maint_qr}</span></div>}
-                                                        {item.maint_cable === '불량' && <div>- 케이블 상태: <span style={{ color: 'red' }}>{item.maint_cable}</span></div>}
-                                                        {item.maint_power === '불량' && <div>- 전원 공급 상태: <span style={{ color: 'red' }}>{item.maint_power}</span></div>}
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={() => setModalIsOpen(false)}>취소</button>
-                            <button type="button" className="btn btn-primary" onClick={handleUserConfirm}>확인</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Modal show={modalIsOpen} onHide={() => setModalIsOpen(false)} centered>
+                <Modal.Dialog className="custom-modal-dialog" style={{ width: '700px' }}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>작업자 선택</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {selectedMaintsInfo.length > 0 && (
+                            <>
+                                <Form.Group controlId="userSelect" style={{ marginBottom: '1rem' }}>
+                                    <Form.Label>작업자</Form.Label>
+                                    <Form.Control
+                                        as="select"
+                                        value={selectedUser}
+                                        onChange={handleUserChange}
+                                    >
+                                        <option value="">작업자를 선택하세요</option>
+                                        {users.map(user => (
+                                            <option key={user.user_id} value={user.user_id}>
+                                                {user.user_name} ({user.user_id})
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Form.Group>
 
-            <div className={`modal fade ${confirmModalIsOpen ? 'show d-block' : ''}`} id="confirmModal" tabIndex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden={!confirmModalIsOpen}>
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="confirmModalLabel">요청사항 확인</h5>
-                            <button type="button" className="close" onClick={() => setConfirmModalIsOpen(false)} aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                            <p>요청 작업자와 요청 내용을 확인하세요.</p>
-                            <h5>작업자: {users.find(user => user.user_id === selectedUser)?.user_name} ({selectedUser})</h5>
-                            <p><strong>추가 요청사항:</strong> {alarmMsg || '없음'}</p>
-                            <h5>선택된 유지보수 내역</h5>
-                            <ul>
-                                {selectedMaintsInfo.map((item) => (
-                                    <li key={item.maint_idx} style={{ textAlign: 'left' }}>
-                                        <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
-                                        <strong>오류 내용</strong><br />
-                                        <div style={{ marginLeft: '10px' }}>
-                                            {item.maint_qr === '불량' && <div>- QR 상태: <span style={{ color: 'red' }}>{item.maint_qr}</span></div>}
-                                            {item.maint_cable === '불량' && <div>- 케이블 상태: <span style={{ color: 'red' }}>{item.maint_cable}</span></div>}
-                                            {item.maint_power === '불량' && <div>- 전원 공급 상태: <span style={{ color: 'red' }}>{item.maint_power}</span></div>}
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={() => setConfirmModalIsOpen(false)}>취소</button>
-                            <button type="button" className="btn btn-primary" onClick={handleConfirmSubmit}>확인</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                <Form.Group controlId="alarmMsg">
+                                    <Form.Label>추가 요청사항</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        value={alarmMsg}
+                                        onChange={handleAlarmMsgChange}
+                                        placeholder="추가 요청사항을 입력해주세요"
+                                    />
+                                </Form.Group>
+
+                                <div className="mt-4">
+                                    <h5>선택된 유지보수 내역</h5>
+                                    <ul>
+                                        {selectedMaintsInfo.map((item) => (
+                                            <li key={item.maint_idx} style={{ textAlign: 'left' }}>
+                                                <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
+                                                <strong>오류 내용</strong><br />
+                                                <div style={{ marginLeft: '10px' }}>
+                                                    {item.maint_qr === '불량' && <div>- QR 상태: <span style={{ color: 'red' }}>{item.maint_qr}</span></div>}
+                                                    {item.maint_cable === '불량' && <div>- 케이블 상태: <span style={{ color: 'red' }}>{item.maint_cable}</span></div>}
+                                                    {item.maint_power === '불량' && <div>- 전원 공급 상태: <span style={{ color: 'red' }}>{item.maint_power}</span></div>}
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setModalIsOpen(false)}>취소</Button>
+                        <Button variant="primary" onClick={handleUserConfirm}>확인</Button>
+                    </Modal.Footer>
+                </Modal.Dialog>
+            </Modal>
+
+            <Modal show={confirmModalIsOpen} onHide={() => setConfirmModalIsOpen(false)} centered>
+                <Modal.Dialog className="modal-dialog" style={{ width: '700px' }}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>요청사항 확인</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>요청 작업자와 요청 내용을 확인하세요.</p>
+                        <h5>작업자: {users.find(user => user.user_id === selectedUser)?.user_name} ({selectedUser})</h5>
+                        <p><strong>추가 요청사항:</strong> {alarmMsg || '없음'}</p>
+                        <h5>선택된 유지보수 내역</h5>
+                        <ul>
+                            {selectedMaintsInfo.map((item) => (
+                                <li key={item.maint_idx} style={{ textAlign: 'left' }}>
+                                    <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
+                                    <strong>오류 내용</strong><br />
+                                    <div style={{ marginLeft: '10px' }}>
+                                        {item.maint_qr === '불량' && <div>- QR 상태: <span style={{ color: 'red' }}>{item.maint_qr}</span></div>}
+                                        {item.maint_cable === '불량' && <div>- 케이블 상태: <span style={{ color: 'red' }}>{item.maint_cable}</span></div>}
+                                        {item.maint_power === '불량' && <div>- 전원 공급 상태: <span style={{ color: 'red' }}>{item.maint_power}</span></div>}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" style={{ backgroundColor: '#4574C4', borderColor: '#4574C4' }} onClick={() => setConfirmModalIsOpen(false)}>취소</Button>
+                        <Button variant="primary" onClick={handleConfirmSubmit}>확인</Button>
+                    </Modal.Footer>
+                </Modal.Dialog>
+            </Modal>
         </div>
     );
 };

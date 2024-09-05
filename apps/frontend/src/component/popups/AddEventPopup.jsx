@@ -145,10 +145,10 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                         </div>
                     </div>
                     <div>
-                        <label onClick={onClose} className="btn btn-label-primary close-btn" style={{ marginRight: '0.5rem' }}>
+                        <Button variant="secondary" onClick={onClose} style={{ marginRight: '0.5rem' }}>
                             취소
-                        </label>
-                        <Button onClick={handleSave}>
+                        </Button>
+                        <Button variant="primary" onClick={handleSave}>
                             저장
                         </Button>
                     </div>
