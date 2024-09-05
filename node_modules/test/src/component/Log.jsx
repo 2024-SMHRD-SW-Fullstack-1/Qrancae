@@ -114,7 +114,7 @@ const Log = () => {
 
   const handleReportDownload = () => {
     axios({
-      url: 'http://localhost:8089/qrancae/reportLog',
+      url: 'http://localhost:8089/qrancae/api/reportLog',
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
