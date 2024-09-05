@@ -165,13 +165,17 @@ const Qr = () => {
     const year = date.getFullYear().toString().slice(-2); // 두 자리 연도
     const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (01, 02, ...)
     const day = String(date.getDate()).padStart(2, '0'); // 일 (01, 02, ...)
-    const hours = String(date.getHours()).padStart(2, '0'); // 시간 (00, 01, ...)
+
+    // 12시간 형식과 AM/PM 구분
+    let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0'); // 분 (00, 01, ...)
+    const ampm = hours >= 12 ? '오후' : '오전'; // 오전/오후 구분
+    hours = hours % 12 || 12; // 12시간 형식으로 변환 (0시는 12시로)
 
     return (
       <>
         <div>연결 완료</div>
-        <div>({year}.{month}.{day} {hours}시 {minutes}분)</div>
+        <div>({year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분)</div>
       </>
     );
   };
