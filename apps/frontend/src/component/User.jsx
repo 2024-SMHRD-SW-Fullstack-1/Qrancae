@@ -3,30 +3,15 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
+import { Modal } from 'react-bootstrap'; // 모달 추가 (React Bootstrap 사용)
+import UserDetail from './UserDetail'; // UserDetail 임포트
 import { useNavigate } from 'react-router-dom';
-import styles from './User.module.css'; // 모듈 CSS를 불러옵니다.
-
-// 날짜 포맷팅 함수
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  let formattedDate = date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-
-  // 연도를 두 자리로 변환
-  const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
-  formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
-
-  return formattedDate.replace(',', '');
-};
+import styles from './User.module.css';
 
 const User = () => {
   const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null); // 선택된 사용자 ID 저장
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
 
   const navigate = useNavigate();
 
@@ -35,35 +20,46 @@ const User = () => {
     navigate('/register');
   };
 
+  // 모달 열기 함수
+  const openModal = (userId) => {
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  // 모달 닫기 함수
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   useEffect(() => {
-    axios.get('http://localhost:8089/qrancae/api/users')
-      .then(response => {
+    axios
+      .get('http://localhost:8089/qrancae/api/users')
+      .then((response) => {
         const userData = response.data;
-        const logRequests = userData.map(user =>
+        const logRequests = userData.map((user) =>
           axios.get(`http://localhost:8089/qrancae/api/logs/count/${user.userId}`)
         );
-        const maintRequests = userData.map(user =>
+        const maintRequests = userData.map((user) =>
           axios.get(`http://localhost:8089/qrancae/api/maint/count/${user.userId}`)
         );
 
-        // 모든 로그 및 수리 요청을 병렬로 처리
         Promise.all([...logRequests, ...maintRequests])
-          .then(responses => {
+          .then((responses) => {
             const logResponses = responses.slice(0, userData.length);
             const maintResponses = responses.slice(userData.length);
 
             const updatedUsers = userData.map((user, index) => ({
               ...user,
               logCount: logResponses[index].data,
-              maintCount: maintResponses[index].data
+              maintCount: maintResponses[index].data,
             }));
             setUsers(updatedUsers);
           })
-          .catch(error => {
+          .catch((error) => {
             console.error('정보 가져오기 실패!', error);
           });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('유저 정보 가져오기 실패!', error);
       });
   }, []);
@@ -71,20 +67,18 @@ const User = () => {
   return (
     <div className="wrapper">
       <Sidebar />
-
       <div className="main-panel">
         <Header />
-
         <div className="container">
           <div className={styles.pageInner}>
             <div className={styles.pageHeader}>
               <h3 className="fw-bold mb-3">사용자 관리</h3>
-              {/* 작업자 등록 버튼을 오른쪽 상단으로 이동 */}
-              <label
+              <button
                 className={`btn btn-label-primary btn-round ${styles.btnRegister}`}
-                onClick={handleRegisterClick}>
+                onClick={handleRegisterClick}
+              >
                 작업자 등록
-              </label>
+              </button>
             </div>
 
             <div className="row">
@@ -95,17 +89,15 @@ const User = () => {
                       <div className="user-profile text-center">
                         <div className="name">{user.userName}</div>
                         <div className="job">{user.userId}</div>
-                        <div className="desc">{formatDate(user.joinedAt)}</div>
+                        <div className="desc">{user.joinedAt}</div>
                         <div className="view-profile">
-                          <div className="view-profile">
-                            <label
-                              className="btn btn-primary btn-border btn-round"
-                              onClick={() => navigate(`/user/${user.userId}`)}
-                              style={{ marginTop: '30px' }}
-                            >
-                              작업자 정보 수정
-                            </label>
-                          </div>
+                          <button
+                            className="btn btn-primary btn-border btn-round"
+                            onClick={() => openModal(user.userId)}
+                            style={{ marginTop: '30px' }}
+                          >
+                            작업자 정보 수정
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -127,8 +119,14 @@ const User = () => {
             </div>
           </div>
         </div>
-
         <Footer />
+
+        {/* 모달 영역 */}
+        <Modal show={isModalOpen} onHide={closeModal} centered> {/* 최소 구조 모달 */}
+          <Modal.Body className={styles.modalContent}> {/* 헤더와 푸터 없이 */}
+            <UserDetail userId={selectedUserId} onClose={closeModal} />
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );
