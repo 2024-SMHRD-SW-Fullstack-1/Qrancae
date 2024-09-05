@@ -1,12 +1,13 @@
 .register_form {
     max-width: 400px;
-    margin: 20px auto;
+    margin: 100px auto;
     padding: 30px;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     font-family: Arial, sans-serif;
+    height: 700px;
 }
 
 .register_form h1 {

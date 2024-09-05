@@ -75,8 +75,10 @@ const User = () => {
               <h3 className="fw-bold mb-3">사용자 관리</h3>
               <button
                 className={`btn btn-label-primary btn-round ${styles.btnRegister}`}
-                onClick={handleRegisterClick}
-              >
+                onClick={handleRegisterClick}>
+                <span className="btn-label">
+                  <i className="fas fa-user-plus icon-spacing"></i>
+                </span>
                 작업자 등록
               </button>
             </div>

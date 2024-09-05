@@ -104,6 +104,13 @@ public class MaintController {
 			return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
 		}
 	}
+	// 알림 내역 가져오기
+	@GetMapping("/maint/msg")
+	public List<Maint> getMaintMsg(){
+		List<Maint> maints = maintService.getMaintMsg();
+		
+		return maints;
+	}
 
 	// 보고서 다운로드
 	@GetMapping("/reportMaint")

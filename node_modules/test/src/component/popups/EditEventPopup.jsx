@@ -17,6 +17,7 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave, getCalendarList }) => 
     const [end, setEnd] = useState(event?.end || '');
     const [color, setColor] = useState(event?.color || '#ffffff');
     const [allDay, setAllDay] = useState(event?.allDay === "O" || false);
+    const [showError, setShowError] = useState(false); // Add state for error message
 
     useEffect(() => {
         if (event) {
@@ -30,6 +31,11 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave, getCalendarList }) => 
     }, [event]);
 
     const handleSave = () => {
+        if (title.trim() === '') {
+            setShowError(true);
+            return;
+        }
+
         const updatedEvent = {
             ...event,
             title,
@@ -102,11 +108,20 @@ const EditEventPopup = ({ isOpen, onClose, event, onSave, getCalendarList }) => 
                     <Modal.Title>일정 수정</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
+                        <label>제목</label>
+                        {showError && (
+                            <div className="error-message" style={{ color: 'red' }}>*제목을 입력해주세요.</div>
+                        )}
+                    </div>
                     <input
                         className="form-control input-full"
                         type="text"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(e) => {
+                            setTitle(e.target.value);
+                            setShowError(false); // Reset error when user types
+                        }}
                         placeholder="제목"
                         style={{ marginBottom: '0.5rem' }}
                     />

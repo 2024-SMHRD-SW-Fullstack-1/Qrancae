@@ -12,7 +12,9 @@ Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return `${date.getHours()}:${date.getMinutes()}`;
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 };
 
 const Header = () => {
@@ -20,10 +22,11 @@ const Header = () => {
   const [adminName, setAdminName] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [advice, setAdvice] = useState('');
-  const [notifications, setNotifications] = useState([]); // 알림을 저장할 상태
-  const [countMsg, setCountMsg] = useState(0); // 알림 개수
-  const [repairCnt, setRepairCnt] = useState([]);
+  const [countMsg, setCountMsg] = useState(0);
+  const [repairCnt, setRepairCnt] = useState([]);// 알림 개수
   const navigate = useNavigate();
+  const [maints, setMaints] = useState([]);
+  const [showAlert, setShowAlert] = useState(true); // 알림 표시 상태
 
   useEffect(() => {
     const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
@@ -45,6 +48,7 @@ const Header = () => {
 
   useEffect(() => {
     getTodayRepair();
+    getMaintMsg(); // 데이터를 가져오는 함수 호출
 
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
@@ -53,28 +57,21 @@ const Header = () => {
         login: 'user',
         passcode: 'password',
       },
-      debug: function (str) {
+      debug: (str) => {
         console.log(str);
       },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-      onConnect: () => {
-        stompClient.subscribe('/topic/notifications', (message) => {
-          const notification = JSON.parse(message.body);
-          console.log("메시지", notification);
-          setNotifications((prevNotifications) => {
-            // 중복 알림을 방지
-            if (!prevNotifications.some(notif => notif.id === notification.id)) {
-              return [...prevNotifications, notification];
-            }
-            return prevNotifications;
-          });
-          setCountMsg((prevCount) => prevCount + 1); // 알림 개수 증가
-        });
-      },
     });
 
+    stompClient.onConnect = () => {
+      stompClient.subscribe('/topic/notifications', (message) => {
+        const notification = JSON.parse(message.body);
+        console.log("메시지", notification);
+        setCountMsg((prevCount) => prevCount + 1); // 알림 개수 증가
+      });
+    };
     stompClient.activate();
 
     return () => {
@@ -83,6 +80,22 @@ const Header = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    // repairCnt가 업데이트될 때 countMsg를 업데이트
+    setCountMsg(repairCnt.cntNewRepair || 0);
+  }, [repairCnt]);
+
+  // 알림div태그
+  useEffect(() => {
+    // 5초 후 알림 숨기기
+    if (showAlert) {
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 5000); // 5초
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   const handleAIButtonClick = (advice) => {
     setAdvice(advice);
@@ -97,7 +110,6 @@ const Header = () => {
     setIsOpen(!isOpen);
     if (isOpen) {
       setCountMsg(0); // 드롭다운 열 때 알림 개수 초기화
-      setNotifications([]); // 알림 목록 초기화
     }
   };
 
@@ -106,9 +118,22 @@ const Header = () => {
       url: 'http://localhost:8089/qrancae/todayRepair',
       method: 'get',
     }).then((res) => {
-      console.log('오늘의 점검', res.data);
+      //console.log('오늘의 점검', res.data);
       setRepairCnt(res.data);
+      setCountMsg(res.data.cntNewRepair || 0); // 알림 개수를 신규 접수 건수로 설정
     });
+
+  }
+  // 알림 내역가져오기
+  const getMaintMsg = () => {
+    axios.get('http://localhost:8089/qrancae/maint/msg')
+      .then((res) => {
+        console.log('신규알림내역', res.data)
+        setMaints(res.data)
+      })
+      .catch((err) => {
+        console.log('헤더maintData error:', err);
+      });
   }
 
   const handleRepairClick = () => {
@@ -142,7 +167,7 @@ const Header = () => {
         </div>
       </div>
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
-        <div className='today-repair'>
+        <div className='today-repair' style={{ border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '70%' }}>
           <label className='btn btn-primary btn-border btn-round' onClick={handleRepairClick}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 'bold' }}>
               <div>오늘의 점검</div>
@@ -186,36 +211,37 @@ const Header = () => {
               >
                 <li>
                   <div className="dropdown-title">
-                    {countMsg}개의 알림{countMsg > 1 ? 's' : ''} {/* 알림 제목 */}
+                    {countMsg}개의 알림{countMsg > 1 ? '' : ''} {/* 알림 제목 */}
                   </div>
                 </li>
                 <li>
                   <div className="notif-scroll scrollbar-outer">
                     <div className="notif-center">
-                      {notifications.length > 0 ? (
-                        notifications.map((notification, index) => (
+                      {maints.length > 0 ? (
+                        maints.map((maint, index) => (
                           <a href="#" key={index}>
-                            <div className={`notif-icon notif-${notification.type}`}>
-                              <i className={`fa ${notification.icon}`}></i>
+                            <div className={`notif-icon notif-${maint.user.user_name}`}>
+                              <i className="fas fa-bell"></i>
                             </div>
                             <div className="notif-content">
-                              <span className="block">{notification.message}</span>
-                              <span className="time">{formatDate(notification.timestamp)}</span>
+                              <span className="block">{maint.user.user_name}</span>
+                              <span className="block">케이블 {maint.cable.cable_idx} 점검 요청</span>
+                              <span className="time">{formatDate(maint.maint_date)}</span>
                             </div>
                           </a>
                         ))
                       ) : (
-                        <p style={{ textAlign: 'center' }}>알림이 없습니다</p>
+                        <p style={{ textAlign: 'center' }}>새로운 알림이 없습니다</p>
                       )}
                     </div>
                   </div>
                 </li>
                 <li>
-                  <Link to='/repair'>
+                  <label onClick={handleRepairClick}>
                     <a className="see-all" href="javascript:void(0);">
                       자세히 보기
                     </a>
-                  </Link>
+                  </label>
                 </li>
               </ul>
             </li>
@@ -302,6 +328,73 @@ const Header = () => {
             닫기
           </button>
         </Modal>
+      )}
+      {showAlert && (
+        <div
+          className="col-10 col-xs-11 col-sm-4 alert alert-secondary animated fadeInUp"
+          role="alert"
+          style={{
+            display: 'inline-block',
+            margin: '0px auto',
+            paddingLeft: '65px',
+            position: 'fixed',
+            transition: '0.5s ease-in-out',
+            zIndex: 1031,
+            bottom: '20px',
+            right: '20px',
+          }}
+        >
+          <button
+            type="button"
+            aria-hidden="true"
+            className="close"
+            style={{
+              position: 'absolute',
+              right: '10px',
+              top: '5px',
+              zIndex: 1033,
+            }}
+            onClick={() => setShowAlert(false)}
+          >
+            &times;
+          </button>
+          {maints.length > 0 ? (
+            <div>
+              {(() => {
+                const latestMaint = maints[maints.length - 1]; // 최신 항목 가져오기
+                let errorMessages = [];
+
+                if (latestMaint.maint_qr === '불량') {
+                  errorMessages.push(`QR 상태: <span style="color:red">${latestMaint.maint_qr}</span>`);
+                }
+                if (latestMaint.maint_cable === '불량') {
+                  errorMessages.push(`케이블 상태: <span style="color:red">${latestMaint.maint_cable}</span>`);
+                }
+                if (latestMaint.maint_power === '불량') {
+                  errorMessages.push(`전원 공급 상태: <span style="color:red">${latestMaint.maint_power}</span>`);
+                }
+                if (latestMaint.maint_msg) {
+                  errorMessages.push(`(${latestMaint.maint_msg})`);
+                }
+
+                return (
+                  <div>
+                    <span className="icon-bell"></span>
+                    <span className="title">{latestMaint.user?.user_name || '알림 없음'}</span>
+                    <span className="message">
+                      {formatDate(latestMaint.maint_date || new Date())} - 케이블 {latestMaint.cable?.cable_idx || '없음'} 점검 요청
+                      <div dangerouslySetInnerHTML={{ __html: errorMessages.join('<br />') }} />
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
+          ) : (
+            <span className="message">새로운 알림이 없습니다</span>
+          )}
+
+          <a href="#" target="_blank" rel="noopener noreferrer"></a>
+        </div>
       )}
     </div>
   );
