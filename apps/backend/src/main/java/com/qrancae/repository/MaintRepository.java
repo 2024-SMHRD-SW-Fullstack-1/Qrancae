@@ -25,11 +25,11 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 
 	@Query("SELECT u FROM User u WHERE u.user_type = 'U'")
 	List<User> findAllUsers();
-	
+
 	// 신규 알림 내역
 	@Query("SELECT m FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NULL")
 	List<Maint> findByMaintDateAndMaintUserIsNull();
-	
+
 	// 유지보수에 처리 작업자 추가하기
 	@Modifying
 	@Transactional
@@ -117,20 +117,16 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	List<Maint> countRepairThisMonthForUser(@Param("user_id") String userId);
 
 	// 5초마다 한번씩 maint에 새로운게 올라왔는지 확인
-	@Query("SELECT m FROM Maint m WHERE m.maint_date > :lastCheckTime")
+	@Query("SELECT m FROM Maint m WHERE m.maint_date > :lastCheckTime "
+			+ "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
 	List<Maint> findByMaintUpdateAfter(LocalDateTime lastCheckTime);
 
 	// 보수 완료된 작업 내역을 해당 작업자의 user_id로 카운트
-
-
 	@Query("SELECT COUNT(m) FROM Maint m WHERE m.maintUser.user_id = :userId AND m.maint_status = '보수완료'")
 	int countCompletedMaintenanceByUser(@Param("userId") String userId);
-	
 
-	@Query("SELECT COUNT(m) FROM Maint m " +
-		       "WHERE m.maintUser.user_id = :userId " +
-		       "AND m.maint_status = '보수완료' " +
-		       "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
+	@Query("SELECT COUNT(m) FROM Maint m " + "WHERE m.maintUser.user_id = :userId " + "AND m.maint_status = '보수완료' "
+			+ "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
 	int countCompletedMaintenanceByUserWithDefectiveItems(@Param("userId") String userId);
 
 }

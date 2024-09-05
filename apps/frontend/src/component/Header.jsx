@@ -24,9 +24,10 @@ const Header = () => {
   const [advice, setAdvice] = useState('');
   const [countMsg, setCountMsg] = useState(0);
   const [repairCnt, setRepairCnt] = useState([]);// 알림 개수
-  const navigate = useNavigate();
   const [maints, setMaints] = useState([]);
-  const [showAlert, setShowAlert] = useState(true); // 알림 표시 상태
+  const [showAlert, setShowAlert] = useState(false); // 알림 표시 상태
+  const [latestMaint, setLatestMaint] = useState(null); // 최신 알림 저장
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
@@ -69,7 +70,9 @@ const Header = () => {
       stompClient.subscribe('/topic/notifications', (message) => {
         const notification = JSON.parse(message.body);
         console.log("메시지", notification);
-        setCountMsg((prevCount) => prevCount + 1); // 알림 개수 증가
+        setLatestMaint(notification); // 최신 알림 상태 업데이트
+        setCountMsg(prevCount => prevCount + 1); // 알림 개수 증가
+        setShowAlert(true); // 알림 표시 상태 업데이트
       });
     };
     stompClient.activate();
@@ -358,39 +361,16 @@ const Header = () => {
           >
             &times;
           </button>
-          {maints.length > 0 ? (
-            <div>
-              {(() => {
-                const latestMaint = maints[maints.length - 1]; // 최신 항목 가져오기
-                let errorMessages = [];
-
-                if (latestMaint.maint_qr === '불량') {
-                  errorMessages.push(`QR 상태: <span style="color:red">${latestMaint.maint_qr}</span>`);
-                }
-                if (latestMaint.maint_cable === '불량') {
-                  errorMessages.push(`케이블 상태: <span style="color:red">${latestMaint.maint_cable}</span>`);
-                }
-                if (latestMaint.maint_power === '불량') {
-                  errorMessages.push(`전원 공급 상태: <span style="color:red">${latestMaint.maint_power}</span>`);
-                }
-                if (latestMaint.maint_msg) {
-                  errorMessages.push(`(${latestMaint.maint_msg})`);
-                }
-
-                return (
-                  <div>
-                    <span className="icon-bell"></span>
-                    <span className="title">{latestMaint.user?.user_name || '알림 없음'}</span>
-                    <span className="message">
-                      {formatDate(latestMaint.maint_date || new Date())} - 케이블 {latestMaint.cable?.cable_idx || '없음'} 점검 요청
-                      <div dangerouslySetInnerHTML={{ __html: errorMessages.join('<br />') }} />
-                    </span>
-                  </div>
-                );
-              })()}
+          {showAlert && latestMaint && ( // 최신 알림이 있을 때만 표시
+            <div className="alert alert-info">
+              <div className="alert-header">
+                <h6 className="alert-title">{latestMaint.title}</h6>
+                <span className="alert-time">{formatDate(latestMaint.date)}</span>
+              </div>
+              <div className="alert-body">
+                {latestMaint.message}
+              </div>
             </div>
-          ) : (
-            <span className="message">새로운 알림이 없습니다</span>
           )}
 
           <a href="#" target="_blank" rel="noopener noreferrer"></a>

@@ -39,50 +39,64 @@ public class MaintService {
 	private LocalDateTime lastCheckTime = LocalDateTime.now();
 	private Set<LocalDateTime> checkedTimes = new HashSet<>(); // 중복 메시지 방지용
 
+	@Scheduled(fixedRate = 5000) // 5초마다 실행
+	public void checkForNewMaints() {
+	    LocalDateTime currentTime = LocalDateTime.now();
+	    
+	    // 마지막 체크 시간 이후에 업데이트된 Maint 목록 조회
+	    List<Maint> newMaints = maintRepository.findByMaintUpdateAfter(lastCheckTime);
 
+	    if (!newMaints.isEmpty()) {
+	        // 새로운 Maint가 있는 경우, 알림 내용 생성 및 전송
+	        for (Maint maint : newMaints) {
+	            if (maint != null) {
+	                try {
+	                    // Maint 객체의 maint_msg를 직접 사용
+	                	StringBuilder sb = new StringBuilder();
+	                	sb.append("{")
+	                	  .append("\"cable_idx\": \"").append(maint.getCable() != null ? maint.getCable().getCable_idx() : "N/A").append("\",")
+	                	  .append("\"maint_date\": \"").append(maint.getMaint_date() != null ? maint.getMaint_date().toString() : "N/A").append("\",")
+	                	  .append("\"user_name\": \"").append(maint.getUser() != null ? maint.getUser().getUser_name() : "N/A").append("\",")
+	                	  .append("\"maint_msg\": \"").append(maint.getMaint_msg() != null ? maint.getMaint_msg().replaceAll("\"", "\\\"") : "N/A").append("\",")
+	                	  .append("\"maint_qr\": \"").append(maint.getMaint_qr() != null ? maint.getMaint_qr() : "N/A").append("\",")
+	                	  .append("\"maint_cable\": \"").append(maint.getMaint_cable() != null ? maint.getMaint_cable() : "N/A").append("\",")
+	                	  .append("\"maint_power\": \"").append(maint.getMaint_power() != null ? maint.getMaint_power() : "N/A").append("\"")
+	                	  .append("}");
 
-//	@Scheduled(fixedRate = 5000) // 5초마다 실행
-//	public void checkForNewMaints() {
-//	    if (lastCheckTime == null) {
-//	        lastCheckTime = LocalDateTime.now().minusDays(1); // 적절한 초기값 설정
-//	    }
-//	    System.out.println("마지막 체크 타임: " + lastCheckTime);
-//
-//	    // 마지막 체크 시간 이후에 업데이트된 Maint 목록 조회
-//	    List<Maint> newMaints = maintRepository.findByMaintUpdateAfter(lastCheckTime);
-//
-//	    if (!newMaints.isEmpty()) {
-//	        // 새로운 Maint가 있는 경우, 알림 내용 생성 및 전송
-//	        ObjectMapper objectMapper = new ObjectMapper();
-//	        for (Maint maint : newMaints) {
-//	            try {
-//	                // Maint 객체를 JSON으로 변환
-//	                String notificationMessage = objectMapper.writeValueAsString(maint);
-//	                System.out.println("알림 메시지: " + notificationMessage);
-//
-//	                // 웹소켓을 통해 알림 전송
-//	                messagingTemplate.convertAndSend("/topic/notifications", notificationMessage);
-//	            } catch (Exception e) {
-//	                System.err.println("JSON 변환 실패: " + e.getMessage());
-//	            }
-//	        }
-//
-//	        // 최신 maint_update로 lastCheckTime 업데이트
-//	        lastCheckTime = newMaints.stream()
-//	                                .map(Maint::getMaint_update)
-//	                                .filter(Objects::nonNull) // null 값을 필터링
-//	                                .max(LocalDateTime::compareTo)
-//	                                .orElse(lastCheckTime);
-//	        // 체크된 시간 업데이트
-//	        checkedTimes.add(lastCheckTime);
-//	    } else {
-//	        // 새로운 Maint가 없고, 이전에 체크한 적이 없는 시간일 때만 메시지 출력
-//	        if (!checkedTimes.contains(lastCheckTime)) {
-//	            System.out.println("새로운 Maint 없음");
-//	            checkedTimes.add(lastCheckTime); // 메시지 출력 후, 시간 추가
-//	        }
-//	    }
-//	}
+	                	String notificationMessage = sb.toString();
+	                    if (notificationMessage != null) {
+	                        System.out.println("알림 메시지: " + notificationMessage);
+	                        // 웹소켓을 통해 알림 전송
+	                        messagingTemplate.convertAndSend("/topic/notifications", notificationMessage);
+	                    } else {
+	                        System.err.println("알림 메시지가 null입니다.");
+	                    }
+	                } catch (Exception e) {
+	                    System.err.println("알림 메시지 전송 실패: " + e.getMessage());
+	                }
+	            } else {
+	                System.err.println("Maint 객체가 null입니다.");
+	            }
+	        }
+
+	        // 최신 maint_update로 lastCheckTime 업데이트
+	        lastCheckTime = LocalDateTime.now();
+
+	        // 체크된 시간 업데이트
+	        checkedTimes.add(lastCheckTime);
+	    } else {
+	        // 새로운 Maint가 없고, 이전에 체크한 적이 없는 시간일 때만 메시지 출력
+	        if (!checkedTimes.contains(lastCheckTime)) {
+	            System.out.println("새로운 Maint 없음");
+	            checkedTimes.add(lastCheckTime); // 메시지 출력 후, 시간 추가
+	        }
+	    }
+	    
+	    // 모든 checkedTimes가 lastCheckTime을 초과하는 경우, lastCheckTime을 최신 체크된 시간으로 업데이트
+	    lastCheckTime = checkedTimes.stream()
+	                                .max(LocalDateTime::compareTo)
+	                                .orElse(currentTime.minusDays(1)); // 초기값 설정
+	}
 
    
    // 해당 케이블의 모든 유지보수 내역
