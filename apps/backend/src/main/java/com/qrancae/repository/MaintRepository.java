@@ -25,16 +25,11 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 
 	@Query("SELECT u FROM User u WHERE u.user_type = 'U'")
 	List<User> findAllUsers();
-
-	// 처리 작업자, 날짜 업데이트
-//   @Modifying
-//   @Transactional
-//   @Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_update = :maintUpdate "
-//         + "WHERE m.maint_idx = :maintIdx")
-//   int updateMaint(@Param("maintIdx") int maintIdx, 
-//                  @Param("userId") String userId, 
-//                  @Param("maintUpdate") LocalDateTime maintUpdate);
-
+	
+	// 신규 알림 내역
+	@Query("SELECT m FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NULL")
+	List<Maint> findByMaintDateAndMaintUserIsNull();
+	
 	// 유지보수에 처리 작업자 추가하기
 	@Modifying
 	@Transactional
