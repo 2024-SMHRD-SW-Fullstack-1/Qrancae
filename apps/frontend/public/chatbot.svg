@@ -5,7 +5,7 @@
 	 y="0px" viewBox="0 0 1024 1024" enable-background="new 0 0 1024 1024" xml:space="preserve">
   
   <!-- Outer circle for border -->
-  <circle cx="512" cy="512" r="480" stroke="#0096E6" stroke-width="32" fill="none"/>
+  <circle cx="512" cy="512" r="480" stroke="#1D3557" stroke-width="32" fill="#1D3557"/>
 
 <g id="support-avatar-support-avatar">
 	<g>

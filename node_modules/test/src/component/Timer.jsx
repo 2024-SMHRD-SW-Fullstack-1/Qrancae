@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from './Timer.module.css'; // CSS 모듈 임포트
+import { Button } from 'react-bootstrap';
 
 const Timer = () => {
     const navigate = useNavigate();
@@ -36,10 +37,10 @@ const Timer = () => {
                 if (response.data === '로그아웃 성공') {
                     Cookies.remove('userId');
                     navigate('/login');
-    
+
                     // 1초 대기 (sleep 기능)
                     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
                     // 1초 후에 alert 표시
                     alert('로그인 시간이 만료되어 로그아웃 되었습니다.');
                 } else {
@@ -65,25 +66,24 @@ const Timer = () => {
     const formatTime = seconds => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        return `${minutes}분 ${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}초`;
     };
 
     return (
         <div className={styles.timerContainer}>
-            남은 로그인 시간: {formatTime(displayTime)}
-            <br></br>
-            <button onClick={handleExtendTime} className={styles.extendTimeButton}>로그인 시간 연장</button>
-            
+            <p style={{ margin: '0' }}>남은 로그인 시간</p>
+            <p>{formatTime(displayTime)}</p>
+            <Button variant="secondary" onClick={handleExtendTime} className={styles.extendTimeButton}>로그인 시간 연장</Button>
+
             {showExtendPrompt && (
                 <div className={styles.extendPrompt}>
-                    <button onClick={handleClosePrompt} className={styles.closeButton}>X</button>
+                    <Button onClick={handleClosePrompt}>X</Button>
                     <p>로그인 시간이 얼마 남지 않았습니다. 연장하시겠습니까?</p>
-                    <button 
-                        onClick={handleExtendTime} 
-                        className={styles.extendButton}
+                    <Button
+                        onClick={handleExtendTime}
                     >
                         연장
-                    </button>
+                    </Button>
                 </div>
             )}
 

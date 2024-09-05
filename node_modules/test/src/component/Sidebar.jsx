@@ -37,7 +37,7 @@ const Sidebar = () => {
     { name: '로그 내역', path: '/log', icon: 'fas fa-clipboard-list' },
     { name: '유지보수 내역', path: '/maint', icon: 'fas fa-clipboard-check' },
     { name: '사용자 관리', path: '/user', icon: 'fas fa-user-cog' },
-   
+
   ];
 
   const subMenus = [
@@ -101,8 +101,7 @@ const Sidebar = () => {
             ))}
           </ul>
 
-           {/* Timer 컴포넌트를 Sidebar 하단에 추가 */}
-           <div className="sidebar-timer">
+          <div className="sidebar-timer">
             <Timer />
           </div>
         </div>

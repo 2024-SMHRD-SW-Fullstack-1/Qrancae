@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ReactToPrint from "react-to-print";
 import axios from 'axios';
+import ModalPopup from './popups/ModalPopup';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
@@ -17,6 +18,7 @@ const Qr = () => {
   const [modalMessage, setModalMessage] = useState(''); // 모달 메시지
   const [deleteConfirmed, setDeleteConfirmed] = useState(false); // 삭제 확인 여부
   const printRef = useRef(null); // 프린트 참조
+  const [showNonePopup, setShowNonePopup] = useState(false);
 
 
 
@@ -46,7 +48,10 @@ const Qr = () => {
   // 데이터 가져오기
   const getData = () => {
     axios.get('http://localhost:8089/qrancae/cablelist')
-      .then((res) => setJsonData(res.data))
+      .then((res) => {
+        console.log('받아온 케이블 리스트', res.data)
+        setJsonData(res.data)
+      })
       .catch((error) => console.error('Error fetching data: ', error));
   };
 
@@ -129,8 +134,7 @@ const Qr = () => {
   // 선택된 항목 삭제 버튼 클릭 핸들러
   const handleDeleteSelected = () => {
     if (selectedCableIds.size === 0) {
-      setModalMessage('케이블을 선택해주세요.');
-      setShowModal(true);
+      setShowNonePopup(true);
       return;
     }
 
@@ -174,8 +178,7 @@ const Qr = () => {
 
     return (
       <>
-        <div>연결 완료</div>
-        <div>({year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분)</div>
+        {year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분
       </>
     );
   };
@@ -187,6 +190,10 @@ const Qr = () => {
       console.log("프린트 완료 시 상태 변환", res);
       window.location.reload();
     });
+  };
+
+  const closeNonePopup = () => {
+    setShowNonePopup(false);
   };
 
   return (
@@ -212,6 +219,13 @@ const Qr = () => {
 
       <div className="main-panel">
         <Header />
+        {showNonePopup && (
+          <ModalPopup
+            isOpen={showNonePopup}
+            onClose={closeNonePopup}
+            message="케이블을 선택해주세요."
+          />
+        )}
 
         <div className="container">
           <div className="page-inner">
@@ -305,7 +319,21 @@ const Qr = () => {
                               <td>{item.d_rack_location}</td>
                               <td>{item.d_server_name}</td>
                               <td>{item.d_port_number}</td>
-                              <td>{item.cable_date ? formatDate(item.cable_date) : '-'}</td>
+                              <td>
+                                {item.cable_date && !item.remove_date ? (
+                                  <>
+                                    <div>연결 완료</div>
+                                    <div>{formatDate(item.cable_date)}</div>
+                                  </>
+                                ) : item.remove_date ? (
+                                  <>
+                                    <div>제거</div>
+                                    <div>{formatDate(item.remove_date)}</div>
+                                  </>
+                                ) : (
+                                  '-'
+                                )}
+                              </td>
                               <td>
                                 {item.qr.qr_status !== 'X' ? (
                                   <span className="badge badge-success">출력</span>
