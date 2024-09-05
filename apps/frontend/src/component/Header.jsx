@@ -303,6 +303,41 @@ const Header = () => {
           </button>
         </Modal>
       )}
+      <div
+        className="col-10 col-xs-11 col-sm-4 alert alert-secondary animated fadeOutUp"
+        role="alert"
+        style={{
+          display: 'inline-block',
+          margin: '0px auto',
+          paddingLeft: '65px',
+          position: 'fixed',
+          transition: '0.5s ease-in-out',
+          zIndex: 1031,
+          bottom: '20px',
+          right: '20px',
+        }}
+      >
+        <button
+          type="button"
+          aria-hidden="true"
+          className="close"
+          style={{
+            position: 'absolute',
+            right: '10px',
+            top: '5px',
+            zIndex: 1033,
+          }}
+          onClick={() => {
+            // Notification 닫기 로직 추가
+          }}
+        >
+          &times;
+        </button>
+        <span className="icon-bell"></span>
+        <span className="title">Kaiadmin</span>
+        <span className="message">Premium Bootstrap 5 Admin Dashboard</span>
+        <a href="#" target="_blank" rel="noopener noreferrer"></a>
+      </div>
     </div>
   );
 };
