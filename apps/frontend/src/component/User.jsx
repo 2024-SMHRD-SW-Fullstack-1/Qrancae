@@ -3,7 +3,6 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
-import { Modal } from 'react-bootstrap'; // 모달 추가 (React Bootstrap 사용)
 import UserDetail from './UserDetail'; // UserDetail 임포트
 import { useNavigate } from 'react-router-dom';
 import styles from './User.module.css';
@@ -74,7 +73,7 @@ const User = () => {
             <div className={styles.pageHeader}>
               <h3 className="fw-bold mb-3">사용자 관리</h3>
               <button
-                className={`btn btn-label-primary btn-round ${styles.btnRegister}`}
+                className={`btn btn-label-primary btn-round`}
                 onClick={handleRegisterClick}>
                 <span className="btn-label">
                   <i className="fas fa-user-plus icon-spacing"></i>
@@ -124,11 +123,13 @@ const User = () => {
         <Footer />
 
         {/* 모달 영역 */}
-        <Modal show={isModalOpen} onHide={closeModal} centered> {/* 최소 구조 모달 */}
-          <Modal.Body className={styles.modalContent}> {/* 헤더와 푸터 없이 */}
-            <UserDetail userId={selectedUserId} onClose={closeModal} />
-          </Modal.Body>
-        </Modal>
+        {isModalOpen && (
+          <UserDetail
+            userId={selectedUserId}
+            isOpen={isModalOpen}
+            onClose={closeModal}
+          />
+        )}
       </div>
     </div>
   );

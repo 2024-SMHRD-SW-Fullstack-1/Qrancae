@@ -4270,7 +4270,7 @@ label {
 }
 
 .form-control:focus {
-  border-color: #3e93ff;
+  border-color: #4574C4;
 }
 
 .form-control-lg,
@@ -6546,8 +6546,12 @@ label.error {
 }
 
 .btn-border.btn-primary {
-  /* color: #1D3557 !important; */
+  color: #1D3557 !important;
   border: 1px solid #1D3557 !important;
+}
+
+.btn-border.btn-primary:hover {
+  color: #fff !important;
 }
 
 .btn-border.btn-secondary {
@@ -11312,6 +11316,10 @@ button.fc-next-button.fc-button.fc-button-primary:hover {
 .project-team {
   color: #1D3557;
   font-weight: bold;
+}
+
+button.btn {
+  border-radius: .5rem;
 }
 
 /* 물음표 */

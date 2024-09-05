@@ -48,7 +48,7 @@ const Sidebar = () => {
   ];
 
   const subMenus = [
-    { name: '설정', path: '/admin/me', icon: 'fas fa-cog' }, // 설정 메뉴 추가
+    { name: '설정', path: '/admin', icon: 'fas fa-cog' }, // 설정 메뉴 추가
     {
       name: '로그아웃',
       path: '#', // 로그아웃은 페이지 이동이 아닌 함수 호출이므로 #으로 설정
