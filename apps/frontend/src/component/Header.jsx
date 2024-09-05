@@ -8,6 +8,7 @@ import Modal from 'react-modal';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
+
 Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const formatDate = (dateString) => {
@@ -129,10 +130,17 @@ const Header = () => {
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div className="container-fluid">
           <ul className="navbar-nav topbar-nav align-items-center">
+
             {/* Timer 컴포넌트를 좌측에 배치 */}
             <li className="nav-item">
 
             </li>
+
+
+            {/* <li className="nav-item">
+              
+            </li> */}
+
           </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
             <li className="nav-item">

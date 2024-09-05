@@ -8,6 +8,7 @@ const AdminDetail = () => {
     const [userPw, setUserPw] = useState('');
     const [confirmPw, setConfirmPw] = useState('');
     const [userId, setUserId] = useState('');
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,8 +34,16 @@ const AdminDetail = () => {
     }, [navigate]);
 
     const handleUpdate = () => {
-        if (userPw !== confirmPw) {
-            alert('비밀번호가 일치하지 않습니다.');
+        let newErrors = {};
+
+        // 이름과 비밀번호 필수 입력 검사
+        if (!userName) newErrors.userName = '*이름을 입력해주세요.';
+        if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
+        if (userPw !== confirmPw) newErrors.confirmPw = '*비밀번호가 일치하지 않습니다.';
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
             return;
         }
 
@@ -66,14 +75,17 @@ const AdminDetail = () => {
             <div className="form-group">
                 <label>이름</label>
                 <input type="text" className="form-control" value={userName} onChange={(e) => setUserName(e.target.value)} />
+                {errors.userName && <div style={{ color: 'red' }}>{errors.userName}</div>}
             </div>
             <div className="form-group">
                 <label>비밀번호</label>
                 <input type="password" className="form-control" value={userPw} onChange={(e) => setUserPw(e.target.value)} />
+                {errors.userPw && <div style={{ color: 'red' }}>{errors.userPw}</div>}
             </div>
             <div className="form-group">
                 <label>비밀번호 확인</label>
                 <input type="password" className="form-control" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} />
+                {errors.confirmPw && <div style={{ color: 'red' }}>{errors.confirmPw}</div>}
             </div>
             <button className="btn btn-primary" onClick={handleUpdate}>정보 수정</button>
         </div>

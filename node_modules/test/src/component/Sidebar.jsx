@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'; //useNavigate지정(선우)
 import axios from 'axios';
 import Cookies from 'js-cookie';//js-cookie지정(선우)
-
+import Timer from './Timer'; // Timer 컴포넌트를 가져옵니다.
 
 const Sidebar = () => {
   const location = useLocation();
@@ -37,10 +37,11 @@ const Sidebar = () => {
     { name: '로그 내역', path: '/log', icon: 'fas fa-clipboard-list' },
     { name: '유지보수 내역', path: '/maint', icon: 'fas fa-clipboard-check' },
     { name: '사용자 관리', path: '/user', icon: 'fas fa-user-cog' },
-    { name: '설정', path: '/admin/me', icon: 'fas fa-cog' }, // 설정 메뉴 추가
+   
   ];
 
   const subMenus = [
+    { name: '설정', path: '/admin/me', icon: 'fas fa-cog' }, // 설정 메뉴 추가
     {
       name: '로그아웃',
       path: '#', // 로그아웃은 페이지 이동이 아닌 함수 호출이므로 #으로 설정
@@ -99,6 +100,11 @@ const Sidebar = () => {
               </li>
             ))}
           </ul>
+
+           {/* Timer 컴포넌트를 Sidebar 하단에 추가 */}
+           <div className="sidebar-timer">
+            <Timer />
+          </div>
         </div>
       </div>
     </div>

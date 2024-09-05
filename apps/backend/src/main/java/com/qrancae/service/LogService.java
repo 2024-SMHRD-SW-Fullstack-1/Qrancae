@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.qrancae.model.Cable;
 import com.qrancae.model.Log;
+import com.qrancae.model.User;
 import com.qrancae.repository.LogRepository;
 
 @Service
@@ -73,7 +74,6 @@ public class LogService {
            default: return "Unknown";
        }
    }
-   
    // 오늘 로그
    public int getCntLogToday() {
 	   return logRepository.countLogsToday();
@@ -96,5 +96,9 @@ public class LogService {
    
    public List<Log> getLogListToday() {
 	   return logRepository.findAllLogsToday();
+   }
+
+   public int countLogsByUser(User user) {
+	   return logRepository.countLogsByUser(user);
    }
 }

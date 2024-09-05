@@ -140,6 +140,25 @@ public class MaintService {
 	   return maintRepository.countDistinctMaintUserIdsForCompletedMaintenance();
    }
    
+   /* 이번주 케이블 점검 */
+   // 이번주 전체 점검 내역
+   public List<Maint> todayMaintList() {
+	   return maintRepository.findMaintsForToday();
+   }
+   
+   // 이번주 QR 불량
+   public int cntQrDefect() {
+	   return maintRepository.countDefectiveQrThisWeek();
+   }
+   
+   // 이번주 케이블 불량
+   public int cntCableDefect() {
+	   return maintRepository.countDefectiveCableThisWeek();
+   }
+   // 이번주 전원 공급 상태 불량
+   public int cntPowerDefect() {
+	   return maintRepository.countDefectivePowerThisWeek();
+   }
    /* 이달의 케이블 점검 */
    // 이번 달 총 유지보수 수
    public int countMaintThisMonth() {
@@ -188,6 +207,11 @@ public class MaintService {
                .count();
 	   
 	   return (int) count;
+   }
+   
+// 보수 완료 내역을 사용자 ID로 카운트
+   public int countCompletedMaintenanceByUser(String userId) {
+       return maintRepository.countCompletedMaintenanceByUser(userId);
    }
    
 }
