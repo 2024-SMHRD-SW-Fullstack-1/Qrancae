@@ -83,6 +83,9 @@ const User = () => {
               <label
                 className={`btn btn-label-primary btn-round ${styles.btnRegister}`}
                 onClick={handleRegisterClick}>
+                <span className="btn-label">
+                  <i className="fas fa-user-plus icon-spacing"></i>
+                </span>
                 작업자 등록
               </label>
             </div>

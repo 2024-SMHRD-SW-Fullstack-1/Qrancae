@@ -323,7 +323,7 @@ const Addqr = () => {
                         onClick={registerQr}
                       >
                         <span className="btn-label">
-                          <i className="fas fa-check-circle"></i>
+                          <i className="fas fa-check-circle icon-spacing"></i>
                         </span>
                         전체 등록
                       </label>

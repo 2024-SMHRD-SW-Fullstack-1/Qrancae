@@ -480,7 +480,12 @@ const Repair = () => {
                                 <div className="card card-round">
                                     <div className="card-header">
                                         <div className="card-title">점검 대상 케이블</div>
-                                        <label className="btn btn-label-primary btn-round btn-sm" onClick={maintUserSelectClick}>작업자 선택</label>
+                                        <label className="btn btn-label-primary btn-round btn-sm" onClick={maintUserSelectClick}>
+                                            <span className="btn-label">
+                                                <i className="fas fa-check-double icon-spacing"></i>
+                                            </span>
+                                            작업자 선택
+                                        </label>
                                     </div>
                                     <div className="card-body" style={{ height: '50%', overflowY: 'auto' }}>
                                         <div className="table-responsive">
