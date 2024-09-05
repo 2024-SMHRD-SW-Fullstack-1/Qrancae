@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ReactToPrint from "react-to-print";
 import axios from 'axios';
+import ModalPopup from './popups/ModalPopup';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
@@ -17,6 +18,7 @@ const Qr = () => {
   const [modalMessage, setModalMessage] = useState(''); // 모달 메시지
   const [deleteConfirmed, setDeleteConfirmed] = useState(false); // 삭제 확인 여부
   const printRef = useRef(null); // 프린트 참조
+  const [showNonePopup, setShowNonePopup] = useState(false);
 
 
 
@@ -129,8 +131,7 @@ const Qr = () => {
   // 선택된 항목 삭제 버튼 클릭 핸들러
   const handleDeleteSelected = () => {
     if (selectedCableIds.size === 0) {
-      setModalMessage('케이블을 선택해주세요.');
-      setShowModal(true);
+      setShowNonePopup(true);
       return;
     }
 
@@ -189,6 +190,10 @@ const Qr = () => {
     });
   };
 
+  const closeNonePopup = () => {
+    setShowNonePopup(false);
+  };
+
   return (
     <div className="wrapper">
       <style>
@@ -212,6 +217,13 @@ const Qr = () => {
 
       <div className="main-panel">
         <Header />
+        {showNonePopup && (
+          <ModalPopup
+            isOpen={showNonePopup}
+            onClose={closeNonePopup}
+            message="케이블을 선택해주세요."
+          />
+        )}
 
         <div className="container">
           <div className="page-inner">

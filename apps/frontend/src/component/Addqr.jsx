@@ -7,14 +7,14 @@ import Footer from './Footer';
 import 'datatables.net';
 import * as xlsx from 'xlsx';
 import ModalPopup from './popups/ModalPopup';
-import { Button } from 'react-bootstrap';
+import DeletePopup from './popups/DeletePopup';
 
 const Addqr = () => {
   // 로딩중인지 확인
   const [loading, setLoading] = useState(false);
   // 삭제 기능 팝업 상태
   const [showPopup, setShowPopup] = useState(false);
-  const [popupItemSelected, setPopupItemSelected] = useState(true);
+  const [showNonePopup, setShowNonePopup] = useState(false);
   // qr 코드 등록 완료 팝업 상태
   const [showQrPopup, setShowQrPopup] = useState(false);
   const [showNoneQrPopup, setShowNoneQrPopup] = useState(false);
@@ -157,14 +157,14 @@ const Addqr = () => {
   const openPopup = () => {
     const selectedRows = $('#basic-datatables1 .row-select:checked').length;
     if (selectedRows === 0) {
-      setPopupItemSelected(false);
+      setShowNonePopup(true);
     } else {
-      setPopupItemSelected(true);
+      setShowPopup(true);
     }
-    setShowPopup(true);
   };
 
   const closePopup = () => setShowPopup(false);
+  const closeNonePopup = () => setShowNonePopup(false);
 
   // 선택된 케이블 삭제
   const handleDeleteSelected = () => {
@@ -238,23 +238,19 @@ const Addqr = () => {
           </div>
         )}
         {showPopup && (
-          <div className="popup-overlay">
-            <div className="popup-content">
-              <div className='popup-body'>
-                {popupItemSelected ? '선택된 케이블을 삭제하시겠습니까?' : '선택된 케이블이 없습니다.'}
-              </div>
-              <div className="popup-buttons">
-                {popupItemSelected ? (
-                  <>
-                    <Button variant="secondary" onClick={closePopup}>취소</Button>
-                    <button onClick={() => { handleDeleteSelected(); closePopup(); }} className="btn btn-primary">확인</button>
-                  </>
-                ) : (
-                  <Button variant="primary" onClick={closePopup} className="btn btn-primary">확인</Button>
-                )}
-              </div>
-            </div>
-          </div>
+          <DeletePopup
+            isOpen={showPopup}
+            closePopup={closePopup}
+            handleDeleteSelected={handleDeleteSelected}
+          />
+        )}
+
+        {showNonePopup && (
+          <ModalPopup
+            isOpen={showNonePopup}
+            onClose={closeNonePopup}
+            message="선택된 케이블이 없습니다."
+          />
         )}
 
         {showQrPopup && (

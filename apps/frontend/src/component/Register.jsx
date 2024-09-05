@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Register.module.css'; // module.css 파일을 불러옵니다.
+import { Button } from 'react-bootstrap';
+import ModalPopup from './popups/ModalPopup';
 
 function Register() {
     const navigate = useNavigate();
@@ -11,6 +13,7 @@ function Register() {
     const [userName, setUserName] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
+    const [showPopup, setShowPopup] = useState(false);
 
     const register = () => {
         let newErrors = {};
@@ -32,8 +35,7 @@ function Register() {
             .then((response) => {
                 console.log(response.data);
                 if (response.data === '회원가입 성공') {
-                    alert('회원가입 성공');
-                    navigate('/user');  // 회원가입 성공 시 사용자 관리 페이지로 이동
+                    setShowPopup(true);
                 } else {
                     setMessage(response.data);
                 }
@@ -44,32 +46,69 @@ function Register() {
             });
     };
 
+    const closePopup = () => {
+        setShowPopup(false);
+        navigate('/user');  // 회원가입 성공 시 사용자 관리 페이지로 이동
+    };
+
     return (
-        <div className={styles.register_form}>
-            <h1>회원가입</h1>
-            <div className={styles.note}>*는 필수 입력</div>
-            <label>아이디 <span className={styles.required}>*</span></label>
-            <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)}
-                placeholder='아이디를 입력하세요.' /><br />
-            {errors.userId && <div className={styles.error}>{errors.userId}</div>}
-            {message && <div className={styles.error}>{message}</div>}
+        <div>
+            <div className={styles.register_form}>
+                <img
+                    src="assets/img/logo.png"
+                    alt="navbar brand"
+                    className="navbar-brand"
+                    height="20"
+                    style={{ marginBottom: '2rem' }}
+                />
+                <h1>회원가입</h1>
+                <div className={styles.note} style={{ marginBottom: '.5rem' }}>*는 필수 입력</div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ marginRight: '10px' }}>아이디 <span className={styles.required}>*</span></label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto' }}>
+                        {errors.userId && <div className={styles.error} style={{ marginBottom: '0' }}>{errors.userId}</div>}
+                        {message && <div className={styles.error}>{message}</div>}
+                    </div>
+                </div>
+                <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)}
+                    placeholder='아이디를 입력하세요.' /><br />
 
-            <label>비밀번호 <span className={styles.required}>*</span></label>
-            <input type="password" value={userPw} onChange={(e) => setUserPw(e.target.value)}
-                placeholder='비밀번호를 입력하세요.' /><br />
-            {errors.userPw && <div className={styles.error}>{errors.userPw}</div>}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ marginRight: '10px' }}>비밀번호 <span className={styles.required}>*</span></label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto' }}>
+                        {errors.userPw && <div className={styles.error} style={{ marginBottom: '0' }}>{errors.userPw}</div>}
+                    </div>
+                </div>
+                <input type="password" value={userPw} onChange={(e) => setUserPw(e.target.value)}
+                    placeholder='비밀번호를 입력하세요.' /><br />
 
-            <label>비밀번호 재입력 <span className={styles.required}>*</span></label>
-            <input type="password" value={userPwConfirm} onChange={(e) => setUserPwConfirm(e.target.value)}
-                placeholder='비밀번호를 다시 입력하세요.' /><br />
-            {errors.userPwConfirm && <div className={styles.error}>{errors.userPwConfirm}</div>}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ marginRight: '10px' }}>비밀번호 재입력 <span className={styles.required}>*</span></label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto' }}>
+                        {errors.userPwConfirm && <div className={styles.error} style={{ marginBottom: '0' }}>{errors.userPwConfirm}</div>}
+                    </div>
+                </div>
+                <input type="password" value={userPwConfirm} onChange={(e) => setUserPwConfirm(e.target.value)}
+                    placeholder='비밀번호를 다시 입력하세요.' /><br />
 
-            <label>이름 <span className={styles.required}>*</span></label>
-            <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}
-                placeholder='이름을 입력하세요.' /><br />
-            {errors.userName && <div className={styles.error}>{errors.userName}</div>}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ marginRight: '10px' }}>이름 <span className={styles.required}>*</span></label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto' }}>
+                        {errors.userName && <div className={styles.error} style={{ marginBottom: '0' }}>{errors.userName}</div>}
+                    </div>
+                </div>
+                <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}
+                    placeholder='이름을 입력하세요.' /><br />
 
-            <button onClick={register}>회원가입</button>
+                <Button onClick={register} style={{ marginTop: '3rem' }}>회원가입</Button>
+            </div>
+            {showPopup && (
+                <ModalPopup
+                    isOpen={showPopup}
+                    onClose={closePopup}
+                    message="회원가입 성공"
+                />
+            )}
         </div>
     );
 };
