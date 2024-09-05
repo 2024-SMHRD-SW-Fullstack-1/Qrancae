@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'; //useNavigate지정(선우)
 import axios from 'axios';
 import Cookies from 'js-cookie';//js-cookie지정(선우)
 import Timer from './Timer'; // Timer 컴포넌트를 가져옵니다.
+import ModalPopup from './popups/ModalPopup';
 
 const Sidebar = () => {
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false); // 로그아웃 팝업
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
   const navigate = useNavigate();
@@ -17,8 +19,7 @@ const Sidebar = () => {
         if (response.data === '로그아웃 성공') {
           // 클라이언트 측 쿠키 삭제
           Cookies.remove('userId');
-          alert('로그아웃 성공');
-          navigate('/login'); // 로그인 페이지로 이동
+          setShowLogoutPopup(true);
         } else {
           alert('로그아웃 실패');
         }
@@ -27,6 +28,12 @@ const Sidebar = () => {
         console.error('로그아웃 요청 중 오류가 발생했습니다.', error);
         alert('로그아웃 실패');
       });
+  };
+
+  // 로그아웃 팝업 닫기
+  const closeLogoutPopup = () => {
+    setShowLogoutPopup(false);
+    navigate('/login'); // 로그인 페이지로 이동
   };
 
 
@@ -100,6 +107,14 @@ const Sidebar = () => {
               </li>
             ))}
           </ul>
+
+          {showLogoutPopup && (
+            <ModalPopup
+              isOpen={showLogoutPopup}
+              onClose={closeLogoutPopup}
+              message="로그아웃되었습니다."
+            />
+          )}
 
           <div className="sidebar-timer">
             <Timer />
