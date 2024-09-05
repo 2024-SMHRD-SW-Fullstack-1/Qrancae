@@ -75,7 +75,7 @@ const Log = () => {
 
   const getData = async () => {
     try {
-      const response = await axios.get('http://localhost:8089/qrancae/getlog');
+      const response = await axios.get('http://localhost:8089/qrancae/api/getlog');
       setLogdata(response.data);
       setFilteredData(response.data);
     } catch (error) {
@@ -114,7 +114,7 @@ const Log = () => {
 
   const handleReportDownload = () => {
     axios({
-      url: 'http://localhost:8089/qrancae/reportLog',
+      url: 'http://localhost:8089/qrancae/api/reportLog',
       method: 'get',
       responseType: 'blob',
     }).then((res) => {

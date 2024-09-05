@@ -37,7 +37,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
 
     const userMessage = { role: 'user', content: keywords }; //사용자의 메시지를 생성
     const data = {
-      model: 'ft:gpt-3.5-turbo-1106:personal::A2rP3Xcq',  //튜닝한 모델 (수정해야함)
+      model: 'ft:gpt-3.5-turbo-1106:personal::A2rP3Xcq',  //튜닝한 모델 
       messages: [{ role: 'system', content: prompt }, userMessage],
       max_tokens: 100, // 응답받을 메시지 최대 토큰(단어) 수 설정
       top_p: 1, // 토큰 샘플링 확률을 설정
