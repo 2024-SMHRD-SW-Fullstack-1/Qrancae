@@ -25,19 +25,6 @@ import com.qrancae.repository.UserRepository;
 
 @Service
 public class MaintService {
-<<<<<<< HEAD
-
-	@Autowired
-	MaintRepository maintRepository;
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	AlarmRepository alarmRepository;
-	@Autowired
-	SimpMessagingTemplate messagingTemplate;
-
-	private LocalDateTime lastCheckTime = LocalDateTime.now();
-=======
    
    @Autowired
    MaintRepository maintRepository;
@@ -106,53 +93,6 @@ public class MaintService {
    public List<User> getAllUsers() {
        return maintRepository.findAllUsers();
    }
->>>>>>> a6c5ea1658ec03c8af7a43bf95b144f472aced38
-
-	@Scheduled(fixedRate = 5000) // 5초마다 실행
-	public void checkForNewMaints() {
-		System.out.println("마지막 체크 타임: " + lastCheckTime);
-
-		// 마지막 체크 시간 이후에 업데이트된 Maint 목록 조회
-		List<Maint> newMaints = maintRepository.findByMaintUpdateAfter(lastCheckTime);
-
-		if (!newMaints.isEmpty()) {
-			// 새로운 Maint가 있는 경우, 알림 내용 생성 및 전송
-			for (Maint maint : newMaints) {
-				// maint_msg가 null인 경우 기본 메시지 설정
-				String message = maint.getMaint_msg() != null ? maint.getMaint_msg() : "No message provided";
-
-				// 디버깅 로그 추가
-				System.out.println("Maint ID: " + maint.getMaintUser() + ", Message: " + message);
-
-				String notificationMessage = "{ \"message\": \"New maintenance alert: " + message + "\" }";
-				System.out.println(notificationMessage);
-				// 웹소켓을 통해 알림 전송
-				messagingTemplate.convertAndSend("/topic/notifications", notificationMessage);
-			}
-
-			// 최신 maint_update로 lastCheckTime 업데이트
-			lastCheckTime = newMaints.stream().map(Maint::getMaint_update).filter(Objects::nonNull) // null 값을 필터링
-					.max(LocalDateTime::compareTo).orElse(lastCheckTime);
-		}
-	}
-<<<<<<< HEAD
-
-	// 해당 케이블의 모든 유지보수 내역
-	public Maint findByCable(Cable cable) {
-		return maintRepository.findByCable(cable);
-	}
-
-	// 유지보수 내역 불러오기
-	public List<Maint> getMaint() {
-		List<Maint> result = maintRepository.findAllWithUser();
-
-		return result;
-	}
-
-	// 작업자 목록 가져오기
-	public List<User> getAllUsers() {
-		return maintRepository.findAllUsers();
-	}
 
 	// 처리 작업자에게 전송하기
 	@Transactional
@@ -291,23 +231,4 @@ public class MaintService {
 		return maintRepository.countCompletedMaintenanceByUser(userId);
 	}
 
-=======
-   
-   /* 작업자별 점검 현황 */
-   public int userRepairThisMonth(String user_id, String status) {
-	   List<Maint> maintList = maintRepository.countRepairThisMonthForUser(user_id);
-	   
-	   long count = maintList.stream()
-               .filter(m -> status.equals(m.getMaint_status()))
-               .count();
-	   
-	   return (int) count;
-   }
-   
-// 보수 완료 내역을 사용자 ID로 카운트
-   public int countCompletedMaintenanceByUser(String userId) {
-       return maintRepository.countCompletedMaintenanceByUserWithDefectiveItems(userId);
-   }
-   
->>>>>>> a6c5ea1658ec03c8af7a43bf95b144f472aced38
 }

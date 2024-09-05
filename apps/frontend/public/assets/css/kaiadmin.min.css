@@ -11312,3 +11312,8 @@ button.fc-next-button.fc-button.fc-button-primary:hover {
   color: white !important;
   border-color: #1D3557 !important;
 }
+
+.project-team {
+  color: #1D3557;
+  font-weight: bold;
+}
