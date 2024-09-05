@@ -6,7 +6,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons'; // 사용할 아이
 
 const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정의. onClose는 prop으로 받아옴(property)
   const [keywords, setKeywords] = useState(''); // 사용자가 입력한 키워드를 상태로 관리
-  const [messages, setMessages] = useState([]); //채팅 메시지들을 상태로 관리함
+  const [messages, setMessages] = useState([{ role: 'assistant', content: '무엇이 궁금하시나요?' }]); // 기본 메시지를 초기 상태에 추가
   const [loading, setLoading] = useState(false); //로딩 상태를 관리
   const chatRef = useRef(null); //chatRef는 DOM 요소를 참조하기 위해 사용
 
