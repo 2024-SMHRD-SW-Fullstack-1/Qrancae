@@ -48,7 +48,10 @@ const Qr = () => {
   // 데이터 가져오기
   const getData = () => {
     axios.get('http://localhost:8089/qrancae/cablelist')
-      .then((res) => setJsonData(res.data))
+      .then((res) => {
+        console.log('받아온 케이블 리스트', res.data)
+        setJsonData(res.data)
+      })
       .catch((error) => console.error('Error fetching data: ', error));
   };
 
@@ -175,8 +178,7 @@ const Qr = () => {
 
     return (
       <>
-        <div>연결 완료</div>
-        <div>({year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분)</div>
+        {year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분
       </>
     );
   };
@@ -317,7 +319,21 @@ const Qr = () => {
                               <td>{item.d_rack_location}</td>
                               <td>{item.d_server_name}</td>
                               <td>{item.d_port_number}</td>
-                              <td>{item.cable_date ? formatDate(item.cable_date) : '-'}</td>
+                              <td>
+                                {item.cable_date && !item.remove_date ? (
+                                  <>
+                                    <div>연결 완료</div>
+                                    <div>{formatDate(item.cable_date)}</div>
+                                  </>
+                                ) : item.remove_date ? (
+                                  <>
+                                    <div>제거</div>
+                                    <div>{formatDate(item.remove_date)}</div>
+                                  </>
+                                ) : (
+                                  '-'
+                                )}
+                              </td>
                               <td>
                                 {item.qr.qr_status !== 'X' ? (
                                   <span className="badge badge-success">출력</span>

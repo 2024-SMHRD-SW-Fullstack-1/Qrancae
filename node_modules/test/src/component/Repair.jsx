@@ -7,6 +7,7 @@ import 'datatables.net';
 import axios from 'axios';
 import ModalPopup from './popups/ModalPopup';
 import { Modal, Button, Form } from 'react-bootstrap';
+import styles from './Login.module.css';
 
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
@@ -40,6 +41,7 @@ const Repair = () => {
     const [highlightPosition, setHighlightPosition] = useState(null); // 보여줄 위치 저장
     const [selectedMaintsInfo, setSelectedMaintsInfo] = useState([]); // 선택된 유지보수 내역 정보
     const [selectedBtn, setSelectedBtn] = useState("전체");
+    const [showError, setShowError] = useState(false); // 작업자 선택 안함
 
     // 팝업
     const [showNonePopup, setShowNonePopup] = useState(false); // 작업자 선택한게 없을 때
@@ -352,10 +354,11 @@ const Repair = () => {
     const handleUserConfirm = () => {
         if (selectedUser) {
             // 최종 확인 모달 열고 그 전 모달 닫기
+            setShowError(false);
             setConfirmModalIsOpen(true);
             setModalIsOpen(false);
         } else {
-            alert('작업자는 필수로 선택해 주세요.');
+            setShowError(true);
         }
     };
 
@@ -453,7 +456,15 @@ const Repair = () => {
                             <div className="col-md-4">
                                 <div className="card card-round">
                                     <div className="card-header">
-                                        <div className="card-title">케이블 위치 확인</div>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div className="card-title">케이블 위치 확인</div>
+                                            <span className="tooltip-container">
+                                                <span className="tooltip-icon">
+                                                    <i className="fas fa-question-circle" style={{ color: '#4574C4', cursor: 'pointer' }}></i>
+                                                </span>
+                                                <span className="tooltip-text">점검 대상 케이블 목록의 행 선택하기</span>
+                                            </span>
+                                        </div>
                                         {rackLocationInfo && (
                                             <div className="card-tools">
                                                 <h6 style={{ margin: 0 }}>랙 위치 : {rackLocationInfo}</h6>
@@ -539,7 +550,14 @@ const Repair = () => {
                         {selectedMaintsInfo.length > 0 && (
                             <>
                                 <Form.Group controlId="userSelect" style={{ marginBottom: '1rem' }}>
-                                    <Form.Label>작업자</Form.Label>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Form.Label>작업자</Form.Label>
+                                        {showError && (
+                                            <div className={styles.error} style={{ margin: 0 }}>
+                                                *작업자를 선택해주세요.
+                                            </div>
+                                        )}
+                                    </div>
                                     <Form.Control
                                         as="select"
                                         value={selectedUser}

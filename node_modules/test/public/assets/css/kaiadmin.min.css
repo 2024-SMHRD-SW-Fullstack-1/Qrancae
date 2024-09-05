@@ -11282,7 +11282,6 @@ button.fc-next-button.fc-button.fc-button-primary {
   background: #1D3557 !important;
   color: white !important;
   border: 2px solid #1D3557 !important;
-  padding: 10px 20px !important;
   border-radius: 5px !important;
   font-size: 14px !important;
   font-weight: bold !important;
@@ -11299,7 +11298,6 @@ button.fc-next-button.fc-button.fc-button-primary:hover {
   background-color: transparent !important;
   color: black !important;
   border: 2px solid #1D3557 !important;
-  padding: 10px 20px !important;
   border-radius: 5px !important;
   font-size: 14px !important;
   font-weight: bold !important;
@@ -11314,4 +11312,50 @@ button.fc-next-button.fc-button.fc-button-primary:hover {
 .project-team {
   color: #1D3557;
   font-weight: bold;
+}
+
+/* 물음표 */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.tooltip-icon {
+  cursor: pointer;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
