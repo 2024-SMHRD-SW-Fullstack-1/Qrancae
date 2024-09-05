@@ -11,15 +11,22 @@ import { ko } from 'date-fns/locale';
 // 날짜 포맷팅 함수
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleString('ko-KR', {
+  let formattedDate = date.toLocaleString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
-  }).replace(',', '');
+    second: '2-digit'
+  });
+
+  // 연도를 두 자리로 변환
+  const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
+  formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
+
+  return formattedDate.replace(',', '');
 };
+
 
 // 유지보수 작업자 옵션 생성
 const generateUserOptions = (users) => {
@@ -122,7 +129,7 @@ const Maintenance = () => {
             } else if (maintUser && !maintUpdate) {
               return `진행중 (${maintUser.user_name})`;
             } else if (maintUser && maintUpdate) {
-              return `${formatDate(maintUpdate)} (${maintUser.user_name}) 완료`;
+              return `완료 (${maintUser.user_name})<br/>${formatDate(maintUpdate)}`;
             }
           }
         }

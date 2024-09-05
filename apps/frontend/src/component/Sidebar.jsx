@@ -53,7 +53,7 @@ const Sidebar = () => {
     <div className="sidebar" data-background-color="dark">
       <div className="sidebar-logo">
         <div className="logo-header" data-background-color="dark">
-          <Link to="/" className="logo" style={{ marginLeft: '3px' }}>
+          <Link to="/home" className="logo" style={{ marginLeft: '3px' }}>
             <img
               src="assets/img/logo_white.png"
               alt="navbar brand"

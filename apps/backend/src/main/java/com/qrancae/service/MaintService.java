@@ -47,7 +47,13 @@ public class MaintService {
        if (!newMaints.isEmpty()) {
            // 새로운 Maint가 있는 경우, 알림 내용 생성 및 전송
            for (Maint maint : newMaints) {
-        	   String notificationMessage = "{ \"message\": \"New maintenance alert: " + maint.getMaint_msg() + "\" }";;
+               // maint_msg가 null인 경우 기본 메시지 설정
+               String message = maint.getMaint_msg() != null ? maint.getMaint_msg() : "No message provided";
+               
+               // 디버깅 로그 추가
+               System.out.println("Maint ID: " + maint.getMaintUser() + ", Message: " + message);
+               
+               String notificationMessage = "{ \"message\": \"New maintenance alert: " + message + "\" }";
                System.out.println(notificationMessage);
                // 웹소켓을 통해 알림 전송
                messagingTemplate.convertAndSend("/topic/notifications", notificationMessage);

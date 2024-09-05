@@ -1,32 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import Timer from './Timer';
+import axios from 'axios';
 import AIButton from './AIButton';
 import Modal from 'react-modal';
-//import SockJS from 'sockjs-client';
-//import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 
 Modal.setAppElement('#root'); // Modal의 접근성 설정
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return `${date.getHours()}:${date.getMinutes()}`;
+};
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [adminName, setAdminName] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [advice, setAdvice] = useState('');
-  //  const [notifications, setNotifications] = useState([]); // 알림을 저장할 상태
+  const [notifications, setNotifications] = useState([]); // 알림을 저장할 상태
+  const [countMsg, setCountMsg] = useState(0); // 알림 개수
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedAdminName = Cookies.get('userId');
-    if (storedAdminName) {
-      setAdminName(storedAdminName);
+    const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
+    if (storedUserId) {
+      // userId로 사용자 이름을 가져오는 API 호출
+      axios.get(`http://localhost:8089/qrancae/api/users/${storedUserId}`)
+        .then(response => {
+          const userName = response.data.userName; // 서버에서 받은 사용자 이름
+          setAdminName(userName); // 사용자 이름을 저장
+        })
+        .catch(error => {
+          console.error('사용자 정보 가져오기 실패:', error);
+          navigate('/login'); // 실패 시 로그인 페이지로 이동
+        });
     } else {
       navigate('/login');
     }
   }, [navigate]);
 
-  /* useEffect(() => {
+
+  useEffect(() => {
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
       webSocketFactory: () => socket,
@@ -44,7 +61,14 @@ const Header = () => {
         stompClient.subscribe('/topic/notifications', (message) => {
           const notification = JSON.parse(message.body);
           console.log("메시지", notification);
-          setNotifications((prevNotifications) => [...prevNotifications, notification]);
+          setNotifications((prevNotifications) => {
+            // 중복 알림을 방지
+            if (!prevNotifications.some(notif => notif.id === notification.id)) {
+              return [...prevNotifications, notification];
+            }
+            return prevNotifications;
+          });
+          setCountMsg((prevCount) => prevCount + 1); // 알림 개수 증가
         });
       },
     });
@@ -56,7 +80,7 @@ const Header = () => {
         stompClient.deactivate();
       }
     };
-  }, []); */
+  }, []);
 
   const handleAIButtonClick = (advice) => {
     setAdvice(advice);
@@ -69,20 +93,26 @@ const Header = () => {
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
+    if (isOpen) {
+      setCountMsg(0); // 드롭다운 열 때 알림 개수 초기화
+      setNotifications([]); // 알림 목록 초기화
+    }
   };
 
   return (
     <div className="main-header">
       <div className="main-header-logo">
         <div className="logo-header" data-background-color="dark">
-          <a href="index.html" className="logo">
+          {/* 로고 클릭 시 메인 화면 이동 */}
+          <Link to='/home'>
             <img
               src="assets/img/kaiadmin/logo_light.svg"
               alt="navbar brand"
               className="navbar-brand"
               height="20"
             />
-          </a>
+
+          </Link>
           <div className="nav-toggle">
             <button className="btn btn-toggle toggle-sidebar">
               <i className="gg-menu-right"></i>
@@ -101,19 +131,10 @@ const Header = () => {
           <ul className="navbar-nav topbar-nav align-items-center">
             {/* Timer 컴포넌트를 좌측에 배치 */}
             <li className="nav-item">
-              <Timer />
+
             </li>
           </ul>
           <ul className="navbar-nav topbar-nav ms-md-auto align-items-center">
-            <a href="#">
-              <div className="notif-icon notif-primary">
-                <i className="fa fa-user-plus"></i>
-              </div>
-              <div className="notif-content">
-                <span className="block"></span>
-                <span className="time">just now</span>
-              </div>
-            </a>
             <li className="nav-item">
               <AIButton onAIButtonClick={handleAIButtonClick} />
             </li>
@@ -130,7 +151,7 @@ const Header = () => {
                 onClick={toggleDropdown}
               >
                 <i className="fa fa-bell"></i>{/* 알림 아이콘 */}
-                <span className="notification">3</span>{/* 알림 개수 표시 */}
+                {countMsg > 0 && <span className="notification">{countMsg}</span>}{/* 알림 개수 표시 */}
               </a>
               <ul
                 className={`dropdown-menu notif-box animated fadeIn ${isOpen ? 'show' : ''}`}
@@ -138,33 +159,39 @@ const Header = () => {
               >
                 <li>
                   <div className="dropdown-title">
-                    You have 3 new notification{/* 알림 제목 */}
+                    {countMsg}개의 알림{countMsg > 1 ? 's' : ''} {/* 알림 제목 */}
                   </div>
                 </li>
                 <li>
                   <div className="notif-scroll scrollbar-outer">
                     <div className="notif-center">
-                      {/* 개별 알림 항목들 */}
-                      <a href="#">
-                        <div className="notif-icon notif-primary">
-                          <i className="fa fa-user-plus"></i>
-                        </div>
-                        <div className="notif-content">
-                          <span className="block"></span>
-                          <span className="time">just now</span>
-                        </div>
-                      </a>
+                      {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                          <a href="#" key={index}>
+                            <div className={`notif-icon notif-${notification.type}`}>
+                              <i className={`fa ${notification.icon}`}></i>
+                            </div>
+                            <div className="notif-content">
+                              <span className="block">{notification.message}</span>
+                              <span className="time">{formatDate(notification.timestamp)}</span>
+                            </div>
+                          </a>
+                        ))
+                      ) : (
+                        <p style={{ textAlign: 'center' }}>알림이 없습니다</p>
+                      )}
                     </div>
                   </div>
                 </li>
                 <li>
-                  <a className="see-all" href="javascript:void(0);">
-                    See all notifications<i className="fa fa-angle-right"></i>
-                  </a>
+                  <Link to='/repair'>
+                    <a className="see-all" href="javascript:void(0);">
+                      자세히 보기
+                    </a>
+                  </Link>
                 </li>
               </ul>
             </li>
-            {/* 사용자 프로필 드롭다운 메뉴 */}
             <li className="nav-item topbar-user dropdown hidden-caret">
               <a
                 className="dropdown-toggle profile-pic"

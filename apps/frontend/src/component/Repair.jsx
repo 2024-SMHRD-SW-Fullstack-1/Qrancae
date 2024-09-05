@@ -54,6 +54,34 @@ const Repair = () => {
             }
         }
     }, [maints]);
+    // 처음 렌더링 될 때 첫 번째 줄 강조
+    useEffect(() => {
+
+        if (tableInstance && maints.length > 0) {
+            const firstRow = tableInstance.repairTable.row(0).node();
+            $(firstRow).css({
+                'background-color': '#f0f8ff', // 밝은 파란색 배경
+                'font-weight': 'bold' // 글자 굵게
+            });
+
+            const data = tableInstance.repairTable.row(firstRow).data();
+            const rackLocation = data.cable.s_rack_location;
+            const rackNumber = data.cable.s_rack_number;
+            const portNumber = data.cable.s_port_number;
+
+            const extractNumber = (str) => {
+                const match = str.match(/\d+/);
+                return match ? parseInt(match[0], 10) : null;
+            };
+
+            setHighlightPosition({
+                rackNumber: extractNumber(rackNumber),
+                portNumber: extractNumber(portNumber)
+            });
+
+            setRackLocationInfo(rackLocation);
+        }
+    }, [tableInstance, maints]);
 
     // 유지 보수 내역 가져오기
     function getData() {
@@ -150,6 +178,7 @@ const Repair = () => {
 
         // 해당 줄 클릭 시 표시
         $('#repair-table tbody').on('click', 'tr', function () {
+
             const data = repairTable.row(this).data();
 
             const rackLocation = data.cable.s_rack_location;
@@ -165,6 +194,15 @@ const Repair = () => {
             setHighlightPosition({
                 rackNumber: extractNumber(rackNumber),
                 portNumber: extractNumber(portNumber)
+            });
+            // 모든 줄에서 인라인 스타일 제거 (이전 강조 해제)
+            $('#repair-table tbody tr').css({
+                'background-color': '',
+                'font-weight': ''
+            });
+            $(this).css({
+                'background-color': '#f0f8ff', // 밝은 파란색 배경
+                'font-weight': 'bold' // 글자 굵게
             });
         });
 
@@ -208,7 +246,7 @@ const Repair = () => {
                         if (data.maintUser) {
                             return `${data.maintUser.user_name} (${data.maintUser.user_id})`;
                         }
-                        return ''
+                        return '';
                     }
                 },
                 {
@@ -244,7 +282,6 @@ const Repair = () => {
             // maint_update가 없는 항목을 먼저 표시하고, 있는 항목을 나중에 표시
             order: [
                 [6, 'asc'], // '상태 정렬' 열을 기준으로 정렬
-                [4, 'asc'], // '처리 작업자' 열이 없는 항목 먼저 정렬
             ],
             pageLength: 5,
             lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
@@ -333,6 +370,18 @@ const Repair = () => {
                     return item;
                 });
                 setMaints(updatedData);
+                setRackLocationInfo('');
+                // 점검 현황 케이블 테이블 갱신
+                const filterFaultyMaints = (data) => {
+                    return data.filter(item =>
+                        item.maint_qr === '불량' ||
+                        item.maint_cable === '불량' ||
+                        item.maint_power === '불량'
+                    );
+                };
+                const updatedRepairingData = filterFaultyMaints(updatedData).filter(item => item.maintUser !== null);
+                tableInstance.repairingTable.clear().rows.add(updatedRepairingData).draw();
+
                 setRackLocationInfo('');
             })
             .catch((err) => {
