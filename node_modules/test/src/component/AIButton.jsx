@@ -38,7 +38,7 @@ const AIButton = () => {
         icon={faThumbsUp}
         size="2x"
         onClick={handleClick}
-        style={{ cursor: 'pointer', color: loading ? '#aaa' : '#007bff' }}
+        style={{ cursor: 'pointer', color: loading ? '#aaa' : '#4574C4', fontSize: '20px' }}
       />
       {loading && <div className="loading-text">{loadingText}</div>}
       <AIModal

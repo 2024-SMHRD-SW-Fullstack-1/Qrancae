@@ -233,20 +233,20 @@ const Header = () => {
                 )}
               </ul>
             </li>
-            <li className="nav-item topbar-user dropdown hidden-caret">
+            <li className="nav-item topbar-user dropdown hidden-caret" style={{ marginRight: '2rem' }}>
               <a
                 className="dropdown-toggle profile-pic"
                 data-bs-toggle="dropdown"
                 href="#"
                 aria-expanded="false"
               >
-                <div className="avatar-sm">
+                {/* <div className="avatar-sm">
                   <img
                     src="assets/img/profile.jpg"
                     alt="..."
                     className="avatar-img rounded-circle"
                   />
-                </div>
+                </div> */}
                 <span className="profile-username">
                   <span className="fw-bold">{adminName}</span>
                   <span className="op-7">님 환영합니다!</span>
