@@ -19,9 +19,12 @@ const Qr = () => {
   const [deleteConfirmed, setDeleteConfirmed] = useState(false); // 삭제 확인 여부
   const printRef = useRef(null); // 프린트 참조
   const [showNonePopup, setShowNonePopup] = useState(false);
+  // 로딩중인지 확인
+  const [loading, setLoading] = useState(false);
 
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
+    setLoading(true);
     getData();
   }, []);
 
@@ -40,6 +43,7 @@ const Qr = () => {
   useEffect(() => {
     if (jsonData.length > 0) {
       initializeDataTable();
+      setLoading(false);
     }
   }, [jsonData]);
 
@@ -162,24 +166,24 @@ const Qr = () => {
   const arrow = "<->"; // 화살표 문자
 
   // 날짜 포맷팅 함수
-  // const formatDate = (dateString) => {
-  //   const date = new Date(dateString);
-  //   const year = date.getFullYear().toString().slice(-2); // 두 자리 연도
-  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (01, 02, ...)
-  //   const day = String(date.getDate()).padStart(2, '0'); // 일 (01, 02, ...)
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear().toString().slice(-2); // 두 자리 연도
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (01, 02, ...)
+    const day = String(date.getDate()).padStart(2, '0'); // 일 (01, 02, ...)
 
-  //   // 12시간 형식과 AM/PM 구분
-  //   let hours = date.getHours();
-  //   const minutes = String(date.getMinutes()).padStart(2, '0'); // 분 (00, 01, ...)
-  //   const ampm = hours >= 12 ? '오후' : '오전'; // 오전/오후 구분
-  //   hours = hours % 12 || 12; // 12시간 형식으로 변환 (0시는 12시로)
+    // 12시간 형식과 AM/PM 구분
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0'); // 분 (00, 01, ...)
+    const ampm = hours >= 12 ? '오후' : '오전'; // 오전/오후 구분
+    hours = hours % 12 || 12; // 12시간 형식으로 변환 (0시는 12시로)
 
-  //   return (
-  //     <>
-  //       {year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분
-  //     </>
-  //   );
-  // };
+    return (
+      <>
+        {year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}분
+      </>
+    );
+  };
 
   const handlePrintComplete = () => {
     axios.post('http://localhost:8089/qrancae/printComplete', Array.from(selectedCableIds), {
@@ -248,6 +252,15 @@ const Qr = () => {
 
       <div className="main-panel">
         <Header />
+        {loading && (
+          <div className="overlay">
+            <img
+              src="assets/img/spinner.svg"
+              alt="Loading..."
+              className="spinner"
+            />
+          </div>
+        )}
         {showNonePopup && (
           <ModalPopup
             isOpen={showNonePopup}
