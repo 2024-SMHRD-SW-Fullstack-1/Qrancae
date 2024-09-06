@@ -42,6 +42,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
       .then(() => {
         alert('작업자 정보가 수정되었습니다.');
         onClose();
+        window.location.reload(); // 수정 후 새로고침
       })
       .catch((error) => {
         console.error('작업자 정보 수정 실패!', error);
@@ -49,18 +50,34 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
   };
 
   const handleDelete = () => {
+    let newErrors = {};
+
+    if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
+    if (userPw !== confirmPw) newErrors.confirmPw = '*비밀번호가 일치하지 않습니다.';
+    if (!userName) newErrors.userName = '*이름을 입력해주세요.';
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      return;
+    }
+
     if (window.confirm('정말로 이 작업자를 삭제하시겠습니까?')) {
       axios
-        .delete(`http://localhost:8089/qrancae/api/users/${userId}`)
+        .delete(`http://localhost:8089/qrancae/api/users/${userId}`, {
+          userPw: userPw,
+          userName: userName,
+        })
         .then(() => {
           alert('작업자 정보가 삭제되었습니다.');
           onClose();
+          window.location.reload(); // 삭제 후 새로고침
         })
         .catch((error) => {
           console.error('작업자 정보 삭제 실패!', error);
         });
     }
-  };
+};
 
   return (
     <Modal show={isOpen} onHide={onClose} centered>
