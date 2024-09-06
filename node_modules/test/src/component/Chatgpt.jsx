@@ -9,6 +9,13 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
   const [messages, setMessages] = useState([{ role: 'assistant', content: '궁금한 점이 있으신가요? 제가 도와드리겠습니다.' }]); // 기본 메시지를 초기 상태에 추가
   const [loading, setLoading] = useState(false); //로딩 상태를 관리
   const chatRef = useRef(null); //chatRef는 DOM 요소를 참조하기 위해 사용
+  const messageEndRef = useRef(null); // 메시지 끝부분을 참조하는 ref 생성
+  // 메시지가 추가될 때 자동으로 스크롤을 아래로 이동시키는 effect
+  useEffect(() => {
+  if (messageEndRef.current) {
+    messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
+}, [messages, loading]);
 
   useEffect(() => {
     const handleClickOutside = (event) => { //컴포넌트 외부를 클릭했을 때 닫히게 함
@@ -26,6 +33,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
   
   //**prompt 설정!!**
   const chatGPT = async () => { //chatGPT 함수는 사용자의 입력을 GPT-3 API로 보내고 응답을 받음
+    if (!keywords.trim()) return; // 키워드가 없을 경우 전송하지 않음
     const api_key = 'sk-xg7d3GD1jZRJtL3wEFJXJ_7Wq_SomqJReTD3KW4JK2T3BlbkFJdnsd7XNtDUstattuN8gfohZotRHIz5gbhF4rjoirYA'; // <- API KEY 입력
     const prompt = 
   'You are an assistant that only answers questions related to cable management tasks, including terms like "랙", "QR", "qr", "전원", "케이블","케이블 종류" and "케이블 로그". ' +
@@ -50,6 +58,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
     setKeywords(''); //키워드 상태를 초기화
 
     try {
+      
       setLoading(true); // 로딩 상태를 true로 설정
       const response = await axios.post('https://api.openai.com/v1/chat/completions', data, {
         headers: {
@@ -85,6 +94,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
             </div>
           ))}
           {loading && <div className={styles.messageBoxAssistant}>Loading...</div>}
+        
         </div>
         <div className={styles.userMessage}>
           <input
@@ -96,9 +106,17 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
             onChange={(e) => setKeywords(e.target.value)} //이벤트 객체(e): 이벤트가 발생했을 때 이벤트 핸들러에 전달되는 객체 //target 속성: 이벤트가 발생한 요소를 나타내는 속성 
                                                           //, value 속성: target 속성을 통해 접근할 수 있는 속성 중 하나로, 사용자 입력 요소에서 입력된 값(텍스트 입력, 선택된 옵션 등)을 나타냅
             className={styles.userMessageInput}
+            placeholder="질문을 입력하세요."
           />
-          <button onClick={chatGPT} className={styles.userMessageButton}>입력</button>
+          <button
+            onClick={chatGPT}
+            className={styles.userMessageButton}
+            disabled={!keywords.trim()} // 키워드가 없으면 버튼 비활성화
+          >
+            입력
+          </button>
         </div>
+        <div ref={messageEndRef}></div> {/* 스크롤 위치를 설정할 빈 div */}
       </div>
     </div>
   );
