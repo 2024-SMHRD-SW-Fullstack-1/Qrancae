@@ -19,11 +19,12 @@ const Qr = () => {
   const [deleteConfirmed, setDeleteConfirmed] = useState(false); // 삭제 확인 여부
   const printRef = useRef(null); // 프린트 참조
   const [showNonePopup, setShowNonePopup] = useState(false);
-
-
+  // 로딩중인지 확인
+  const [loading, setLoading] = useState(false);
 
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
+    setLoading(true);
     getData();
   }, []);
 
@@ -42,6 +43,7 @@ const Qr = () => {
   useEffect(() => {
     if (jsonData.length > 0) {
       initializeDataTable();
+      setLoading(false);
     }
   }, [jsonData]);
 
@@ -250,6 +252,15 @@ const Qr = () => {
 
       <div className="main-panel">
         <Header />
+        {loading && (
+          <div className="overlay">
+            <img
+              src="assets/img/spinner.svg"
+              alt="Loading..."
+              className="spinner"
+            />
+          </div>
+        )}
         {showNonePopup && (
           <ModalPopup
             isOpen={showNonePopup}
@@ -345,49 +356,86 @@ const Qr = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {jsonData.map((item, index) => (
-                            <tr key={index}>
-                              <td>
-                                <input
-                                  type="checkbox"
-                                  className="row-select"
-                                  defaultChecked={true}
-                                  data-id={item.cable_idx}
-                                />
-                              </td>
-                              <td>{item.cable_idx}</td>
-                              <td>{item.s_rack_number}</td>
-                              <td>{item.s_rack_location}</td>
-                              <td>{item.s_server_name}</td>
-                              <td>{item.s_port_number}</td>
-                              <td>{item.d_rack_number}</td>
-                              <td>{item.d_rack_location}</td>
-                              <td>{item.d_server_name}</td>
-                              <td>{item.d_port_number}</td>
-                              <td>
-                                {item.cable_date && !item.remove_date ? (
-                                  <>
-                                    <div>연결 완료</div>
-                                    <div>{formatDate(item.cable_date)}</div>
-                                  </>
-                                ) : item.remove_date ? (
-                                  <>
-                                    <div>제거</div>
-                                    <div>{formatDate(item.remove_date)}</div>
-                                  </>
-                                ) : (
-                                  '-'
-                                )}
-                              </td>
-                              <td>
-                                {item.qr.qr_status !== 'X' ? (
-                                  <span className="badge badge-success">출력</span>
-                                ) : (
-                                  <span className="badge badge-warning">미출력</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
+                          {jsonData.map((item, index) => {
+                            if (item.histories.length === 0) {
+                              return (
+                                <tr key={index}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      className="row-select"
+                                      defaultChecked={true}
+                                      data-id={item.cable_idx}
+                                    />
+                                  </td>
+                                  <td>{item.cable_idx}</td>
+                                  <td>{item.s_rack_number}</td>
+                                  <td>{item.s_rack_location}</td>
+                                  <td>{item.s_server_name}</td>
+                                  <td>{item.s_port_number}</td>
+                                  <td>{item.d_rack_number}</td>
+                                  <td>{item.d_rack_location}</td>
+                                  <td>{item.d_server_name}</td>
+                                  <td>{item.d_port_number}</td>
+                                  <td>-</td>
+                                  <td>
+                                    {item.qr.qr_status !== 'X' ? (
+                                      <span className="badge badge-success">출력</span>
+                                    ) : (
+                                      <span className="badge badge-warning">미출력</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            } else {
+                              const sortedHistories = [...item.histories].sort((a, b) => b.history_idx - a.history_idx);
+                              const latestHistory = sortedHistories[0];
+
+                              return (
+                                <tr key={index}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      className="row-select"
+                                      defaultChecked={true}
+                                      data-id={item.cable_idx}
+                                    />
+                                  </td>
+                                  <td>{item.cable_idx}</td>
+                                  <td>{item.s_rack_number}</td>
+                                  <td>{item.s_rack_location}</td>
+                                  <td>{item.s_server_name}</td>
+                                  <td>{item.s_port_number}</td>
+                                  <td>{item.d_rack_number}</td>
+                                  <td>{item.d_rack_location}</td>
+                                  <td>{item.d_server_name}</td>
+                                  <td>{item.d_port_number}</td>
+                                  <td>
+                                    {latestHistory.remove_date ? (
+                                      <>
+                                        <div style={{ color: 'red' }}>제거됨</div>
+                                        <div>{formatDate(latestHistory.remove_date)}</div>
+                                      </>
+                                    ) : latestHistory.connect_date ? (
+                                      <>
+                                        <div style={{ color: 'green' }}>연결 완료</div>
+                                        <div>{formatDate(latestHistory.connect_date)}</div>
+                                      </>
+                                    ) : (
+                                      '-'
+                                    )}
+                                  </td>
+                                  <td>
+                                    {item.qr.qr_status !== 'X' ? (
+                                      <span className="badge badge-success">출력</span>
+                                    ) : (
+                                      <span className="badge badge-warning">미출력</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            }
+                          })}
                         </tbody>
                       </table>
                     </div>

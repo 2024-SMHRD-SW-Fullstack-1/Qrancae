@@ -12,9 +12,11 @@ Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  const hours = date.getHours().toString().padStart(2, '0');
+  const hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
+  const period = hours >= 12 ? '오후' : '오전'; // 오전/오후 결정
+  const formattedHours = hours % 12 || 12; // 12시간제로 변환, 0은 12로 표시
+  return `${period} ${formattedHours.toString().padStart(2, '0')}:${minutes}`;
 };
 
 const Header = () => {
@@ -24,10 +26,11 @@ const Header = () => {
   const [advice, setAdvice] = useState('');
   const [countMsg, setCountMsg] = useState(0);
   const [repairCnt, setRepairCnt] = useState([]);// 알림 개수
-  const [maints, setMaints] = useState([]);
   const [showAlert, setShowAlert] = useState(false); // 알림 표시 상태
   const [latestMaint, setLatestMaint] = useState(null); // 최신 알림 저장
+  const [notifications, setNotifications] = useState([]); // 알림 리스트 상태
   const navigate = useNavigate();
+  const [hover, setHover] = useState(false);
 
   useEffect(() => {
     const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
@@ -46,10 +49,9 @@ const Header = () => {
       navigate('/login');
     }
   }, [navigate]);
-
+  // 알림 내역 가져오기
   useEffect(() => {
     getTodayRepair();
-    getMaintMsg(); // 데이터를 가져오는 함수 호출
 
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
@@ -71,7 +73,16 @@ const Header = () => {
         const notification = JSON.parse(message.body);
         console.log("메시지", notification);
         setLatestMaint(notification); // 최신 알림 상태 업데이트
-        setCountMsg(prevCount => prevCount + 1); // 알림 개수 증가
+        setCountMsg(prevCount => {
+          const newCount = prevCount + 1;
+          localStorage.setItem('countMsg', newCount);
+          return newCount;
+        });
+        setNotifications(prevNotifications => {
+          const updatedNotifications = [notification, ...prevNotifications];
+          localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+          return updatedNotifications;
+        });
         setShowAlert(true); // 알림 표시 상태 업데이트
       });
     };
@@ -84,18 +95,13 @@ const Header = () => {
     };
   }, []);
 
-  useEffect(() => {
-    // repairCnt가 업데이트될 때 countMsg를 업데이트
-    setCountMsg(repairCnt.cntNewRepair || 0);
-  }, [repairCnt]);
-
   // 알림div태그
   useEffect(() => {
     // 5초 후 알림 숨기기
     if (showAlert) {
       const timer = setTimeout(() => {
         setShowAlert(false);
-      }, 5000); // 5초
+      }, 9000); // 5초
       return () => clearTimeout(timer);
     }
   }, [showAlert]);
@@ -110,10 +116,18 @@ const Header = () => {
   };
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-    if (isOpen) {
-      setCountMsg(0); // 드롭다운 열 때 알림 개수 초기화
-    }
+    // 드롭다운 열기/닫기 상태 변경
+    setIsOpen(prevOpen => {
+      const newOpen = !prevOpen;
+
+      if (newOpen) {
+        // 드롭다운이 열릴 때 알림 개수를 리셋
+        setCountMsg(0);
+        localStorage.setItem('countMsg', '0');
+      }
+
+      return newOpen;
+    });
   };
 
   const getTodayRepair = () => {
@@ -123,20 +137,8 @@ const Header = () => {
     }).then((res) => {
       //console.log('오늘의 점검', res.data);
       setRepairCnt(res.data);
-      setCountMsg(res.data.cntNewRepair || 0); // 알림 개수를 신규 접수 건수로 설정
     });
 
-  }
-  // 알림 내역가져오기
-  const getMaintMsg = () => {
-    axios.get('http://localhost:8089/qrancae/maint/msg')
-      .then((res) => {
-        console.log('신규알림내역', res.data)
-        setMaints(res.data)
-      })
-      .catch((err) => {
-        console.log('헤더maintData error:', err);
-      });
   }
 
   const handleRepairClick = () => {
@@ -204,6 +206,13 @@ const Header = () => {
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 onClick={toggleDropdown}
+                onMouseOver={() => setHover(true)}
+                onMouseOut={() => setHover(false)}
+                style={{
+                  backgroundColor: hover ? 'transparent' : 'transparent', // hover 시 배경색 유지
+                  color: hover ? '#4574C4' : '#8a95a0', // hover 시 아이콘 색상 변경
+                  textDecoration: 'none', // 링크 장식 제거
+                }}
               >
                 <i className="fa fa-bell"></i>{/* 알림 아이콘 */}
                 {countMsg > 0 && <span className="notification">{countMsg}</span>}{/* 알림 개수 표시 */}
@@ -214,57 +223,73 @@ const Header = () => {
               >
                 <li>
                   <div className="dropdown-title">
-                    {countMsg > 0 ? `${countMsg}개의 알림` : `${adminName}님 알림이 없습니다`} {/* 알림 제목 */}
+                    {countMsg > 0 ? (
+                      `${countMsg}개의 알림`
+                    ) : (
+                      <>
+                        <span style={{ color: '#4574C4' }}>{adminName}</span> 님 알림 내역
+                      </>
+                    )}
                   </div>
                 </li>
                 <li>
                   <div className="notif-scroll scrollbar-outer">
                     <div className="notif-center">
-                      {maints.length > 0 ? (
-                        maints.map((maint, index) => (
-                          <a href="#" key={index}>
-                            <div className={`notif-icon notif-${maint.user.user_name}`}>
+                      {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                          <Link to="/repair" key={index} style={{ textDecoration: 'none' }}>
+                            <div className={`notif-icon notif-${notification.user_name}`}>
                               <i className="fas fa-bell"></i>
                             </div>
                             <div className="notif-content">
-                              <span className="block">{maint.user.user_name}</span>
-                              <span className="block">케이블 {maint.cable.cable_idx} 점검 요청</span>
-                              <span className="time">{formatDate(maint.maint_date)}</span>
+                              <span className="block">{notification.user_name}</span>
+                              <span className="block">케이블 {notification.cable_idx} 점검 요청</span>
+                              <span className="time">{formatDate(notification.maint_date)}</span>
                             </div>
-                          </a>
+                          </Link>
                         ))
                       ) : (
-                        <p style={{ textAlign: 'center' }}>새로운 알림이 없습니다</p>
+                        <p style={{ textAlign: 'center', margin: '20px' }}>새로운 알림이 없습니다</p>
                       )}
                     </div>
                   </div>
                 </li>
                 <li>
-                  <label onClick={handleRepairClick}>
-                    <a className="see-all" href="javascript:void(0);">
-                      자세히 보기
+                  {countMsg > 0 ? (
+                    <label onClick={handleRepairClick}>
+                      <a className="see-all" href="javascript:void(0);">
+                        자세히 보기
+                        <i className="fas fa-chevron-right" style={{ marginLeft: '8px' }}></i>
+                      </a>
+                    </label>
+                  ) : (
+                    <a className="see-all" href="/repair">
+                      점검 관리로 이동
+                      <i className="fas fa-chevron-right" style={{ marginLeft: '8px' }}></i>
                     </a>
-                  </label>
+
+                  )}
                 </li>
               </ul>
             </li>
-            <li className="nav-item topbar-user dropdown hidden-caret">
+            <li className="nav-item topbar-user dropdown hidden-caret" style={{ marginRight: '2rem' }}>
               <a
                 className="dropdown-toggle profile-pic"
                 data-bs-toggle="dropdown"
                 href="#"
                 aria-expanded="false"
+                style={{ pointerEvents: 'none' }} // 클릭 불가능하게 설정
               >
-                <div className="avatar-sm">
+                {/* <div className="avatar-sm">
                   <img
                     src="assets/img/profile.jpg"
                     alt="..."
                     className="avatar-img rounded-circle"
                   />
-                </div>
+                </div> */}
                 <span className="profile-username">
                   <span className="fw-bold">{adminName}</span>
-                  <span className="op-7">님 환영합니다!</span>
+                  <span className="op-7"> 님 환영합니다!</span>
                 </span>
               </a>
               <ul className="dropdown-menu dropdown-user animated fadeIn">
@@ -332,16 +357,17 @@ const Header = () => {
           </button>
         </Modal>
       )}
-      {showAlert && (
+      {showAlert && latestMaint && (
         <div
           className="col-10 col-xs-11 col-sm-4 alert alert-secondary animated fadeInUp"
           role="alert"
           style={{
             display: 'inline-block',
+            width: '350px', // 가로 길이 조정
             margin: '0px auto',
-            paddingLeft: '65px',
+            paddingLeft: '30px',// 패딩 조정
             position: 'fixed',
-            transition: '0.5s ease-in-out',
+            transition: '0.8s ease-in-out', // 사라지는 시간
             zIndex: 1031,
             bottom: '20px',
             right: '20px',
@@ -361,21 +387,44 @@ const Header = () => {
           >
             &times;
           </button>
-          {showAlert && latestMaint && ( // 최신 알림이 있을 때만 표시
-            <div className="alert alert-info">
-              <div className="alert-header">
-                <h6 className="alert-title">{latestMaint.title}</h6>
-                <span className="alert-time">{formatDate(latestMaint.date)}</span>
-              </div>
-              <div className="alert-body">
-                {latestMaint.message}
-              </div>
+          <div className="alert-header">
+            <h6 className="alert-title">
+              <span style={{ fontWeight: 'bold' }}>{latestMaint.user_name}</span>
+              {' '}
+              ({formatDate(latestMaint.maint_date)})
+            </h6>
+          </div>
+          <div className="alert-body">
+            <div>
+              <span>
+                케이블 <strong>{latestMaint.cable_idx}</strong> 점검 요청
+              </span>
             </div>
-          )}
-
+            <div>
+              {[
+                latestMaint.maint_qr === '불량' && 'QR 상태: 불량',
+                latestMaint.maint_cable === '불량' && '케이블 상태: 불량',
+                latestMaint.maint_power === '불량' && '전원 상태: 불량'
+              ]
+                .filter(Boolean) // '불량' 상태만 남기기
+                .map((status, index, array) => {
+                  // 각 상태 메시지에서 '불량'만 빨간색으로 변경
+                  const parts = status.split('불량');
+                  return (
+                    <span key={index}>
+                      {parts[0]}
+                      <span style={{ color: 'red' }}>불량</span>
+                      {parts[1]}
+                      {(index < array.length - 1) && ', '} {/* 마지막 항목에는 쉼표를 추가하지 않음 */}
+                    </span>
+                  );
+                })}
+            </div>
+          </div>
           <a href="#" target="_blank" rel="noopener noreferrer"></a>
         </div>
       )}
+
     </div>
   );
 };

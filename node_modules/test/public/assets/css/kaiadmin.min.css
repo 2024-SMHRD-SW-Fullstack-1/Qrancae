@@ -5139,7 +5139,7 @@ label.error {
 }
 
 .navbar .navbar-nav .nav-item .nav-link i {
-  font-size: 16px;
+  font-size: 18px;
   vertical-align: middle;
   line-height: 1 !important;
 }
@@ -5191,7 +5191,7 @@ label.error {
 
 .navbar .navbar-nav .notification {
   position: absolute;
-  background-color: #31ce36;
+  background-color: #4574C4;
   text-align: center;
   border-radius: 10px;
   min-width: 17px;

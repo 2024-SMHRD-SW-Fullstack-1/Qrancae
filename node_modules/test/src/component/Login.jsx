@@ -96,7 +96,7 @@ function Login() {
         <ModalPopup
           isOpen={showPopup}
           onClose={closePopup}
-          message="로그인 성공"
+          message="관리자 님 환영합니다!"
         />
       )}
     </div>

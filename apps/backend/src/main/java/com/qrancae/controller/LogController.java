@@ -286,6 +286,7 @@ public class LogController {
 
 		response.getOutputStream().write(excelContent);
 	}
+	
 	@GetMapping("/logs/count/{userId}")
 	   public ResponseEntity<Integer> getLogCountByUserId(@PathVariable String userId) {
 	       User user = memberService.findUserByUserId(userId); // MemberService에 findUserByUserId 메서드를 추가해야 합니다.
