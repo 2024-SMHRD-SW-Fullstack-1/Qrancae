@@ -7,6 +7,25 @@ import UserDetail from './UserDetail'; // UserDetail 임포트
 import { useNavigate } from 'react-router-dom';
 import styles from './User.module.css';
 
+//날짜 및 시간 포맷팅
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  let formattedDate = date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  // 연도를 두 자리로 변환
+  const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
+  formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
+
+  return formattedDate.replace(',', '');
+};
+
 const User = () => {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null); // 선택된 사용자 ID 저장
@@ -72,14 +91,16 @@ const User = () => {
           <div className={styles.pageInner}>
             <div className={styles.pageHeader}>
               <h3 className="fw-bold mb-3">사용자 관리</h3>
-              <button
-                className={`btn btn-label-primary btn-round`}
-                onClick={handleRegisterClick}>
-                <span className="btn-label">
-                  <i className="fas fa-user-plus icon-spacing"></i>
-                </span>
-                작업자 등록
-              </button>
+              <div className="common-labels" style={{ marginBottom: '1rem' }}>
+                <button
+                  className={`btn btn-label-primary btn-round`}
+                  onClick={handleRegisterClick}>
+                  <span className="btn-label">
+                    <i className="fas fa-user-plus icon-spacing"></i>
+                  </span>
+                  작업자 등록
+                </button>
+              </div>
             </div>
 
             <div className="row">
@@ -90,7 +111,7 @@ const User = () => {
                       <div className="user-profile text-center">
                         <div className="name">{user.userName}</div>
                         <div className="job">{user.userId}</div>
-                        <div className="desc">{user.joinedAt}</div>
+                        <div className="desc">{formatDate(user.joinedAt)}</div>
                         <div className="view-profile">
                           <button
                             className="btn btn-primary btn-border btn-round"
