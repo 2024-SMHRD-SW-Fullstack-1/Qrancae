@@ -120,8 +120,9 @@ const Header = () => {
     setIsOpen(prevOpen => {
       const newOpen = !prevOpen;
 
-      if (newOpen) {
-        // 드롭다운이 열릴 때 알림 개수를 리셋
+      // 드롭다운이 열릴 때 알림 개수를 리셋
+      if (newOpen && countMsg > 0) {
+
         setCountMsg(0);
         localStorage.setItem('countMsg', '0');
       }
@@ -167,7 +168,9 @@ const Header = () => {
             </button>
           </div>
           <button className="topbar-toggler more">
-            <i className="gg-more-vertical-alt"></i>
+            <Link to="/repair">
+              <i className="gg-more-vertical-alt"></i>
+            </Link>
           </button>
         </div>
       </div>
