@@ -79,10 +79,10 @@ const Qr = () => {
         { title: '랙 위치', data: 'd_rack_location' },
         { title: '서버 이름', data: 'd_server_name' },
         { title: '포트 번호', data: 'd_port_number' },
-        {
+        /* {
           title: '케이블 연결',
           data: 'cable_date',
-        },
+        }, */
         {
           title: '출력 상태',
           data: 'qr.qr_status',
@@ -330,7 +330,7 @@ const Qr = () => {
                             </th>
                             <th colSpan="4">
                               <i className="fas fa-sign-in-alt" style={{ color: '#1572e8', marginRight: '.5rem' }}></i> 도착점 (End)</th>
-                            <th rowSpan="2">케이블 연결</th>
+                            {/* <th rowSpan="2">케이블 연결</th> */}
                             <th rowSpan="2">출력 상태</th>
                           </tr>
                           <tr>
@@ -364,7 +364,7 @@ const Qr = () => {
                               <td>{item.d_rack_location}</td>
                               <td>{item.d_server_name}</td>
                               <td>{item.d_port_number}</td>
-                              <td>
+                              {/* <td>
                                 {item.cable_date && !item.remove_date ? (
                                   <>
                                     <div>연결 완료</div>
@@ -378,7 +378,7 @@ const Qr = () => {
                                 ) : (
                                   '-'
                                 )}
-                              </td>
+                              </td> */}
                               <td>
                                 {item.qr.qr_status !== 'X' ? (
                                   <span className="badge badge-success">출력</span>
