@@ -386,7 +386,11 @@ const Header = () => {
             </h6>
           </div>
           <div className="alert-body">
-            {`케이블 ${latestMaint.cable_idx} 점검 요청`}
+            <div>
+              <span>
+                케이블 <strong>{latestMaint.cable_idx}</strong> 점검 요청
+              </span>
+            </div>
             <div>
               {[
                 latestMaint.maint_qr === '불량' && 'QR 상태: 불량',
@@ -394,14 +398,18 @@ const Header = () => {
                 latestMaint.maint_power === '불량' && '전원 상태: 불량'
               ]
                 .filter(Boolean) // '불량' 상태만 남기기
-                .map(status =>
-                  status.includes('불량') ? (
-                    <span key={status} style={{ color: 'red' }}>{status}</span>
-                  ) : (
-                    <span key={status}>{status}</span>
-                  )
-                )
-                .reduce((prev, curr) => [prev, ', ', curr])} {/* 쉼표로 구분하여 한 줄로 출력 */}
+                .map((status, index, array) => {
+                  // 각 상태 메시지에서 '불량'만 빨간색으로 변경
+                  const parts = status.split('불량');
+                  return (
+                    <span key={index}>
+                      {parts[0]}
+                      <span style={{ color: 'red' }}>불량</span>
+                      {parts[1]}
+                      {(index < array.length - 1) && ', '} {/* 마지막 항목에는 쉼표를 추가하지 않음 */}
+                    </span>
+                  );
+                })}
             </div>
           </div>
           <a href="#" target="_blank" rel="noopener noreferrer"></a>

@@ -6,7 +6,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons'; // 사용할 아이
 
 const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정의. onClose는 prop으로 받아옴(property)
   const [keywords, setKeywords] = useState(''); // 사용자가 입력한 키워드를 상태로 관리
-  const [messages, setMessages] = useState([{ role: 'assistant', content: '궁금한 점이 있으신가요? 제가 도와드리겠습니다.' }]); // 기본 메시지를 초기 상태에 추가
+  const [messages, setMessages] = useState([{ role: 'assistant', content: '무엇을 도와드릴까요? 궁금한 점을 물어보시면 빠르게 해결해 드리겠습니다.' }]); // 기본 메시지를 초기 상태에 추가
   const [loading, setLoading] = useState(false); //로딩 상태를 관리
   const chatRef = useRef(null); //chatRef는 DOM 요소를 참조하기 위해 사용
 
@@ -23,17 +23,17 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
       document.removeEventListener('mousedown', handleClickOutside); // 컴포넌트가 언마운트 될 때 이벤트를 제거
     };
   }, [onClose]); // onClose prop이 변경될 때마다 effect를 재실행
-  
+
   //**prompt 설정!!**
   const chatGPT = async () => { //chatGPT 함수는 사용자의 입력을 GPT-3 API로 보내고 응답을 받음
     const api_key = 'sk-xg7d3GD1jZRJtL3wEFJXJ_7Wq_SomqJReTD3KW4JK2T3BlbkFJdnsd7XNtDUstattuN8gfohZotRHIz5gbhF4rjoirYA'; // <- API KEY 입력
-    const prompt = 
-  'You are an assistant that only answers questions related to cable management tasks, including terms like "랙", "QR", "qr", "전원", "케이블","케이블 종류" and "케이블 로그". ' +
-  'If the question is not related to these topics, respond with: "죄송합니다, 이 질문은 케이블 업무와 관련이 없습니다." ' +
-  'Please follow these instructions strictly.\n' +
-  '1. 100자 이내로 대답하세요.\n' +
-  '2. 친절하게 대답하세요.\n' +
-  '3. 케이블 업무 관련된 질문 이외엔 답변하지 마시오.\n\n';
+    const prompt =
+      'You are an assistant that only answers questions related to cable management tasks, including terms like "랙", "QR", "qr", "전원", "케이블","케이블 종류" and "케이블 로그". ' +
+      'If the question is not related to these topics, respond with: "죄송합니다. 이 질문은 케이블 업무와 관련이 없습니다." ' +
+      'Please follow these instructions strictly.\n' +
+      '1. 100자 이내로 대답하세요.\n' +
+      '2. 친절하게 대답하세요.\n' +
+      '3. 케이블 업무 관련된 질문 이외엔 답변하지 마시오.\n\n';
 
     const userMessage = { role: 'user', content: keywords }; //사용자의 메시지를 생성
     const data = {
@@ -94,7 +94,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
             required
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)} //이벤트 객체(e): 이벤트가 발생했을 때 이벤트 핸들러에 전달되는 객체 //target 속성: 이벤트가 발생한 요소를 나타내는 속성 
-                                                          //, value 속성: target 속성을 통해 접근할 수 있는 속성 중 하나로, 사용자 입력 요소에서 입력된 값(텍스트 입력, 선택된 옵션 등)을 나타냅
+            //, value 속성: target 속성을 통해 접근할 수 있는 속성 중 하나로, 사용자 입력 요소에서 입력된 값(텍스트 입력, 선택된 옵션 등)을 나타냅
             className={styles.userMessageInput}
           />
           <button onClick={chatGPT} className={styles.userMessageButton}>입력</button>
