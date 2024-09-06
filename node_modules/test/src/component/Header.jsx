@@ -28,6 +28,8 @@ const Header = () => {
   const [latestMaint, setLatestMaint] = useState(null); // 최신 알림 저장
   const [notifications, setNotifications] = useState([]); // 알림 리스트 상태
   const navigate = useNavigate();
+  const [dropdownTimeout, setDropdownTimeout] = useState(null);
+  const [hover, setHover] = useState(false);
 
   useEffect(() => {
     const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
@@ -107,11 +109,25 @@ const Header = () => {
   const toggleDropdown = () => {
     // 드롭다운 열기/닫기 상태 변경
     setIsOpen(prevOpen => {
-      if (!prevOpen) {
-        // 드롭다운이 닫혀있을 때 열리면 알림 개수를 0으로 설정
+      const newOpen = !prevOpen;
+
+      if (newOpen) {
+        // 드롭다운이 열릴 때 알림 개수를 리셋
         setCountMsg(0);
+        // 드롭다운이 열릴 때 타이머 설정
+        const timeout = setTimeout(() => {
+          setIsOpen(false);
+        }, 5000); // 5초
+        setDropdownTimeout(timeout);
+      } else {
+        // 드롭다운이 닫힐 때 타이머 정리
+        if (dropdownTimeout) {
+          clearTimeout(dropdownTimeout);
+          setDropdownTimeout(null);
+        }
       }
-      return !prevOpen;
+
+      return newOpen;
     });
   };
 
@@ -191,6 +207,13 @@ const Header = () => {
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 onClick={toggleDropdown}
+                onMouseOver={() => setHover(true)}
+                onMouseOut={() => setHover(false)}
+                style={{
+                  backgroundColor: hover ? 'transparent' : 'transparent', // hover 시 배경색 유지
+                  color: hover ? '#4574C4' : '#8a95a0', // hover 시 아이콘 색상 변경
+                  textDecoration: 'none', // 링크 장식 제거
+                }}
               >
                 <i className="fa fa-bell"></i>{/* 알림 아이콘 */}
                 {countMsg > 0 && <span className="notification">{countMsg}</span>}{/* 알림 개수 표시 */}
@@ -201,7 +224,13 @@ const Header = () => {
               >
                 <li>
                   <div className="dropdown-title">
-                    {countMsg > 0 ? `${countMsg}개의 알림` : `${adminName} 님 알림 내역`} {/* 알림 제목 */}
+                    {countMsg > 0 ? (
+                      `${countMsg}개의 알림`
+                    ) : (
+                      <>
+                        <span style={{ color: '#4574C4' }}>{adminName}</span> 님 알림 내역
+                      </>
+                    )}
                   </div>
                 </li>
                 <li>
@@ -221,7 +250,7 @@ const Header = () => {
                           </Link>
                         ))
                       ) : (
-                        <p style={{ textAlign: 'center' }}>새로운 알림이 없습니다</p>
+                        <p style={{ textAlign: 'center', margin: '20px' }}>새로운 알림이 없습니다</p>
                       )}
                     </div>
                   </div>
@@ -231,12 +260,15 @@ const Header = () => {
                     <label onClick={handleRepairClick}>
                       <a className="see-all" href="javascript:void(0);">
                         자세히 보기
+                        <i className="fas fa-chevron-right" style={{ marginLeft: '8px' }}></i>
                       </a>
                     </label>
                   ) : (
                     <a className="see-all" href="/repair">
                       점검 관리로 이동
+                      <i className="fas fa-chevron-right" style={{ marginLeft: '8px' }}></i>
                     </a>
+
                   )}
                 </li>
               </ul>
@@ -247,6 +279,7 @@ const Header = () => {
                 data-bs-toggle="dropdown"
                 href="#"
                 aria-expanded="false"
+                style={{ pointerEvents: 'none' }} // 클릭 불가능하게 설정
               >
                 {/* <div className="avatar-sm">
                   <img
@@ -257,7 +290,7 @@ const Header = () => {
                 </div> */}
                 <span className="profile-username">
                   <span className="fw-bold">{adminName}</span>
-                  <span className="op-7">님 환영합니다!</span>
+                  <span className="op-7"> 님 환영합니다!</span>
                 </span>
               </a>
               <ul className="dropdown-menu dropdown-user animated fadeIn">
