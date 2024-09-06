@@ -19,9 +19,12 @@ const Qr = () => {
   const [deleteConfirmed, setDeleteConfirmed] = useState(false); // 삭제 확인 여부
   const printRef = useRef(null); // 프린트 참조
   const [showNonePopup, setShowNonePopup] = useState(false);
+  // 로딩중인지 확인
+  const [loading, setLoading] = useState(false);
 
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
+    setLoading(true);
     getData();
   }, []);
 
@@ -40,6 +43,7 @@ const Qr = () => {
   useEffect(() => {
     if (jsonData.length > 0) {
       initializeDataTable();
+      setLoading(false);
     }
   }, [jsonData]);
 
@@ -248,6 +252,15 @@ const Qr = () => {
 
       <div className="main-panel">
         <Header />
+        {loading && (
+          <div className="overlay">
+            <img
+              src="assets/img/spinner.svg"
+              alt="Loading..."
+              className="spinner"
+            />
+          </div>
+        )}
         {showNonePopup && (
           <ModalPopup
             isOpen={showNonePopup}
