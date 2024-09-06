@@ -26,6 +26,7 @@ const Header = () => {
   const [repairCnt, setRepairCnt] = useState([]);// 알림 개수
   const [showAlert, setShowAlert] = useState(false); // 알림 표시 상태
   const [latestMaint, setLatestMaint] = useState(null); // 최신 알림 저장
+  const [notifications, setNotifications] = useState([]); // 알림 리스트 상태
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,6 +71,7 @@ const Header = () => {
         console.log("메시지", notification);
         setLatestMaint(notification); // 최신 알림 상태 업데이트
         setCountMsg(prevCount => prevCount + 1); // 알림 개수 증가
+        setNotifications(prevNotifications => [notification, ...prevNotifications]); // 새 알림 추가
         setShowAlert(true); // 알림 표시 상태 업데이트
       });
     };
@@ -205,32 +207,38 @@ const Header = () => {
                 <li>
                   <div className="notif-scroll scrollbar-outer">
                     <div className="notif-center">
-                      {latestMaint ? (
-                        <a href="#">
-                          <div className={`notif-icon notif-${latestMaint.user_name}`}>
-                            <i className="fas fa-bell"></i>
-                          </div>
-                          <div className="notif-content">
-                            <span className="block">{latestMaint.user_name}</span>
-                            <span className="block">케이블 {latestMaint.cable_idx} 점검 요청</span>
-                            <span className="time">{formatDate(latestMaint.maint_date)}</span>
-                          </div>
-                        </a>
+                      {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                          <Link to="/repair" key={index} style={{ textDecoration: 'none' }}>
+                            <div className={`notif-icon notif-${notification.user_name}`}>
+                              <i className="fas fa-bell"></i>
+                            </div>
+                            <div className="notif-content">
+                              <span className="block">{notification.user_name}</span>
+                              <span className="block">케이블 {notification.cable_idx} 점검 요청</span>
+                              <span className="time">{formatDate(notification.maint_date)}</span>
+                            </div>
+                          </Link>
+                        ))
                       ) : (
                         <p style={{ textAlign: 'center' }}>새로운 알림이 없습니다</p>
                       )}
                     </div>
                   </div>
                 </li>
-                {countMsg > 0 && ( // 알림이 있을 때만 자세히 보기 표시
-                  <li>
+                <li>
+                  {countMsg > 0 ? (
                     <label onClick={handleRepairClick}>
                       <a className="see-all" href="javascript:void(0);">
                         자세히 보기
                       </a>
                     </label>
-                  </li>
-                )}
+                  ) : (
+                    <a className="see-all" href="/repair">
+                      점검 관리로 이동
+                    </a>
+                  )}
+                </li>
               </ul>
             </li>
             <li className="nav-item topbar-user dropdown hidden-caret" style={{ marginRight: '2rem' }}>
@@ -346,30 +354,26 @@ const Header = () => {
           >
             &times;
           </button>
-          {showAlert && latestMaint && ( // 최신 알림이 있을 때만 표시
-            <div className="alert alert-info">
-              <div className="alert-header">
-                <h6 className="alert-title">{latestMaint.user_name}</h6>
-                <span className="alert-time">{formatDate(latestMaint.maint_date)}</span>
-              </div>
-              <div className="alert-body">
-                {`케이블 ${latestMaint.cable_idx} 점검 요청`}
-                <div>
-                  {[
-                    latestMaint.maint_qr === '불량' && 'QR 상태: 불량',
-                    latestMaint.maint_cable === '불량' && '케이블 상태: 불량',
-                    latestMaint.maint_power === '불량' && '전원 상태: 불량'
-                  ]
-                    .filter(Boolean) // '불량' 상태만 남기기
-                    .join(', ')} {/* 쉼표로 구분하여 한 줄로 출력 */}
-                </div>
-              </div>
+          <div className="alert-header">
+            <h6 className="alert-title">{latestMaint.user_name}</h6>
+            <span className="alert-time">{formatDate(latestMaint.maint_date)}</span>
+          </div>
+          <div className="alert-body">
+            {`케이블 ${latestMaint.cable_idx} 점검 요청`}
+            <div>
+              {[
+                latestMaint.maint_qr === '불량' && 'QR 상태: 불량',
+                latestMaint.maint_cable === '불량' && '케이블 상태: 불량',
+                latestMaint.maint_power === '불량' && '전원 상태: 불량'
+              ]
+                .filter(Boolean) // '불량' 상태만 남기기
+                .join(', ')} {/* 쉼표로 구분하여 한 줄로 출력 */}
             </div>
-          )}
-
+          </div>
           <a href="#" target="_blank" rel="noopener noreferrer"></a>
         </div>
       )}
+
     </div>
   );
 };
