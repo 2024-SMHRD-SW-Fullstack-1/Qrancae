@@ -38,10 +38,12 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
     const prompt =
       'You are an assistant that only answers questions related to cable management tasks, including terms like "랙", "QR", "qr", "전원", "케이블","케이블 종류" and "케이블 로그". ' +
       'If the question is not related to these topics, respond with: "죄송합니다. 이 질문은 케이블 업무와 관련이 없습니다." ' +
+      'If the question is related to these topics, please answer the question fully and stop when your response is complete.'+
       'Please follow these instructions strictly.\n' +
       '1. 100자 이내로 대답하세요.\n' +
       '2. 친절하게 대답하세요.\n' +
-      '3. 케이블 업무 관련된 질문 이외엔 답변하지 마시오.\n\n';
+      '3. 케이블 업무 관련된 질문 이외엔 답변하지 마시오.\n' +
+      '4. 답변이 중간에 끊기지 않고, 동사형으로 자연스럽게 끝나도록 하세요.\n\n';
 
     const userMessage = { role: 'user', content: keywords }; //사용자의 메시지를 생성
     const data = {
@@ -58,21 +60,37 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
     setKeywords(''); //키워드 상태를 초기화
 
     try {
-      
       setLoading(true); // 로딩 상태를 true로 설정
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', data, {
+      let response = await axios.post('https://api.openai.com/v1/chat/completions', data, {
         headers: {
-          Authorization: `Bearer ${api_key}`, // API 키를 Authorization 헤더에 추가
-          'Content-Type': 'application/json', // 요청의 Content-Type을 설정
+          Authorization: `Bearer ${api_key}`,
+          'Content-Type': 'application/json',
         },
       });
+      let assistantMessage = response.data.choices[0].message.content;
+
+      // 문장이 끊겼다면, 추가로 토큰을 요청해 문장을 완성
+      while (!assistantMessage.endsWith('.') && !assistantMessage.endsWith('!') && !assistantMessage.endsWith('?')) {
+        const additionalResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
+          model: 'ft:gpt-3.5-turbo-1106:personal::A2rP3Xcq',
+          messages: [{ role: 'system', content: prompt }, { role: 'assistant', content: assistantMessage }],
+          max_tokens: 50,
+        }, {
+          headers: {
+            Authorization: `Bearer ${api_key}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        assistantMessage += additionalResponse.data.choices[0].message.content;
+      }
+
       setLoading(false); // 로딩 상태를 false로 설정
       setMessages((prevMessages) => [
-        ...prevMessages,  // JavaScript에서 spread 문법을 사용하여 배열이나 객체를 확장(복사)하는 방법
-        { role: 'assistant', content: response.data.choices[0].message.content }, // API 응답 메시지를 추가
+        ...prevMessages,
+        { role: 'assistant', content: assistantMessage }, // API 응답 메시지를 추가
       ]);
     } catch (error) {
-      setLoading(false);  // 로딩 상태를 false로 설정
+      setLoading(false); // 로딩 상태를 false로 설정
       console.error('Error:', error); // 에러를 콘솔에 출력
     }
   };
@@ -93,9 +111,9 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
               {message.content}
             </div>
           ))}
-          {loading && <div className={styles.messageBoxAssistant}>Loading...</div>}
-        
+          {loading && <div className={styles.messageBoxAssistant}>Loading...</div>}        
         </div>
+        <div ref={messageEndRef}></div> {/* 스크롤 위치를 설정할 빈 div */}
         <div className={styles.userMessage}>
           <input
             type="text"
@@ -115,8 +133,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
           >
             입력
           </button>
-        </div>
-        <div ref={messageEndRef}></div> {/* 스크롤 위치를 설정할 빈 div */}
+        </div>        
       </div>
     </div>
   );
