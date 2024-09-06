@@ -25,10 +25,10 @@ const tableColumns = [
   { title: 'log_idx', data: 'log_idx', visible: false },
   { title: '작업자', data: null, render: data => `${data.user.user_name}(${data.user.user_id})` },
   { title: '케이블', data: 'cable.cable_idx' },
-  { title: '소스 랙 번호', data: 'cable.s_rack_number' },
-  { title: '소스 랙 위치', data: 'cable.s_rack_location' },
-  { title: '목적지 랙 번호', data: 'cable.d_rack_number' },
-  { title: '목적지 랙 위치', data: 'cable.d_rack_location' },
+  { title: '출발점 랙 번호', data: 'cable.s_rack_number' },
+  { title: '출발점 랙 위치', data: 'cable.s_rack_location' },
+  { title: '도착점 랙 번호', data: 'cable.d_rack_number' },
+  { title: '도착점 랙 위치', data: 'cable.d_rack_location' },
   { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
 ];
 
@@ -209,10 +209,40 @@ const Log = () => {
                       >
                         <thead>
                           <tr>
-                            {tableColumns.map(col => <th key={col.title}>{col.title}</th>)}
+                            <th rowSpan="2">번호</th>
+                            <th rowSpan="2">log_idx</th>
+                            <th rowSpan="2">작업자</th>
+                            <th rowSpan="2">케이블</th>
+                            <th colSpan="2">
+                              <i className="fas fa-sign-out-alt" style={{ color: 'red', marginRight: '.5rem' }}></i> 출발점 (Start)
+                            </th>
+                            <th colSpan="2">
+                              <i className="fas fa-sign-in-alt" style={{ color: '#1572e8', marginRight: '.5rem' }}></i> 도착점 (End)
+                            </th>
+                            <th rowSpan="2">날짜 및 시간</th>
+                          </tr>
+                          <tr>
+                            <th>랙 번호</th>
+                            <th>랙 위치</th>
+                            <th>랙 번호</th>
+                            <th>랙 위치</th>
                           </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                          {filteredData.map((item, index) => (
+                            <tr key={item.log_idx || index}>
+                              <td>{index + 1}</td>
+                              <td>{item.log_idx}</td>
+                              <td>{item.user.user_name} ({item.user.user_id})</td>
+                              <td>{item.cable.cable_idx}</td>
+                              <td>{item.cable.s_rack_number}</td>
+                              <td>{item.cable.s_rack_location}</td>
+                              <td>{item.cable.d_rack_number}</td>
+                              <td>{item.cable.d_rack_location}</td>
+                              <td>{formatDate(item.log_date)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -221,7 +251,6 @@ const Log = () => {
             </div>
           </div>
         </div>
-
         <Footer />
       </div>
     </div>

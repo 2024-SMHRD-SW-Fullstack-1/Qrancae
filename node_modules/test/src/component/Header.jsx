@@ -73,8 +73,16 @@ const Header = () => {
         const notification = JSON.parse(message.body);
         console.log("메시지", notification);
         setLatestMaint(notification); // 최신 알림 상태 업데이트
-        setCountMsg(prevCount => prevCount + 1); // 알림 개수 증가
-        setNotifications(prevNotifications => [notification, ...prevNotifications]); // 새 알림 추가
+        setCountMsg(prevCount => {
+          const newCount = prevCount + 1;
+          localStorage.setItem('countMsg', newCount);
+          return newCount;
+        });
+        setNotifications(prevNotifications => {
+          const updatedNotifications = [notification, ...prevNotifications];
+          localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+          return updatedNotifications;
+        });
         setShowAlert(true); // 알림 표시 상태 업데이트
       });
     };
@@ -115,6 +123,7 @@ const Header = () => {
       if (newOpen) {
         // 드롭다운이 열릴 때 알림 개수를 리셋
         setCountMsg(0);
+        localStorage.setItem('countMsg', '0');
       }
 
       return newOpen;
@@ -354,7 +363,7 @@ const Header = () => {
           role="alert"
           style={{
             display: 'inline-block',
-            width: '300px', // 가로 길이 조정
+            width: '350px', // 가로 길이 조정
             margin: '0px auto',
             paddingLeft: '30px',// 패딩 조정
             position: 'fixed',

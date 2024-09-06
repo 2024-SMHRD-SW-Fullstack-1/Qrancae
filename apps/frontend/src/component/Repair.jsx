@@ -192,29 +192,35 @@ const Repair = () => {
 
             const data = repairTable.row(this).data();
 
-            const rackLocation = data.cable.s_rack_location;
-            const rackNumber = data.cable.s_rack_number;
-            const portNumber = data.cable.s_port_number;
-            setRackLocationInfo(rackLocation);
+            if (data && data.cable) {
+                const rackLocation = data.cable.s_rack_location;
+                const rackNumber = data.cable.s_rack_number;
+                const portNumber = data.cable.s_port_number;
 
-            const extractNumber = (str) => {
-                const match = str.match(/\d+/);
-                return match ? parseInt(match[0], 10) : null;
-            };
+                setRackLocationInfo(rackLocation);
 
-            setHighlightPosition({
-                rackNumber: extractNumber(rackNumber),
-                portNumber: extractNumber(portNumber)
-            });
-            // 모든 줄에서 인라인 스타일 제거 (이전 강조 해제)
-            $('#repair-table tbody tr').css({
-                'background-color': '',
-                'font-weight': ''
-            });
-            $(this).css({
-                'background-color': '#f0f8ff', // 밝은 파란색 배경
-                'font-weight': 'bold' // 글자 굵게
-            });
+                const extractNumber = (str) => {
+                    const match = str.match(/\d+/);
+                    return match ? parseInt(match[0], 10) : null;
+                };
+
+                setHighlightPosition({
+                    rackNumber: extractNumber(rackNumber),
+                    portNumber: extractNumber(portNumber)
+                });
+
+                // 모든 줄에서 인라인 스타일 제거 (이전 강조 해제)
+                $('#repair-table tbody tr').css({
+                    'background-color': '',
+                    'font-weight': ''
+                });
+                $(this).css({
+                    'background-color': '#f0f8ff', // 밝은 파란색 배경
+                    'font-weight': 'bold' // 글자 굵게
+                });
+            } else {
+                console.warn('데이터가 없거나 cable 정보가 없습니다.');
+            }
         });
 
         // 점검 현황
