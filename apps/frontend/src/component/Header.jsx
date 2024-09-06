@@ -12,9 +12,11 @@ Modal.setAppElement('#root'); // Modal의 접근성 설정
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  const hours = date.getHours().toString().padStart(2, '0');
+  const hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
+  const period = hours >= 12 ? '오후' : '오전'; // 오전/오후 결정
+  const formattedHours = hours % 12 || 12; // 12시간제로 변환, 0은 12로 표시
+  return `${period} ${formattedHours.toString().padStart(2, '0')}:${minutes}`;
 };
 
 const Header = () => {
@@ -28,7 +30,6 @@ const Header = () => {
   const [latestMaint, setLatestMaint] = useState(null); // 최신 알림 저장
   const [notifications, setNotifications] = useState([]); // 알림 리스트 상태
   const navigate = useNavigate();
-  const [dropdownTimeout, setDropdownTimeout] = useState(null);
   const [hover, setHover] = useState(false);
 
   useEffect(() => {
@@ -114,17 +115,6 @@ const Header = () => {
       if (newOpen) {
         // 드롭다운이 열릴 때 알림 개수를 리셋
         setCountMsg(0);
-        // 드롭다운이 열릴 때 타이머 설정
-        const timeout = setTimeout(() => {
-          setIsOpen(false);
-        }, 5000); // 5초
-        setDropdownTimeout(timeout);
-      } else {
-        // 드롭다운이 닫힐 때 타이머 정리
-        if (dropdownTimeout) {
-          clearTimeout(dropdownTimeout);
-          setDropdownTimeout(null);
-        }
       }
 
       return newOpen;
@@ -364,10 +354,11 @@ const Header = () => {
           role="alert"
           style={{
             display: 'inline-block',
+            width: '300px', // 가로 길이 조정
             margin: '0px auto',
-            paddingLeft: '65px',
+            paddingLeft: '30px',// 패딩 조정
             position: 'fixed',
-            transition: '0.5s ease-in-out',
+            transition: '0.8s ease-in-out', // 사라지는 시간
             zIndex: 1031,
             bottom: '20px',
             right: '20px',
@@ -388,8 +379,11 @@ const Header = () => {
             &times;
           </button>
           <div className="alert-header">
-            <h6 className="alert-title">{latestMaint.user_name}</h6>
-            <span className="alert-time">{formatDate(latestMaint.maint_date)}</span>
+            <h6 className="alert-title">
+              <span style={{ fontWeight: 'bold' }}>{latestMaint.user_name}</span>
+              {' '}
+              ({formatDate(latestMaint.maint_date)})
+            </h6>
           </div>
           <div className="alert-body">
             {`케이블 ${latestMaint.cable_idx} 점검 요청`}
@@ -400,7 +394,14 @@ const Header = () => {
                 latestMaint.maint_power === '불량' && '전원 상태: 불량'
               ]
                 .filter(Boolean) // '불량' 상태만 남기기
-                .join(', ')} {/* 쉼표로 구분하여 한 줄로 출력 */}
+                .map(status =>
+                  status.includes('불량') ? (
+                    <span key={status} style={{ color: 'red' }}>{status}</span>
+                  ) : (
+                    <span key={status}>{status}</span>
+                  )
+                )
+                .reduce((prev, curr) => [prev, ', ', curr])} {/* 쉼표로 구분하여 한 줄로 출력 */}
             </div>
           </div>
           <a href="#" target="_blank" rel="noopener noreferrer"></a>
