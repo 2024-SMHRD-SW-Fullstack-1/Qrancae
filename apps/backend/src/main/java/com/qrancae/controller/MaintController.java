@@ -41,8 +41,10 @@ import com.qrancae.model.Maint;
 import com.qrancae.model.User;
 import com.qrancae.repository.MaintRepository;
 import com.qrancae.service.CableService;
+import com.qrancae.service.EmailService;
 import com.qrancae.service.MaintService;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,6 +58,9 @@ public class MaintController {
 
 	@Autowired
 	private CableService cableService;
+
+	@Autowired
+	private EmailService emailService;
 
 	// 목록 가져오기
 	@GetMapping("/getmaint")
@@ -95,6 +100,17 @@ public class MaintController {
 		if (selectedUser == null || selectedUser.isEmpty()) {
 			return ResponseEntity.status(400).body("유효하지 않은 userId 파라미터");
 		}
+		String to = "kyshs45@naver.com";
+		String subject = "Test Email";
+		String text = "<h1>메일 내용</h1><p>이것은 테스트 메일입니다.<p>";
+
+		try {
+			emailService.sendEmail(to, subject, text);
+			System.out.println("Email sent successfully!");
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			System.out.println("Failed to send email.");
+		}
 
 		System.out.println("추가 메세지 : " + alarmMsg);
 		try {
@@ -103,12 +119,14 @@ public class MaintController {
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
 		}
+
 	}
+
 	// 알림 내역 가져오기
 	@GetMapping("/maint/msg")
-	public List<Maint> getMaintMsg(){
+	public List<Maint> getMaintMsg() {
 		List<Maint> maints = maintService.getMaintMsg();
-		
+
 		return maints;
 	}
 
@@ -337,11 +355,12 @@ public class MaintController {
 
 		response.getOutputStream().write(excelContent);
 	}
-		// 특정 사용자(user_id)의 보수 완료 내역 수를 반환하는 API
-	   	@GetMapping("/api/maint/count/{userId}")
-	   	public ResponseEntity<Integer> getCompletedMaintenanceCountByUser(@PathVariable String userId) {
-	   		int completedCount = maintService.countCompletedMaintenanceByUser(userId);
-	   		return ResponseEntity.ok(completedCount);
-	   	}
+
+	// 특정 사용자(user_id)의 보수 완료 내역 수를 반환하는 API
+	@GetMapping("/api/maint/count/{userId}")
+	public ResponseEntity<Integer> getCompletedMaintenanceCountByUser(@PathVariable String userId) {
+		int completedCount = maintService.countCompletedMaintenanceByUser(userId);
+		return ResponseEntity.ok(completedCount);
+	}
 
 }

@@ -239,7 +239,7 @@ const Header = () => {
                         notifications.map((notification, index) => (
                           <Link to="/repair" key={index} style={{ textDecoration: 'none' }}>
                             <div className={`notif-icon notif-${notification.user_name}`}>
-                              <i className="fas fa-bell"></i>
+                              <i className="fas fa-bell" style={{ color: '#ffad46' }}></i>
                             </div>
                             <div className="notif-content">
                               <span className="block">{notification.user_name}</span>

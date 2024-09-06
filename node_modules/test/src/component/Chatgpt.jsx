@@ -10,12 +10,13 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
   const [loading, setLoading] = useState(false); //로딩 상태를 관리
   const chatRef = useRef(null); //chatRef는 DOM 요소를 참조하기 위해 사용
   const messageEndRef = useRef(null); // 메시지 끝부분을 참조하는 ref 생성
+
   // 메시지가 추가될 때 자동으로 스크롤을 아래로 이동시키는 effect
   useEffect(() => {
-  if (messageEndRef.current) {
-    messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
-}, [messages, loading]);
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   useEffect(() => {
     const handleClickOutside = (event) => { //컴포넌트 외부를 클릭했을 때 닫히게 함
@@ -58,7 +59,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
     setKeywords(''); //키워드 상태를 초기화
 
     try {
-      
+
       setLoading(true); // 로딩 상태를 true로 설정
       const response = await axios.post('https://api.openai.com/v1/chat/completions', data, {
         headers: {
@@ -94,7 +95,7 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
             </div>
           ))}
           {loading && <div className={styles.messageBoxAssistant}>Loading...</div>}
-        
+          <div ref={messageEndRef}></div> {/* 스크롤 위치를 설정할 빈 div */}
         </div>
         <div className={styles.userMessage}>
           <input
@@ -116,7 +117,6 @@ const ChatComponent = ({ onClose }) => {   // ChatComponent 컴포넌트를 정�
             입력
           </button>
         </div>
-        <div ref={messageEndRef}></div> {/* 스크롤 위치를 설정할 빈 div */}
       </div>
     </div>
   );
