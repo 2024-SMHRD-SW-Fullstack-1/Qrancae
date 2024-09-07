@@ -14,13 +14,14 @@ function Register() {
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
     const [showPopup, setShowPopup] = useState(false);
-
+    const [userEmail, setUserEmail] = useState('');
     const register = () => {
         let newErrors = {};
         if (!userId) newErrors.userId = '*아이디를 입력해주세요.';
         if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
         if (userPw !== userPwConfirm) newErrors.userPwConfirm = '*비밀번호가 일치하지 않습니다.';
         if (!userName) newErrors.userName = '*이름을 입력해주세요.';
+        if (!userEmail) newErrors.userEmail = '*이메일을 입력해주세요.'
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -31,6 +32,7 @@ function Register() {
             userId: userId,
             userPw: userPw,
             userName: userName,
+            userEmail: userEmail,
         })
             .then((response) => {
                 console.log(response.data);
@@ -100,7 +102,15 @@ function Register() {
                 <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}
                     placeholder='이름을 입력하세요.' /><br />
 
-                <Button onClick={register} style={{ marginTop: '3rem' }}>회원가입</Button>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ marginRight: '10px' }}>이메일 <span className={styles.required}>*</span></label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 'auto' }}>
+                        {errors.userName && <div className={styles.error} style={{ marginBottom: '0' }}>{errors.userName}</div>}
+                    </div>
+                </div>
+                <input type="text" value={userEmail} onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder='이메일을 입력하세요.' /><br />
+                <Button onClick={register} style={{ marginTop: '0rem' }}>회원가입</Button>
             </div>
             {showPopup && (
                 <ModalPopup
