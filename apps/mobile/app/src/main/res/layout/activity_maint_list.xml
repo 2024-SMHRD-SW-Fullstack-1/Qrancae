@@ -7,31 +7,37 @@
     tools:context=".activity.MainActivity">
 
     <!-- Back button -->
+
     <ImageView
         android:id="@+id/iv_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/ic_back" />
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginBottom="3dp"
+        android:shadowColor="#9E9E9E"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
         android:text="진행 현황"
         android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/iv_back"
+        app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.381"
         app:layout_constraintStart_toEndOf="@id/iv_back"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.533" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_total_receipts"
@@ -50,7 +56,7 @@
         android:id="@+id/tab_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="#F8F8F8"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,6 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/tab_background_selector"
             android:gravity="center"
             android:padding="8dp"
             android:text="전체"
@@ -71,6 +78,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/tab_background_selector"
             android:gravity="center"
             android:padding="8dp"
             android:text="신규 접수" />
@@ -80,15 +88,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/tab_background_selector"
             android:gravity="center"
             android:padding="8dp"
-            android:text="진행중" />
+            android:text="점검중" />
 
         <TextView
             android:id="@+id/tv_tab_completed"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/tab_background_selector"
             android:gravity="center"
             android:padding="8dp"
             android:text="보수 완료" />
@@ -99,7 +109,7 @@
         android:id="@+id/sorting_options"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="@drawable/tab_background_selector"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,6 +125,7 @@
             android:id="@+id/btn_new"
             android:layout_width="60dp"
             android:layout_height="40dp"
+            android:background="@drawable/tab_background_selector"
             android:gravity="center"
             android:padding="8dp"
             android:text="최신순"
@@ -126,6 +137,7 @@
             android:id="@+id/btn_old"
             android:layout_width="60dp"
             android:layout_height="40dp"
+            android:background="@drawable/tab_background_selector"
             android:gravity="center"
             android:padding="8dp"
             android:text="오래된순"
@@ -152,8 +164,7 @@
         android:id="@+id/recycler_view_maintenance_tasks"
         android:layout_width="358dp"
         android:layout_height="462dp"
-        android:layout_marginBottom="-10dp"
-        android:background="#FFFFFF"
+        android:background="@drawable/tab_background_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -206,7 +217,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="20dp" />
+        app:layout_constraintGuide_begin="34dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline43"

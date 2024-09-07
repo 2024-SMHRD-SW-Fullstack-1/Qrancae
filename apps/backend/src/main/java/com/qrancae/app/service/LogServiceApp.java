@@ -2,6 +2,8 @@ package com.qrancae.app.service;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,27 +14,19 @@ import com.qrancae.app.repository.LogRepositoryApp;
 
 @Service
 public class LogServiceApp {
-	
-	@Autowired
-	private LogRepositoryApp logRepository;
-	
-	@Autowired
-	private CableRepositoryApp cableRepository;
-	
-	public void saveLog(LogApp log) {
-		
-		//로그 테이블에서 calbe_idx 존재 여부 확인 
-		boolean logExists = logRepository.existsByCableIdx(log.getCableIdx());
-		
-		// 로그가 없을 경우, 설치일자 추가
-		if (!logExists) {
-			CableApp cable = cableRepository.findById(log.getCableIdx())
-					.orElseThrow(() -> new RuntimeException("Calbe not found"));
-				cable.setCableDate(LocalDateTime.now());
-				cableRepository.save(cable);
-		}
-		
-		// 로그 저장
-		logRepository.save(log);
-	}
+
+    @Autowired
+    private LogRepositoryApp logRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(LogServiceApp.class);
+
+    public void saveLog(LogApp log) {
+        logger.info("Saving log: userId = {}, cableIdx = {}", log.getUserId(), log.getCableIdx());
+        try {
+            logRepository.save(log);
+            logger.info("Log successfully saved for cableIdx = {}", log.getCableIdx());
+        } catch (Exception e) {
+            logger.error("Error occurred while saving log: ", e);
+        }
+    }
 }

@@ -43,11 +43,18 @@ public class CableApp {
 
     @Column(name = "d_port_number", length = 50)
     private String dPortNumber;
-
-    @Column(name = "cable_date")
-    private LocalDateTime cableDate;
     
-    public void setCableDate(LocalDateTime cableDate) {
-        this.cableDate = cableDate;
+ // 설치일자 필드 추가 (DB에 저장하지 않고 사용)
+    private LocalDateTime installDate;
+
+    // Getter and Setter for installDate
+    public LocalDateTime getInstallDate() {
+        return installDate;
     }
+
+    public void setInstallDate(LocalDateTime installDate) {
+        this.installDate = installDate;
+    }
+
+    
 }

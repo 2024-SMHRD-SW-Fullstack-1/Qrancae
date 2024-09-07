@@ -11,84 +11,117 @@
     <!-- Source Section -->
 
     <TextView
-        android:id="@+id/cable_date"
+        android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="24-08-21"
-        android:textColor="#34383D"
-        android:textSize="20sp"
+        android:layout_marginTop="21dp"
+        android:layout_marginBottom="3dp"
+        android:shadowColor="#9E9E9E"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="케이블 정보"
+        android:textColor="#000000"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/install_date"
-        app:layout_constraintStart_toEndOf="@+id/install_date"
-        app:layout_constraintTop_toTopOf="@+id/install_date"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/install_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="84dp"
-        android:layout_marginTop="32dp"
-        android:text="설치 일자 : "
-        android:textColor="#34383D"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/guideline17"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ic_back" />
 
     <TextView
         android:id="@+id/elapsed_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="경과일자 : "
+        android:layout_marginTop="10dp"
+        android:text="경과 일자 : "
         android:textColor="#242323"
-        android:textSize="18dp"
+        android:textSize="20dp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/aging_date"
-        app:layout_constraintHorizontal_bias="0.075"
         app:layout_constraintStart_toStartOf="@+id/guideline39"
         app:layout_constraintTop_toBottomOf="@+id/install_date" />
+
+    <TextView
+        android:id="@+id/cable_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="포설완료"
+        android:textColor="#34383D"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/install_date"
+        app:layout_constraintEnd_toStartOf="@+id/guideline41"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/install_date"
+        app:layout_constraintTop_toTopOf="@+id/install_date"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/install_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="포설 일자 : "
+        android:textColor="#34383D"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/guideline39"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/aging_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="00일"
+        android:gravity="right"
+        android:minWidth="80dp"
+        android:text="오늘 포설됨"
         android:textColor="#242323"
-        android:textSize="18dp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/guideline38"
-        app:layout_constraintTop_toBottomOf="@+id/cable_date" />
+        app:layout_constraintBottom_toBottomOf="@+id/elapsed_date"
+        app:layout_constraintStart_toEndOf="@+id/elapsed_date"
+        app:layout_constraintTop_toTopOf="@+id/elapsed_date"
+        app:layout_constraintVertical_bias="0.0" />
 
     <ImageButton
         android:id="@+id/btn_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="5dp"
         android:background="@android:color/transparent"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.617"
+        app:layout_constraintVertical_bias="0.551"
         app:srcCompat="@drawable/ic_list" />
 
     <TextView
         android:id="@+id/source_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
         android:text="Source"
         android:textColor="#1D3557"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cable_date" />
+        app:layout_constraintTop_toBottomOf="@+id/elapsed_date" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/source_card"
@@ -504,7 +537,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="98dp" />
+        app:layout_constraintGuide_begin="84dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline40"
@@ -519,6 +552,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_end="52dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="34dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

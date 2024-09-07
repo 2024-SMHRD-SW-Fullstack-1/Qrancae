@@ -50,11 +50,23 @@ const Home = () => {
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
+      // 날짜 포맷
+      const getFormattedDate = () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+
+        return `${year}${month}${day}`;
+      };
+
+      const filename = `report_${getFormattedDate()}.xlsx`;
+
       // Blob을 사용하여 파일 다운로드 처리
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'report.xlsx'); // 파일 이름 지정
+      link.setAttribute('download', filename); // 파일 이름 지정
       document.body.appendChild(link);
       link.click();
 
@@ -67,7 +79,6 @@ const Home = () => {
     axios({
       url: 'http://localhost:8089/qrancae/calendar',
       method: 'post',
-      data: userId
     }).then((res) => {
       console.log('캘린더 리스트', res.data);
       const data = res.data;
@@ -300,7 +311,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="col-md-4">
+              <div className="col-md-5">
                 <div className="card card-round">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <div className="card-title">일정</div>
@@ -323,7 +334,7 @@ const Home = () => {
                       locale={koLocale}
                       headerToolbar={{
                         left: 'title',
-                        right: 'prev today next'
+                        right: 'prev today next',
                       }}
                       dateClick={handleDateClick}
                       eventClick={handleEventClick}
@@ -387,7 +398,7 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-8">
+              <div className="col-md-7">
                 <div className="card card-round">
                   <div className="card-header">
                     <div className="card-title">로그 내역</div>

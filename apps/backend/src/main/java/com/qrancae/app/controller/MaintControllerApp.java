@@ -24,6 +24,7 @@ public class MaintControllerApp {
     @Autowired
     private MaintenanceService maintenanceService;
 
+    // 메인페이지에서 진행현황을 가져오기 위한 기능
     @GetMapping("/maint-status/{userId}")
     public ResponseEntity<MaintStatusResponse> getMaintenanceStatus(@PathVariable String userId) {
         MaintStatusResponse statusResponse = maintStatusService.calculateMaintStatus(userId);
@@ -32,7 +33,7 @@ public class MaintControllerApp {
     
     @GetMapping("/alarm/message")
     public ResponseEntity<Map<String, String>> getAlarmByMaintIdx(
-        @RequestParam Integer maintIdx,
+        @RequestParam Long maintIdx,
         @RequestParam String userId
     ) {
         String message = maintenanceService.getAlarmMessage(maintIdx, userId);
@@ -42,18 +43,24 @@ public class MaintControllerApp {
     }
 
     @GetMapping("/maint-idx")
-    public ResponseEntity<Integer> getMaintIdx(@RequestParam String userId, @RequestParam Integer cableIdx, @RequestParam boolean forceCreate) {
+    public ResponseEntity<Map<String, Integer>> getMaintIdx(@RequestParam String userId, @RequestParam Integer cableIdx, @RequestParam boolean forceCreate) {
         Integer maintIdx = maintenanceService.getOrCreateMaintIdx(userId, cableIdx, forceCreate);
-        return ResponseEntity.ok(maintIdx);
+        Map<String, Integer> response = new HashMap<>();
+        response.put("maintIdx", maintIdx);
+        return ResponseEntity.ok(response);
     }
+
     
+    // 진행현황페이지에서 분류하기 위한 기능
     @GetMapping("/maintenance/tasks")
     public ResponseEntity<List<MaintenanceTask>> getMaintenanceTasks(
         @RequestParam String userId,
         @RequestParam String status,
-        @RequestParam String sortBy) {
-        
-        List<MaintenanceTask> tasks = maintenanceService.getMaintenanceTasks(userId, status, sortBy);
+        @RequestParam String sortBy,
+        @RequestParam(defaultValue = "0") int page,   // 기본값 0
+        @RequestParam(defaultValue = "20") int size   // 기본값 10
+    ) {
+        List<MaintenanceTask> tasks = maintenanceService.getMaintenanceTasks(userId, status, sortBy, page, size);
         return ResponseEntity.ok(tasks);
     }
 }

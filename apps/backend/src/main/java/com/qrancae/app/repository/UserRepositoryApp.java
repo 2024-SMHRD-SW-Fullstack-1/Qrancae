@@ -10,4 +10,5 @@ public interface UserRepositoryApp extends JpaRepository<UserApp, String> {
     UserApp findByUserIdAndUserPw(String userId, String userPw);
     boolean existsByUserId(String userId);
     List<UserApp> findAllByUserType(char userType);
+    UserApp findByUserId(String userId);
 }

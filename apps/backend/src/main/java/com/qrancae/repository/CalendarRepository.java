@@ -13,7 +13,7 @@ import com.qrancae.model.Calendar;
 @Repository
 public interface CalendarRepository extends JpaRepository<Calendar, Integer> {
 	
-    @Query("SELECT c FROM Calendar c WHERE c.user_id = :user_id ORDER BY c.calendar_idx DESC")
-    List<Calendar> findAllByUserIdOrderByCalendarIdxDesc(@Param("user_id") String user_id);
+	@Query("SELECT c FROM Calendar c ORDER BY c.calendar_idx DESC")
+	List<Calendar> findAllOrderByCalendarIdxDesc();
 
 }

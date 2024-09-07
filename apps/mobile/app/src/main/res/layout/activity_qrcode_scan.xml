@@ -4,15 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 전체 화면에 카메라 프리뷰를 표시하는 PreviewView -->
-
     <!-- 중앙의 인식 영역을 시각적으로 표시하기 위한 뷰 -->
 
     <androidx.camera.view.PreviewView
         android:id="@+id/fullPreviewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="-16dp" />
 

@@ -15,4 +15,5 @@ public class MaintenanceTask {
     private String sRackNumber;
     private String sRackLocation;
     private String cableIdx;
+    private String maintMsg;
 }

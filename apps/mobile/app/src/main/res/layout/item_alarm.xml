@@ -10,13 +10,14 @@
 
         <TextView
             android:id="@+id/tv_alarm_message"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="새로운 작업이 발생하였습니다."
+            android:text="새로운 작업 발생"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/tv_alarm_date"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline46"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,17 +25,19 @@
             android:id="@+id/tv_alarm_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2024-09-03"
-            android:textSize="14sp"
+            android:text="2024년 09월 12일 22시 10분"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline47"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline46"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="5dp" />
+            app:layout_constraintGuide_begin="16dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline47"

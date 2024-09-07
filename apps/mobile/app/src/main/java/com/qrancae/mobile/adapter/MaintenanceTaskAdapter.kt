@@ -1,5 +1,6 @@
 package com.qrancae.mobile.adapter
 
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,8 @@ import com.qrancae.mobile.R
 import com.qrancae.mobile.model.MaintenanceTask
 import com.qrancae.mobile.util.formatDateTime
 
-class MaintenanceTaskAdapter(private var tasks: List<MaintenanceTask>) : RecyclerView.Adapter<MaintenanceTaskAdapter.MaintenanceTaskViewHolder>() {
+class MaintenanceTaskAdapter(private var tasks: List<MaintenanceTask>) :
+    RecyclerView.Adapter<MaintenanceTaskAdapter.MaintenanceTaskViewHolder>() {
 
     private val TAG = "MaintenanceTaskAdapter"
 
@@ -46,11 +48,19 @@ class MaintenanceTaskAdapter(private var tasks: List<MaintenanceTask>) : Recycle
             if (task.maintQr == "불량") issues.add("QR 불량")
             if (task.maintPower == "불량") issues.add("전원 불량")
 
-            val title = if (issues.isNotEmpty()) issues.joinToString(", ") else "정상"
+            var title = if (issues.isNotEmpty()) issues.joinToString(", ") else "정기점검 이상 무"
+
+            if (title.length > 10) {
+                title = TextUtils.ellipsize(title, taskTitle.paint, 10 * taskTitle.textSize, TextUtils.TruncateAt.END).toString()
+            }
             taskTitle.text = title
 
-            taskDescription.text = task.alarmMsg
-
+            taskDescription.text = when (task.status) {
+                "신규접수" -> task.maintMsg ?: "특이사항이 없습니다."  // 신규 접수 상태에서는 maint_msg를 보여줌
+                "점검중" -> task.alarmMsg
+                "보수완료" -> "유지보수가 완료되었습니다. 점검 결과: 정상"  // 보수 완료 시 메시지
+                else -> "상태 정보 없음"
+            }
             taskDetails.text =
                 "랙 번호: ${task.sRackNumber}, 위치: ${task.sRackLocation}, 케이블 번호: ${task.cableIdx}"
 
@@ -60,7 +70,7 @@ class MaintenanceTaskAdapter(private var tasks: List<MaintenanceTask>) : Recycle
 
             // 상태에 따라 텍스트 색상과 배경 변경
             when (task.status) {
-                "진행중" -> {
+                "점검중" -> {
                     status.setTextColor(ContextCompat.getColor(itemView.context, R.color.gray))
                     status.setBackgroundResource(R.drawable.rounded_border_progress)
                 }

@@ -71,6 +71,8 @@ dependencies {
 
     implementation ("androidx.core:core-ktx:1.7.0")
     implementation(libs.androidx.camera.mlkit.vision)
+    implementation(libs.androidx.core.i18n)
+    implementation(libs.androidx.media3.common)
 
     // CameraX 라이브러리 추가
     val cameraxVersion = "1.1.0-beta01"

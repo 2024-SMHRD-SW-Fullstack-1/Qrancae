@@ -10,12 +10,20 @@
 
     <!-- 기본 텍스트 색상 (검정색) -->
     <color name="default_text_color">#000000</color>
-
     <!-- 선택된 탭의 색상 (핑크색) -->
     <color name="selected_tab_color">#EE38AE</color>
+
+
+    <color name="default_text_color2">#9D9D9D</color>
+    <color name="selected_tab_color2">#000000</color> <!-- 선택된 상태 (검정색) -->
+
+ㅊ
 
     <color name="gray">#7C7C7C</color>
     <color name="purple">#EE38AE</color>
     <color name="green">#4CAF50</color>
+
+    <color name="pressed_background_color">#FFE4E4E4</color> <!-- 눌렸을 때의 배경 색상 -->
+    <color name="default_background_color">#FFFFFF</color> <!-- 기본 배경 색상 -->
 
 </resources>

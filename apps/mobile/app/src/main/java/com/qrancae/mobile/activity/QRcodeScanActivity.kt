@@ -32,7 +32,6 @@ import java.util.concurrent.Executors
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
-
 class QRCodeScanActivity : AppCompatActivity() {
 
     private lateinit var fullPreviewView: PreviewView
@@ -41,7 +40,6 @@ class QRCodeScanActivity : AppCompatActivity() {
     private var isDetected = false // 플래그 추가
     private var cameraProvider: ProcessCameraProvider? = null // 카메라 프로바이더 변수 추가
     private val TAG = "QRCodeScanActivity"
-
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -135,13 +133,8 @@ class QRCodeScanActivity : AppCompatActivity() {
                             val userId = getLoggedInUserId() // 로그인된 사용자 ID 가져오기
                             val cableIdx = extractCableIdxFromQR(decodedValue)
 
-                            // 로그를 서버에 저장하는 API 호출
-                            saveLog(userId, cableIdx)
-
-                            // 인식된 데이터를 QRdetailActivity로 전달
-                            val intent = Intent(this, QRdetailActivity::class.java)
-                            intent.putExtra("QR_DATA", decodedValue)
-                            startActivity(intent)
+                            // 케이블 연결 기록 확인 및 저장
+                            checkAndSaveCableConnection(userId, cableIdx)
                         }
                     }
                 }
@@ -165,40 +158,82 @@ class QRCodeScanActivity : AppCompatActivity() {
         return userId
     }
 
-
-
     private fun extractCableIdxFromQR(qrData: String): Long {
         val dataParts = qrData.split(",")
-        return dataParts.getOrNull(0)?.toLongOrNull() ?: 0L
+        val cableIdx = dataParts.getOrNull(0)?.toLongOrNull() ?: 0L
+        Log.d(TAG, "Extracted cableIdx: $cableIdx")
+        return cableIdx
     }
 
-
-
-    // 서버에 로그를 저장하는 함수
-    private fun saveLog(userId: String, cableIdx: Long) {
-        val logData = LogData(userId, cableIdx)
-
-        Log.d(TAG, "Saving log with userId: $userId, cableIdx: $cableIdx") // 로그 데이터 정보
-
-        RetrofitClient.apiService.saveLog(logData).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Log.d(TAG, "Log saved successfully")
-                    Toast.makeText(this@QRCodeScanActivity, "로그 저장 성공", Toast.LENGTH_SHORT).show()
+    // 새로운 함수 추가: 케이블 연결 기록 확인 후 저장
+    private fun checkAndSaveCableConnection(userId: String, cableIdx: Long) {
+        // 케이블 연결 기록이 있는지 서버에 요청하여 확인
+        RetrofitClient.apiService.checkCableHistory(cableIdx).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful && response.body() == true) {
+                    // 이미 연결 기록이 있으면 QRdetailActivity로 화면 전환
+                    saveLog(userId, cableIdx) // 로그 저장 추가
+                    moveToQRDetailActivity(cableIdx)
                 } else {
-                    Log.e(TAG, "Failed to save log: ${response.errorBody()?.string()}")
-                    Toast.makeText(this@QRCodeScanActivity, "로그 저장 실패", Toast.LENGTH_SHORT).show()
+                    // 연결 기록이 없으면 설치 기록 저장
+                    saveCableInstallation(userId, cableIdx)
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.e(TAG, "Log save error: ${t.message}")
-                Toast.makeText(this@QRCodeScanActivity, "로그 저장 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                Log.e(TAG, "Failed to check cable history: ${t.message}")
             }
         })
     }
 
+    // 포설 날짜를 기록하는 함수
+    private fun saveCableInstallation(userId: String, cableIdx: Long) {
+        RetrofitClient.apiService.saveCableInstallation(cableIdx, userId).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@QRCodeScanActivity, "케이블 포설 날짜가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    saveLog(userId, cableIdx) // 로그 저장 추가
+                    moveToQRDetailActivity(cableIdx)
+                } else {
+                    Log.e(TAG, "Error: ${response.errorBody()?.string()}, Response code: ${response.code()}")
+                    saveLog(userId, cableIdx) // 로그 저장 추가
+                    moveToQRDetailActivity(cableIdx) // 실패했더라도 이동
+                }
+            }
 
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e(TAG, "Failed to save cable installation: ${t.message}")
+            }
+        })
+    }
+
+    // 로그 저장 함수 추가
+    private fun saveLog(userId: String, cableIdx: Long) {
+        val logData = LogData(userId, cableIdx)
+        Log.d(TAG, "Sending log to server: userId = $userId, cableIdx = $cableIdx")
+
+        RetrofitClient.apiService.saveLog(logData).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d(TAG, "Log saved successfully on server for cableIdx = $cableIdx")
+                } else {
+                    Log.e(TAG, "Failed to save log on server. Response code: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e(TAG, "Error saving log on server: ${t.message}")
+            }
+        })
+    }
+
+    // QRdetailActivity로 전환하는 함수
+    private fun moveToQRDetailActivity(cableIdx: Long) {
+        val intent = Intent(this@QRCodeScanActivity, QRdetailActivity::class.java)
+        intent.putExtra("QR_DATA", cableIdx.toString())
+        startActivity(intent)
+        finish()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -215,18 +250,12 @@ class QRCodeScanActivity : AppCompatActivity() {
         startCamera() // 카메라 다시 초기화
     }
 
-
     override fun onBackPressed() {
         super.onBackPressed() // 기본 동작을 유지합니다.
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-        finish() // 현재 Activity를 종료
-    }
-
-    private fun openClose() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        finish()
     }
 
     private fun decodeAndDecrypt(encodedString: String): String {

@@ -1096,27 +1096,27 @@ body {
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item a:focus i,
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item a:hover i,
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item a[data-toggle='collapse'][aria-expanded='true'] i {
-  color: #6861ce !important;
+  color: #4574C4 !important;
 }
 
 .sidebar .nav.nav-secondary>.nav-item a[data-toggle='collapse'][aria-expanded='true']:before,
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item a[data-toggle='collapse'][aria-expanded='true']:before {
-  background: #6861ce !important;
+  background: #4574C4 !important;
 }
 
 .sidebar .nav.nav-secondary>.nav-item.active a:before,
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item.active a:before {
-  background: #6861ce !important;
+  background: #4574C4 !important;
 }
 
 .sidebar .nav.nav-secondary>.nav-item.active a i,
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item.active a i {
-  color: #6861ce !important;
+  color: #4574C4 !important;
 }
 
 .sidebar .nav.nav-secondary>.nav-item .nav-collapse li.active>a,
 .sidebar[data-background-color='white'] .nav.nav-secondary>.nav-item .nav-collapse li.active>a {
-  color: #6861ce !important;
+  color: #4574C4 !important;
 }
 
 .sidebar .nav.nav-info>.nav-item a:focus i,
@@ -1377,7 +1377,7 @@ body {
 .logo-header {
   float: left;
   width: 265px;
-  height: 70px;
+  height: 90px;
   line-height: 60px;
   color: #333;
   z-index: 1001;
@@ -2013,12 +2013,12 @@ body[data-background-color='dark'] .border-top {
 
 .main-header .navbar-header[data-background-color][data-background-color='dark2'] .dropdown-menu,
 .main-header .navbar-header[data-background-color][data-background-color='dark'] .dropdown-menu {
-  background: #202940 !important;
+  background: #1D3557 !important;
 }
 
 .main-header .navbar-header[data-background-color][data-background-color='dark2'] .dropdown-menu:after,
 .main-header .navbar-header[data-background-color][data-background-color='dark'] .dropdown-menu:after {
-  border-bottom-color: #202940;
+  border-bottom-color: #1D3557;
 }
 
 .main-header .navbar-header[data-background-color][data-background-color='dark2'] .dropdown-menu .dropdown-title,
@@ -2148,19 +2148,19 @@ body[data-background-color='dark'] .border-top {
 }
 
 .logo-header[data-background-color='dark'] {
-  background: #1a2035 !important;
+  background: #1D3557 !important;
 }
 
 .logo-header[data-background-color='dark2'] {
-  background: #151a2b !important;
+  background: #1D3557 !important;
 }
 
 .navbar-header[data-background-color='dark'] {
-  background: #1a2035 !important;
+  background: #1D3557 !important;
 }
 
 .navbar-header[data-background-color='dark2'] {
-  background: #151a2b !important;
+  background: #1D3557 !important;
 }
 
 .logo-header[data-background-color='blue'] {
@@ -2264,7 +2264,7 @@ body[data-background-color='dark'] .border-top {
 }
 
 .sidebar[data-background-color='dark'] {
-  background: #1a2035 !important;
+  background: #1D3557 !important;
 }
 
 .sidebar[data-background-color='dark'] .user {
@@ -11276,4 +11276,39 @@ tr.input-datas {
 
 .user-card-body {
   padding: 60px !important;
+}
+
+/* 버튼 */
+button.fc-prev-button.fc-button.fc-button-primary,
+button.fc-next-button.fc-button.fc-button-primary {
+  background: #1D3557 !important;
+  color: white !important;
+  border: 2px solid #1D3557 !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+}
+
+button.fc-prev-button.fc-button.fc-button-primary:hover,
+button.fc-next-button.fc-button.fc-button-primary:hover {
+  background-color: transparent !important;
+  color: #1D3557 !important;
+  border-color: #1D3557 !important;
+}
+
+.fc-today-button {
+  background-color: transparent !important;
+  color: black !important;
+  border: 2px solid #1D3557 !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+}
+
+.fc-today-button:hover {
+  background-color: #1D3557 !important;
+  color: white !important;
+  border-color: #1D3557 !important;
 }

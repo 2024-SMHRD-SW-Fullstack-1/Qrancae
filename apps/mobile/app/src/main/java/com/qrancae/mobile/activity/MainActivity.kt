@@ -3,6 +3,8 @@ package com.qrancae.mobile.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -11,6 +13,8 @@ import androidx.cardview.widget.CardView
 import com.qrancae.mobile.R
 import com.qrancae.mobile.model.MaintStatusResponse
 import com.qrancae.mobile.network.RetrofitClient
+import com.qrancae.mobile.util.ButtonAnimationUtil
+import com.qrancae.mobile.util.TouchEffectUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,26 +47,26 @@ class MainActivity : ComponentActivity() {
 
         // 알림 버튼 클릭 리스너 설정
         val alarmButton: ImageButton = findViewById(R.id.btn_alarm)
-        alarmButton.setOnClickListener {
+        ButtonAnimationUtil.applyButtonAnimation(alarmButton, this) {
             openAlarm()
         }
 
         // 세팅 버튼 클릭 리스너 설정
         val settingButton: ImageButton = findViewById(R.id.btn_setting)
-        settingButton.setOnClickListener {
+        ButtonAnimationUtil.applyButtonAnimation(settingButton, this) {
             openSetting()
         }
 
         // 진행 현황 뷰 클릭 리스너 설정
         val maintButton: CardView = findViewById(R.id.progress_card)
-        maintButton.setOnClickListener {
-            openMaint()
+        TouchEffectUtil.applyTouchEffect(maintButton) {
+            openMaint() // 뷰 클릭 시 실행될 동작
         }
 
         // QR 코드 스캔 버튼 클릭 리스너 설정
         val qrButton: Button = findViewById(R.id.qr_scan_button)
-        qrButton.setOnClickListener {
-            openQRScanner()
+        TouchEffectUtil.applyTouchEffect(qrButton) {
+            openQRScanner() // 버튼 클릭 시 실행될 동작
         }
 
         // 로그아웃 버튼 클릭 리스너 설정

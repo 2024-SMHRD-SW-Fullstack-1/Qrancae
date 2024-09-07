@@ -13,8 +13,8 @@ public class MaintStatusServiceApp {
 
     public MaintStatusResponse calculateMaintStatus(String userId) {
         long newEntryCount = maintenanceRepository.countByUserIdAndMaintStatus(userId, "신규접수");
-        long inProgressCount = maintenanceRepository.countByMaintUserIdAndMaintStatus(userId, "진행중");
-        long completedCount = maintenanceRepository.countByMaintUserIdAndMaintStatus(userId, "보수완료");
+        long inProgressCount = maintenanceRepository.countByMaintUserIdAndMaintStatus(userId, "점검중"); // 수정
+        long completedCount = maintenanceRepository.countByUserIdOrMaintUserIdAndMaintStatus(userId);
 
         return new MaintStatusResponse(newEntryCount, inProgressCount, completedCount);
     }

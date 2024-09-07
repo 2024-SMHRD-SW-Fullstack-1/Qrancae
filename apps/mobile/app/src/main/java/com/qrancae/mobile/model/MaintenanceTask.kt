@@ -12,5 +12,6 @@ data class MaintenanceTask(
     val alarmMsg: String?,
     @SerializedName("srackNumber") val sRackNumber: String?,  // JSON 필드와 매핑
     @SerializedName("srackLocation") val sRackLocation: String?,  // JSON 필드와 매핑
-    val cableIdx: String?
+    val cableIdx: String?,
+    @SerializedName("maintMsg") val maintMsg: String? // <-- Add this field
 )

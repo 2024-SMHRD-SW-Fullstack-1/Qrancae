@@ -27,14 +27,14 @@ class AlarmAdapter(private val onClick: (AlarmData) -> Unit) : ListAdapter<Alarm
     class AlarmViewHolder(private val binding: ItemAlarmBinding) : RecyclerView.ViewHolder(binding.root) {
         @RequiresApi(Build.VERSION_CODES.O)
         fun bind(alarm: AlarmData, onClick: (AlarmData) -> Unit) {
-            binding.tvAlarmMessage.text = "새로운 작업이 발생하였습니다."
+            binding.tvAlarmMessage.text = "새로운 작업 발생"
 
             // Null check before parsing the date
             val alarmDateString = alarm.alarmDate?.toString()
 
             if (alarmDateString != null) {
                 val dateTime = LocalDateTime.parse(alarmDateString)
-                val formattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"))
+                val formattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시mm분"))
                 binding.tvAlarmDate.text = formattedDate
             } else {
                 binding.tvAlarmDate.text = "날짜 없음"  // Null일 경우 기본 텍스트 설정

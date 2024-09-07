@@ -51,6 +51,9 @@ public class Cable {
 
 	@Column(name = "cable_date")
 	private LocalDateTime cable_date;
+	
+	@Column(name = "cable_remove_date")
+	private LocalDateTime cable_remove_date;
 
 	@OneToOne
 	@JoinColumn(name = "cable_idx", referencedColumnName = "cable_idx")

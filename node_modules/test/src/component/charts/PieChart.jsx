@@ -62,6 +62,12 @@ const PieChart = ({ year, month, range }) => {
                 plugins: {
                     legend: {
                         position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                family: "'NanumSquareNeo'",
+                            },
+                        },
                     },
                     tooltip: {
                         callbacks: {

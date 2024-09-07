@@ -1,5 +1,7 @@
 package com.qrancae.app.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,9 +19,18 @@ public class LogControllerApp {
 	@Autowired
 	private LogServiceApp logService;
 
-	@PostMapping("/logs")
-	public ResponseEntity<Void> saveLog(@RequestBody LogApp log) {
-		logService.saveLog(log);
-		return ResponseEntity.ok().build();
-	}
+	private static final Logger logger = LoggerFactory.getLogger(LogControllerApp.class);
+
+    @PostMapping("/logs")
+    public ResponseEntity<Void> saveLog(@RequestBody LogApp log) {
+        logger.info("Received log save request: userId = {}, cableIdx = {}", log.getUserId(), log.getCableIdx());
+        try {
+            logService.saveLog(log);
+            logger.info("Log saved successfully for cableIdx = {}", log.getCableIdx());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("Error saving log: ", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
 }
