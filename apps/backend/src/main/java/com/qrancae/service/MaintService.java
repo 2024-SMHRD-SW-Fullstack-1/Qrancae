@@ -110,6 +110,12 @@ public class MaintService {
       
       return result;
    }
+   // 불량인 유지보수 내역
+   public List<Maint> getMaintReq(){
+	   List<Maint> result = maintRepository.findAllWithUserAndFaults();
+	   
+	   return result;
+   }
    // 작업자 목록 가져오기
    public List<User> getAllUsers() {
        return maintRepository.findAllUsers();
