@@ -48,24 +48,24 @@ public class CableService {
 		return cable;
 	}
 	
-	// 랙 위치당 케이블의 수
-	public Map<String, Integer> countCablesByRackLocation() {
-	    Map<String, Integer> cableCounts = new HashMap<String, Integer>();
+	// 랙 번호당 케이블의 수
+	public Map<String, Integer> countCablesByRackNumber() {
+	    Map<String, Integer> cableCounts = new HashMap<>();
 
-	    // Source Rack Location의 케이블 수 가져오기
-	    List<Object[]> sourceCables = cableRepository.countCablesBySourceRackLocation();
+	    // Source Rack Number의 케이블 수 가져오기
+	    List<Object[]> sourceCables = cableRepository.countCablesBySourceRackNumber();
 	    for (Object[] record : sourceCables) {
-	        String rackLocation = (String) record[0];
+	        String rackNumber = (String) record[0];
 	        Integer cableCount = ((Long) record[1]).intValue();
-	        cableCounts.put(rackLocation, cableCounts.getOrDefault(rackLocation, 0) + cableCount);
+	        cableCounts.put(rackNumber, cableCounts.getOrDefault(rackNumber, 0) + cableCount);
 	    }
 
-	    // Destination Rack Location의 케이블 수 가져오기
-	    List<Object[]> destinationCables = cableRepository.countCablesByDestinationRackLocation();
+	    // Destination Rack Number의 케이블 수 가져오기
+	    List<Object[]> destinationCables = cableRepository.countCablesByDestinationRackNumber();
 	    for (Object[] record : destinationCables) {
-	        String rackLocation = (String) record[0];
+	        String rackNumber = (String) record[0];
 	        Integer cableCount = ((Long) record[1]).intValue();
-	        cableCounts.put(rackLocation, cableCounts.getOrDefault(rackLocation, 0) + cableCount);
+	        cableCounts.put(rackNumber, cableCounts.getOrDefault(rackNumber, 0) + cableCount);
 	    }
 
 	    return cableCounts;

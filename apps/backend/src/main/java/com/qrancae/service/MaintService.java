@@ -224,28 +224,28 @@ public class MaintService {
 	/* 케이블 불량률 */
 	// 해당 Rack 위치 당 불량 수
 	public Map<String, Integer> cntDefectRack(Integer year, Integer month) {
-		Map<String, Integer> defectCounts = new HashMap<>();
+	    Map<String, Integer> defectCounts = new HashMap<>();
 
-		// 출발지 Rack의 불량 수를 가져옴
-		List<Object[]> sourceDefect = maintRepository.countDefectsBySourceRackLocation(year, month);
-		// 도착지 Rack의 불량 수를 가져옴
-		List<Object[]> destinationDefect = maintRepository.countDefectsByDestinationRackLocation(year, month);
+	    // 출발지 Rack의 불량 수를 가져옴
+	    List<Object[]> sourceDefect = maintRepository.countDefectsBySourceRackNumber(year, month);
+	    // 도착지 Rack의 불량 수를 가져옴
+	    List<Object[]> destinationDefect = maintRepository.countDefectsByDestinationRackNumber(year, month);
 
-		// 출발지 Rack의 불량 수를 합산
-		for (Object[] record : sourceDefect) {
-			String rackLocation = (String) record[0];
-			Integer defectCount = ((Long) record[1]).intValue();
-			defectCounts.put(rackLocation, defectCounts.getOrDefault(rackLocation, 0) + defectCount);
-		}
+	    // 출발지 Rack의 불량 수를 합산
+	    for (Object[] record : sourceDefect) {
+	        String rackNumber = (String) record[0];
+	        Integer defectCount = ((Long) record[1]).intValue();
+	        defectCounts.put(rackNumber, defectCounts.getOrDefault(rackNumber, 0) + defectCount);
+	    }
 
-		// 도착지 Rack의 불량 수를 합산
-		for (Object[] record : destinationDefect) {
-			String rackLocation = (String) record[0];
-			Integer defectCount = ((Long) record[1]).intValue();
-			defectCounts.put(rackLocation, defectCounts.getOrDefault(rackLocation, 0) + defectCount);
-		}
+	    // 도착지 Rack의 불량 수를 합산
+	    for (Object[] record : destinationDefect) {
+	        String rackNumber = (String) record[0];
+	        Integer defectCount = ((Long) record[1]).intValue();
+	        defectCounts.put(rackNumber, defectCounts.getOrDefault(rackNumber, 0) + defectCount);
+	    }
 
-		return defectCounts;
+	    return defectCounts;
 	}
 
 	/* 작업자별 점검 현황 */

@@ -118,45 +118,45 @@ public class MainController {
 	// 파이 차트 - 케이블 불량률
 	@GetMapping("/defectChart")
 	public List<Map.Entry<String, Double>> defectChart(@RequestParam(required = false) Integer year,
-			@RequestParam(required = false) Integer month, @RequestParam(required = false) String range) {
-		System.out.println("최고 혹은 최저 : " + range);
+	        @RequestParam(required = false) Integer month, @RequestParam(required = false) String range) {
+	    System.out.println("최고 혹은 최저 : " + range);
 
-		// 랙 위치 당 케이블의 전체 개수
-		Map<String, Integer> cableByRackCounts = cableService.countCablesByRackLocation();
-		// 랙 위치 당 불량 수 (동일 케이블 하나로 카운트)
-		Map<String, Integer> defectCounts = maintService.cntDefectRack(year, month);
+	    // 랙 번호 당 케이블의 전체 개수
+	    Map<String, Integer> cableByRackCounts = cableService.countCablesByRackNumber();
+	    // 랙 번호 당 불량 수 (동일 케이블 하나로 카운트)
+	    Map<String, Integer> defectCounts = maintService.cntDefectRack(year, month);
 
-		// 불량률 계산
-		Map<String, Double> defectRates = new HashMap<>();
-		for (String rackLocation : defectCounts.keySet()) {
-			Integer defectCount = defectCounts.get(rackLocation);
-			System.out.println("불량 개수 : " + defectCount);
-			Integer totalCableCount = cableByRackCounts.get(rackLocation);
-			System.out.println("랙의 전체 케이블 개수 : " + totalCableCount);
+	    // 불량률 계산
+	    Map<String, Double> defectRates = new HashMap<>();
+	    for (String rackNumber : defectCounts.keySet()) {
+	        Integer defectCount = defectCounts.get(rackNumber);
+	        System.out.println("불량 개수 : " + defectCount);
+	        Integer totalCableCount = cableByRackCounts.get(rackNumber);
+	        System.out.println("랙의 전체 케이블 개수 : " + totalCableCount);
 
-			if (totalCableCount != null && totalCableCount > 0) {
-				double defectRate = (double) defectCount / totalCableCount;
-				defectRates.put(rackLocation, defectRate);
-			}
-		}
+	        if (totalCableCount != null && totalCableCount > 0) {
+	            double defectRate = (double) defectCount / totalCableCount;
+	            defectRates.put(rackNumber, defectRate);
+	        }
+	    }
 
-		// 불량률을 기준으로 정렬
-		List<Map.Entry<String, Double>> sortedDefectRates = defectRates.entrySet().stream()
-				.sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue())) // 내림차순
-				.collect(Collectors.toList());
+	    // 불량률을 기준으로 정렬
+	    List<Map.Entry<String, Double>> sortedDefectRates = defectRates.entrySet().stream()
+	            .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue())) // 내림차순
+	            .collect(Collectors.toList());
 
-		// range에 따라 상위 4개 또는 하위 4개 선택
-		List<Map.Entry<String, Double>> topOrBottomDefects;
-		if ("max".equalsIgnoreCase(range)) {
-			topOrBottomDefects = sortedDefectRates.stream().limit(4).collect(Collectors.toList());
-		} else if ("min".equalsIgnoreCase(range)) {
-			topOrBottomDefects = sortedDefectRates.stream().sorted(Map.Entry.comparingByValue()) // 오름차순
-					.limit(4).collect(Collectors.toList());
-		} else {
-			topOrBottomDefects = Collections.emptyList();
-		}
+	    // range에 따라 상위 4개 또는 하위 4개 선택
+	    List<Map.Entry<String, Double>> topOrBottomDefects;
+	    if ("max".equalsIgnoreCase(range)) {
+	        topOrBottomDefects = sortedDefectRates.stream().limit(4).collect(Collectors.toList());
+	    } else if ("min".equalsIgnoreCase(range)) {
+	        topOrBottomDefects = sortedDefectRates.stream().sorted(Map.Entry.comparingByValue()) // 오름차순
+	                .limit(4).collect(Collectors.toList());
+	    } else {
+	        topOrBottomDefects = Collections.emptyList();
+	    }
 
-		return topOrBottomDefects;
+	    return topOrBottomDefects;
 	}
 
 	// 보고서 다운로드
