@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import styles from './Login.module.css'; // module.css 파일을 불러옵니다.
@@ -8,11 +8,20 @@ import ModalPopup from './popups/ModalPopup';
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userId, setUserId] = useState('');
   const [userPw, setUserPw] = useState('');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const [showPopup, setShowPopup] = useState(false);
+  const [showTimeOutPopup, setShowTimeOutPopup] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('message') === 'timeout') {
+      setShowTimeOutPopup(true);
+    }
+  }, [location.search]);
 
   const login = async () => {
     let newErrors = {};
@@ -49,6 +58,11 @@ function Login() {
   const closePopup = () => {
     setShowPopup(false);
     navigate('/home'); // 홈 페이지로 리다이렉트
+  };
+
+  const closeTimeOutPopup = () => {
+    setShowTimeOutPopup(false);
+    navigate('/login');
   };
 
   return (
@@ -97,6 +111,13 @@ function Login() {
           isOpen={showPopup}
           onClose={closePopup}
           message="관리자 님 환영합니다!"
+        />
+      )}
+      {showTimeOutPopup && (
+        <ModalPopup
+          isOpen={showTimeOutPopup}
+          onClose={closeTimeOutPopup}
+          message="로그인 시간이 만료되어 로그아웃 되었습니다."
         />
       )}
     </div>
