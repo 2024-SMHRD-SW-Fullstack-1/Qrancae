@@ -405,8 +405,6 @@ const Repair = () => {
                     }, 100); // 100ms의 지연 후 테이블 갱신
                 }
 
-                window.location.reload();
-
             })
             .catch((err) => {
                 console.log('처리 작업자 선택 오류:', err);
@@ -430,6 +428,7 @@ const Repair = () => {
     // 유지보수 업데이트 완료 팝업 닫기
     const closeCompletePopup = () => {
         setShowCompletePopup(false); // 팝업닫기
+        window.location.reload();
     };
 
     return (
