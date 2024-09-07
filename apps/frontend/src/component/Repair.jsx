@@ -225,7 +225,11 @@ const Repair = () => {
 
         // 점검 현황
         const repairingTable = $('#repairing-table').DataTable({
-            data: maints.filter(item => item.maintUser !== null),
+            data: maints.filter(item => item.maintUser !== null && (
+                item.maint_qr === '불량' ||
+                item.maint_cable === '불량' ||
+                item.maint_power === '불량'
+            )),
             columns: [
                 {
                     title: '요청 작업자',
