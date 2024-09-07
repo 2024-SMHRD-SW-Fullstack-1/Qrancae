@@ -61,9 +61,9 @@ function Register() {
                     alt="navbar brand"
                     className="navbar-brand"
                     height="20"
-                    style={{ marginBottom: '2rem' }}
+                    style={{ marginBottom: '1rem' }}
                 />
-                <h1>회원가입</h1>
+                <h1 style={{ margin: '0' }}>회원가입</h1>
                 <div className={styles.note} style={{ marginBottom: '.5rem' }}>*는 필수 입력</div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ marginRight: '10px' }}>아이디 <span className={styles.required}>*</span></label>
@@ -110,7 +110,7 @@ function Register() {
                 </div>
                 <input type="text" value={userEmail} onChange={(e) => setUserEmail(e.target.value)}
                     placeholder='이메일을 입력하세요.' /><br />
-                <Button onClick={register} style={{ marginTop: '0rem' }}>회원가입</Button>
+                <Button onClick={register} style={{ marginTop: '.5rem' }}>회원가입</Button>
             </div>
             {showPopup && (
                 <ModalPopup
