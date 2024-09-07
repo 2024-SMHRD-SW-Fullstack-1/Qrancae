@@ -409,6 +409,8 @@ const Repair = () => {
                     }, 100); // 100ms의 지연 후 테이블 갱신
                 }
 
+                window.location.reload();
+
             })
             .catch((err) => {
                 console.log('처리 작업자 선택 오류:', err);
@@ -626,10 +628,9 @@ const Repair = () => {
             <Modal show={confirmModalIsOpen} onHide={() => setConfirmModalIsOpen(false)} centered>
                 <Modal.Dialog className="modal-dialog" style={{ width: '700px' }}>
                     <Modal.Header closeButton>
-                        <Modal.Title>요청사항 확인</Modal.Title>
+                        <Modal.Title>요청 작업자와 요청 내용을 확인</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p>요청 작업자와 요청 내용을 확인하세요.</p>
                         <h5>작업자: {users.find(user => user.user_id === selectedUser)?.user_name} ({selectedUser})</h5>
                         <p><strong>추가 요청사항:</strong> {alarmMsg || '없음'}</p>
                         <h5>선택된 유지보수 내역</h5>
