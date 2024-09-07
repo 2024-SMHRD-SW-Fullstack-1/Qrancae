@@ -86,10 +86,31 @@ const Log = () => {
   };
 
   const initializeDataTable = () => {
-
     $('#basic-logtables').empty();
-
-
+    $('#basic-logtables').html(`
+      <thead>
+        <tr>
+          <th rowSpan="2">번호</th>
+          <th rowSpan="2">log_idx</th>
+          <th rowSpan="2">작업자</th>
+          <th rowSpan="2">케이블</th>
+          <th colSpan="2">
+            <i class="fas fa-sign-out-alt" style="color: red; margin-right: .5rem;"></i> 출발점 (Start)
+          </th>
+          <th colSpan="2">
+            <i class="fas fa-sign-in-alt" style="color: #1572e8; margin-right: .5rem;"></i> 도착점 (End)
+          </th>
+          <th rowSpan="2">날짜 및 시간</th>
+        </tr>
+        <tr>
+          <th>랙 번호</th>
+          <th>랙 위치</th>
+          <th>랙 번호</th>
+          <th>랙 위치</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `);
     const table = $('#basic-logtables').DataTable({
       data: filteredData,
       autoWidth: true,
@@ -98,10 +119,10 @@ const Log = () => {
         { title: 'log_idx', data: 'log_idx', visible: false },
         { title: '작업자', data: null, render: data => `${data.user.user_name}(${data.user.user_id})` },
         { title: '케이블', data: 'cable.cable_idx' },
-        { title: '출발점 랙 번호', data: 'cable.s_rack_number' },
-        { title: '출발점 랙 위치', data: 'cable.s_rack_location' },
-        { title: '도착점 랙 번호', data: 'cable.d_rack_number' },
-        { title: '도착점 랙 위치', data: 'cable.d_rack_location' },
+        { title: '랙 번호', data: 'cable.s_rack_number' },
+        { title: '랙 위치', data: 'cable.s_rack_location' },
+        { title: '랙 번호', data: 'cable.d_rack_number' },
+        { title: '랙 위치', data: 'cable.d_rack_location' },
         { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
       ]
     });
