@@ -27,11 +27,10 @@ const Log = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All');
 
-  // 데이터
   useEffect(() => {
     getData();
   }, []);
-  // 작업자
+
   useEffect(() => {
     const uniqueUsers = [...new Set(logdata.map(item => item.user.user_id))]
       .map(userId => logdata.find(item => item.user.user_id === userId).user)
@@ -76,7 +75,6 @@ const Log = () => {
 
     if (selectedUser !== 'All') filtered = filtered.filter(item => item.user.user_id === selectedUser);
 
-    // 날짜 최신순으로 정렬
     filtered.sort((a, b) => new Date(b.log_date) - new Date(a.log_date));
     setFilteredData(filtered);
   };
@@ -87,8 +85,11 @@ const Log = () => {
     setFilteredData(logdata);
   };
 
-  function initializeDataTable() {
+  const initializeDataTable = () => {
+
     $('#basic-logtables').empty();
+
+
     const table = $('#basic-logtables').DataTable({
       data: filteredData,
       autoWidth: true,
@@ -102,11 +103,11 @@ const Log = () => {
         { title: '도착점 랙 번호', data: 'cable.d_rack_number' },
         { title: '도착점 랙 위치', data: 'cable.d_rack_location' },
         { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
-      ],
-      destroy: true
+      ]
     });
+
     setTableInstance(table);
-  }
+  };
 
   const handleReportDownload = () => {
     axios({
@@ -114,7 +115,6 @@ const Log = () => {
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
-      // 날짜 포맷
       const getFormattedDate = () => {
         const now = new Date();
         const year = now.getFullYear().toString().slice(-2);
@@ -126,20 +126,17 @@ const Log = () => {
 
       const filename = `log_${getFormattedDate()}.xlsx`;
 
-      // Blob을 사용하여 파일 다운로드 처리
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', filename); // 파일 이름 지정
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
-
-      // 클릭 후 링크 제거
       document.body.removeChild(link);
     }).catch(err => {
-      console.log(err)
+      console.log(err);
     });
-  }
+  };
 
   return (
     <div className="wrapper">
