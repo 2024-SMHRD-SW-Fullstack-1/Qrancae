@@ -19,33 +19,19 @@ const formatDate = (dateString) => {
   return formattedDate.replace(',', '');
 };
 
-// 로그 테이블의 열 설정
-const tableColumns = [
-  { title: '번호', data: null, render: (_, __, row, meta) => meta.row + 1 },
-  { title: 'log_idx', data: 'log_idx', visible: false },
-  { title: '작업자', data: null, render: data => `${data.user.user_name}(${data.user.user_id})` },
-  { title: '케이블', data: 'cable.cable_idx' },
-  { title: '출발점 랙 번호', data: 'cable.s_rack_number' },
-  { title: '출발점 랙 위치', data: 'cable.s_rack_location' },
-  { title: '도착점 랙 번호', data: 'cable.d_rack_number' },
-  { title: '도착점 랙 위치', data: 'cable.d_rack_location' },
-  { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
-];
-
 const Log = () => {
   const [logdata, setLogdata] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [tableInstance, setTableInstance] = useState(null);
   const [dateRange, setDateRange] = useState([null, null]);
-  const [year, setYear] = useState('All');
-  const [month, setMonth] = useState('All');
-  const [day, setDay] = useState('All');
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All');
 
+  // 데이터
   useEffect(() => {
     getData();
   }, []);
-
+  // 작업자
   useEffect(() => {
     const uniqueUsers = [...new Set(logdata.map(item => item.user.user_id))]
       .map(userId => logdata.find(item => item.user.user_id === userId).user)
@@ -55,22 +41,15 @@ const Log = () => {
 
   useEffect(() => {
     filterData();
-  }, [dateRange, year, month, day, selectedUser]);
+  }, [dateRange, selectedUser, logdata]);
 
   useEffect(() => {
-    const tableElement = $('#basic-logtables');
-    if ($.fn.DataTable.isDataTable(tableElement)) {
-      tableElement.DataTable().clear().rows.add(filteredData).draw();
+    if (tableInstance) {
+      tableInstance.clear().rows.add(filteredData).draw();
     } else {
-      tableElement.DataTable({
-        data: filteredData,
-        columns: tableColumns,
-        destroy: true,
-        paging: true,
-        searching: true,
-        lengthChange: true
-      });
+      initializeDataTable();
     }
+
   }, [filteredData]);
 
   const getData = async () => {
@@ -95,22 +74,39 @@ const Log = () => {
       });
     }
 
-    if (year !== 'All') filtered = filtered.filter(item => new Date(item.log_date).getFullYear() === parseInt(year, 10));
-    if (month !== 'All') filtered = filtered.filter(item => new Date(item.log_date).getMonth() + 1 === parseInt(month, 10));
-    if (day !== 'All') filtered = filtered.filter(item => new Date(item.log_date).getDate() === parseInt(day, 10));
     if (selectedUser !== 'All') filtered = filtered.filter(item => item.user.user_id === selectedUser);
 
+    // 날짜 최신순으로 정렬
+    filtered.sort((a, b) => new Date(b.log_date) - new Date(a.log_date));
     setFilteredData(filtered);
   };
 
   const handleReset = () => {
     setDateRange([null, null]);
-    setYear('All');
-    setMonth('All');
-    setDay('All');
     setSelectedUser('All');
     setFilteredData(logdata);
   };
+
+  function initializeDataTable() {
+    $('#basic-logtables').empty();
+    const table = $('#basic-logtables').DataTable({
+      data: filteredData,
+      autoWidth: true,
+      columns: [
+        { title: '번호', data: null, render: (_, __, row, meta) => meta.row + 1 },
+        { title: 'log_idx', data: 'log_idx', visible: false },
+        { title: '작업자', data: null, render: data => `${data.user.user_name}(${data.user.user_id})` },
+        { title: '케이블', data: 'cable.cable_idx' },
+        { title: '출발점 랙 번호', data: 'cable.s_rack_number' },
+        { title: '출발점 랙 위치', data: 'cable.s_rack_location' },
+        { title: '도착점 랙 번호', data: 'cable.d_rack_number' },
+        { title: '도착점 랙 위치', data: 'cable.d_rack_location' },
+        { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
+      ],
+      destroy: true
+    });
+    setTableInstance(table);
+  }
 
   const handleReportDownload = () => {
     axios({
@@ -140,6 +136,8 @@ const Log = () => {
 
       // 클릭 후 링크 제거
       document.body.removeChild(link);
+    }).catch(err => {
+      console.log(err)
     });
   }
 
@@ -171,7 +169,7 @@ const Log = () => {
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
-                          onChange={dates => { setDateRange(dates); filterData(); }}
+                          onChange={dates => { setDateRange(dates); }}
                           startDate={dateRange[0]}
                           endDate={dateRange[1]}
                           selectsRange
