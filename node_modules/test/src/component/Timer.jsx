@@ -8,7 +8,7 @@ import { Button, Modal } from 'react-bootstrap';
 const Timer = () => {
     const navigate = useNavigate();
     const intervalId = useRef(null);
-    const timeLeft = useRef(62); // 30분 (1800초)
+    const timeLeft = useRef(1800); // 30분 (1800초)
     const [displayTime, setDisplayTime] = useState(timeLeft.current);
     const [showExtendPrompt, setShowExtendPrompt] = useState(false);
 
