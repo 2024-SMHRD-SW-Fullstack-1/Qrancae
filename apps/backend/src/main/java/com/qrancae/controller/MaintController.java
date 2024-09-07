@@ -100,25 +100,32 @@ public class MaintController {
 		if (selectedUser == null || selectedUser.isEmpty()) {
 			return ResponseEntity.status(400).body("유효하지 않은 userId 파라미터");
 		}
-		String to = "kyshs45@naver.com";
-		String subject = "Test Email";
-		String text = "<h1>메일 내용</h1><p>이것은 테스트 메일입니다.<p>";
-
-		try {
-			emailService.sendEmail(to, subject, text);
-			System.out.println("Email sent successfully!");
-		} catch (MessagingException e) {
-			e.printStackTrace();
-			System.out.println("Failed to send email.");
-		}
 
 		System.out.println("추가 메세지 : " + alarmMsg);
 		try {
 			maintService.updateMaintUser(selectedMaints, selectedUser, alarmMsg);
+			
+			// 이메일 보내기
+			if (alarmMsg != null || !alarmMsg.isEmpty()) {
+				String to = "kyshs45@naver.com";
+				String subject = "";
+				String text = "<h1>메일 내용</h1><p>이것은 테스트 메일입니다.<p>";
+				
+				try {
+					emailService.sendEmail(to, subject, text);
+					System.out.println("Email sent successfully!");
+				} catch (MessagingException e) {
+					e.printStackTrace();
+					System.out.println("Failed to send email.");
+				}
+			}
+			
 			return ResponseEntity.ok("작업자 할당 성공");
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
 		}
+		
+		
 
 	}
 

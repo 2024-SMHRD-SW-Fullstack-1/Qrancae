@@ -42,15 +42,15 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	List<Maint> findMaintsForToday();
 
 	// - 신규 내역
-	@Query("SELECT COUNT(m) FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NULL")
+	@Query("SELECT COUNT(m) FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maint_status = '신규접수'")
 	int countByMaintDateAndMaintUserIsNull();
 
 	// - 진행 중
-	@Query("SELECT COUNT(m) FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NOT NULL AND m.maint_update IS NULL")
+	@Query("SELECT COUNT(m) FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NOT NULL AND m.maint_status = '점검중'")
 	int countByMaintUserIsNotNullAndMaintUpdateIsNull();
 
 	// - 보수 완료
-	@Query("SELECT COUNT(m) FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NOT NULL AND m.maint_update IS NOT NULL")
+	@Query("SELECT COUNT(m) FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NOT NULL AND m.maint_status = '보수완료' AND m.maint_update IS NOT NULL")
 	int countByMaintUserIsNotNullAndMaintUpdateIsNotNull();
 
 	// - 보수 완료한 작업자의 수
