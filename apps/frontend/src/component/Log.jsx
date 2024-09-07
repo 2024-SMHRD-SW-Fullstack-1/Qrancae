@@ -28,6 +28,11 @@ const Log = () => {
   const [selectedUser, setSelectedUser] = useState('All');
 
   useEffect(() => {
+    // 오늘 날짜로 초기 날짜 범위 설정
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));  // 오늘 0시
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));  // 오늘 23시 59분
+    setDateRange([startOfDay, endOfDay]);
     getData();
   }, []);
 
