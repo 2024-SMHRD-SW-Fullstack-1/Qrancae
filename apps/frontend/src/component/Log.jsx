@@ -19,30 +19,20 @@ const formatDate = (dateString) => {
   return formattedDate.replace(',', '');
 };
 
-// 로그 테이블의 열 설정
-const tableColumns = [
-  { title: '번호', data: null, render: (_, __, row, meta) => meta.row + 1 },
-  { title: 'log_idx', data: 'log_idx', visible: false },
-  { title: '작업자', data: null, render: data => `${data.user.user_name}(${data.user.user_id})` },
-  { title: '케이블', data: 'cable.cable_idx' },
-  { title: '출발점 랙 번호', data: 'cable.s_rack_number' },
-  { title: '출발점 랙 위치', data: 'cable.s_rack_location' },
-  { title: '도착점 랙 번호', data: 'cable.d_rack_number' },
-  { title: '도착점 랙 위치', data: 'cable.d_rack_location' },
-  { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
-];
-
 const Log = () => {
   const [logdata, setLogdata] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [tableInstance, setTableInstance] = useState(null);
   const [dateRange, setDateRange] = useState([null, null]);
-  const [year, setYear] = useState('All');
-  const [month, setMonth] = useState('All');
-  const [day, setDay] = useState('All');
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All');
 
   useEffect(() => {
+    // 오늘 날짜로 초기 날짜 범위 설정
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));  // 오늘 0시
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));  // 오늘 23시 59분
+    setDateRange([startOfDay, endOfDay]);
     getData();
   }, []);
 
@@ -55,22 +45,15 @@ const Log = () => {
 
   useEffect(() => {
     filterData();
-  }, [dateRange, year, month, day, selectedUser]);
+  }, [dateRange, selectedUser, logdata]);
 
   useEffect(() => {
-    const tableElement = $('#basic-logtables');
-    if ($.fn.DataTable.isDataTable(tableElement)) {
-      tableElement.DataTable().clear().rows.add(filteredData).draw();
+    if (tableInstance) {
+      tableInstance.clear().rows.add(filteredData).draw();
     } else {
-      tableElement.DataTable({
-        data: filteredData,
-        columns: tableColumns,
-        destroy: true,
-        paging: true,
-        searching: true,
-        lengthChange: true
-      });
+      initializeDataTable();
     }
+
   }, [filteredData]);
 
   const getData = async () => {
@@ -95,21 +78,61 @@ const Log = () => {
       });
     }
 
-    if (year !== 'All') filtered = filtered.filter(item => new Date(item.log_date).getFullYear() === parseInt(year, 10));
-    if (month !== 'All') filtered = filtered.filter(item => new Date(item.log_date).getMonth() + 1 === parseInt(month, 10));
-    if (day !== 'All') filtered = filtered.filter(item => new Date(item.log_date).getDate() === parseInt(day, 10));
     if (selectedUser !== 'All') filtered = filtered.filter(item => item.user.user_id === selectedUser);
 
+    filtered.sort((a, b) => new Date(b.log_date) - new Date(a.log_date));
     setFilteredData(filtered);
   };
 
   const handleReset = () => {
     setDateRange([null, null]);
-    setYear('All');
-    setMonth('All');
-    setDay('All');
     setSelectedUser('All');
     setFilteredData(logdata);
+  };
+
+  const initializeDataTable = () => {
+    $('#basic-logtables').empty();
+    $('#basic-logtables').html(`
+      <thead>
+        <tr>
+          <th rowSpan="2">번호</th>
+          <th rowSpan="2">log_idx</th>
+          <th rowSpan="2">작업자</th>
+          <th rowSpan="2">케이블</th>
+          <th colSpan="2">
+            <i class="fas fa-sign-out-alt" style="color: red; margin-right: .5rem;"></i> 출발점 (Start)
+          </th>
+          <th colSpan="2">
+            <i class="fas fa-sign-in-alt" style="color: #1572e8; margin-right: .5rem;"></i> 도착점 (End)
+          </th>
+          <th rowSpan="2">날짜 및 시간</th>
+        </tr>
+        <tr>
+          <th>랙 번호</th>
+          <th>랙 위치</th>
+          <th>랙 번호</th>
+          <th>랙 위치</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `);
+    const table = $('#basic-logtables').DataTable({
+      data: filteredData,
+      autoWidth: true,
+      columns: [
+        { title: '번호', data: null, render: (_, __, row, meta) => meta.row + 1 },
+        { title: 'log_idx', data: 'log_idx', visible: false },
+        { title: '작업자', data: null, render: data => `${data.user.user_name}(${data.user.user_id})` },
+        { title: '케이블', data: 'cable.cable_idx' },
+        { title: '랙 번호', data: 'cable.s_rack_number' },
+        { title: '랙 위치', data: 'cable.s_rack_location' },
+        { title: '랙 번호', data: 'cable.d_rack_number' },
+        { title: '랙 위치', data: 'cable.d_rack_location' },
+        { title: '날짜 및 시간', data: 'log_date', render: data => formatDate(data) }
+      ]
+    });
+
+    setTableInstance(table);
   };
 
   const handleReportDownload = () => {
@@ -118,7 +141,6 @@ const Log = () => {
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
-      // 날짜 포맷
       const getFormattedDate = () => {
         const now = new Date();
         const year = now.getFullYear().toString().slice(-2);
@@ -130,18 +152,17 @@ const Log = () => {
 
       const filename = `log_${getFormattedDate()}.xlsx`;
 
-      // Blob을 사용하여 파일 다운로드 처리
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', filename); // 파일 이름 지정
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
-
-      // 클릭 후 링크 제거
       document.body.removeChild(link);
+    }).catch(err => {
+      console.log(err);
     });
-  }
+  };
 
   return (
     <div className="wrapper">
@@ -171,7 +192,7 @@ const Log = () => {
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
-                          onChange={dates => { setDateRange(dates); filterData(); }}
+                          onChange={dates => { setDateRange(dates); }}
                           startDate={dateRange[0]}
                           endDate={dateRange[1]}
                           selectsRange

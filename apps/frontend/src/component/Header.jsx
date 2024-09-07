@@ -157,7 +157,7 @@ const Header = () => {
           {/* 로고 클릭 시 메인 화면 이동 */}
           <Link to='/home'>
             <img
-              src="assets/img/kaiadmin/logo_light.svg"
+              src="assets/img/logo_white.png"
               alt="navbar brand"
               className="navbar-brand"
               height="20"

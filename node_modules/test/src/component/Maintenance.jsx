@@ -123,7 +123,7 @@ const Maintenance = () => {
             const allGood = data.maint_qr === '양호' && data.maint_cable === '양호' && data.maint_power === '양호';
 
             if (allGood) {
-              return '정기 점검 완료';
+              return '점검 완료';
             } else if (!maintUser && !maintUpdate) {
               return '접수 대기중';
             } else if (maintUser && !maintUpdate) {

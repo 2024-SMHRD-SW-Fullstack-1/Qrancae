@@ -6,6 +6,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
   const [userPw, setUserPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -15,6 +16,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
         const user = data;
         setUserPw(user.userPw);
         setUserName(user.userName);
+        setUserEmail(user.userEmail)
       })
       .catch((error) => {
         console.error('유저 정보 가져오기 실패!', error);
@@ -27,7 +29,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
     if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
     if (userPw !== confirmPw) newErrors.confirmPw = '*비밀번호가 일치하지 않습니다.';
     if (!userName) newErrors.userName = '*이름을 입력해주세요.';
-
+    if (!userEmail) newErrors.userEmail = '*이메일을 입력해주세요.';
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
@@ -38,6 +40,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
       .put(`http://localhost:8089/qrancae/api/users/${userId}`, {
         userPw: userPw,
         userName: userName,
+        userEmail: userEmail,
       })
       .then(() => {
         alert('작업자 정보가 수정되었습니다.');
@@ -55,7 +58,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
     if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
     if (userPw !== confirmPw) newErrors.confirmPw = '*비밀번호가 일치하지 않습니다.';
     if (!userName) newErrors.userName = '*이름을 입력해주세요.';
-
+    if (!userEmail) newErrors.userEmail = '*이메일을 입력해주세요.';
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
@@ -67,6 +70,7 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
         .delete(`http://localhost:8089/qrancae/api/users/${userId}`, {
           userPw: userPw,
           userName: userName,
+          userEmail: userEmail,
         })
         .then(() => {
           alert('작업자 정보가 삭제되었습니다.');
@@ -122,6 +126,18 @@ const UserDetail = ({ userId, isOpen, onClose }) => {
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
           placeholder="이름을 입력하세요."
+        /><br />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <label>이메일</label>
+          {errors.userEmail && <div style={{ color: 'red' }}>{errors.userEmail}</div>}
+        </div>
+        <input
+          className="form-control input-full"
+          type="text"
+          value={userEmail}
+          onChange={(e) => setUserEmail(e.target.value)}
+          placeholder="이메일을 입력하세요."
         /><br />
       </Modal.Body>
       <Modal.Footer>

@@ -68,6 +68,7 @@ public class MemberController {
         if (existingMember != null) {
             existingMember.setUserPw(updatedMember.getUserPw());
             existingMember.setUserName(updatedMember.getUserName());
+            existingMember.setUserEmail(updatedMember.getUserEmail());
             memberService.updateUser(existingMember);  // updateUser는 기존 save 메소드를 사용할 수 있습니다.
             return ResponseEntity.ok("사용자 정보가 수정되었습니다.");
         } else {
