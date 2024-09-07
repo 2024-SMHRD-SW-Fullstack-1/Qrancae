@@ -69,6 +69,12 @@ public class MaintController {
 
 		return maints;
 	}
+	// 불량인 목록 가져오기
+	@GetMapping("/getmaintreq")
+	public List<Maint> getMaintReq(){
+		List<Maint> maints = maintService.getMaintReq();
+		return maints;
+	}
 
 	// 작업자 가져오기
 	@GetMapping("/maint/getusers")

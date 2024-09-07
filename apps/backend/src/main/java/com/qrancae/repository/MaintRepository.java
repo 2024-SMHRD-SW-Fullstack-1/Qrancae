@@ -25,6 +25,10 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 
 	@Query("SELECT u FROM User u WHERE u.user_type = 'U'")
 	List<User> findAllUsers();
+	
+	// 불량인 보수 내역
+	@Query("SELECT m FROM Maint m JOIN FETCH m.user u WHERE m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량' ORDER BY m.maint_date DESC")
+	List<Maint> findAllWithUserAndFaults();
 
 	// 신규 알림 내역
 	@Query("SELECT m FROM Maint m WHERE DATE(m.maint_date) = CURRENT_DATE AND m.maintUser IS NULL")

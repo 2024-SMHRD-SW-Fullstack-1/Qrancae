@@ -96,7 +96,7 @@ const Repair = () => {
 
     // 유지 보수 내역 가져오기
     function getData() {
-        axios.get('http://localhost:8089/qrancae/getmaint')
+        axios.get('http://localhost:8089/qrancae/getmaintreq')
             .then((res) => {
                 setMaints(res.data);
             })
