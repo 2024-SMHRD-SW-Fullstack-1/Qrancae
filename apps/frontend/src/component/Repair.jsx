@@ -96,7 +96,7 @@ const Repair = () => {
 
     // 유지 보수 내역 가져오기
     function getData() {
-        axios.get('http://localhost:8089/qrancae/getmaintreq')
+        axios.get('http://localhost:8089/qrancae/getmaint')
             .then((res) => {
                 setMaints(res.data);
             })
@@ -225,11 +225,7 @@ const Repair = () => {
 
         // 점검 현황
         const repairingTable = $('#repairing-table').DataTable({
-            data: maints.filter(item => item.maintUser !== null && (
-                item.maint_qr === '불량' ||
-                item.maint_cable === '불량' ||
-                item.maint_power === '불량'
-            )),
+            data: maints.filter(item => item.maintUser !== null),
             columns: [
                 {
                     title: '요청 작업자',
@@ -600,17 +596,37 @@ const Repair = () => {
                                 <div className="mt-4">
                                     <h5>선택된 유지보수 내역</h5>
                                     <ul>
-                                        {selectedMaintsInfo.map((item) => (
-                                            <li key={item.maint_idx} style={{ textAlign: 'left' }}>
-                                                <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
-                                                <strong>오류 내용</strong><br />
-                                                <div style={{ marginLeft: '10px' }}>
-                                                    {item.maint_qr === '불량' && <div>- QR 상태: <span style={{ color: 'red' }}>{item.maint_qr}</span></div>}
-                                                    {item.maint_cable === '불량' && <div>- 케이블 상태: <span style={{ color: 'red' }}>{item.maint_cable}</span></div>}
-                                                    {item.maint_power === '불량' && <div>- 전원 공급 상태: <span style={{ color: 'red' }}>{item.maint_power}</span></div>}
-                                                </div>
-                                            </li>
-                                        ))}
+                                        {selectedMaintsInfo.map((item) => {
+                                            // 상태 메시지를 배열로 수집
+                                            const errorMessages = [];
+                                            if (item.maint_qr === '불량') {
+                                                errorMessages.push(<span key="qr">QR 상태( <span style={{ color: 'red' }}>{item.maint_qr}</span> )</span>);
+                                            }
+                                            if (item.maint_cable === '불량') {
+                                                errorMessages.push(<span key="cable">케이블 상태( <span style={{ color: 'red' }}>{item.maint_cable}</span> )</span>);
+                                            }
+                                            if (item.maint_power === '불량') {
+                                                errorMessages.push(<span key="power">전원 공급 상태( <span style={{ color: 'red' }}>{item.maint_power}</span> )</span>);
+                                            }
+
+                                            // 상태 메시지들을 쉼표로 구분하여 문자열로 변환
+                                            const errorText = errorMessages.map((msg, index) => (
+                                                <React.Fragment key={index}>
+                                                    {msg}
+                                                    {index < errorMessages.length - 1 && ', '}
+                                                </React.Fragment>
+                                            ));
+
+                                            return (
+                                                <li key={item.maint_idx} style={{ textAlign: 'left' }}>
+                                                    <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
+                                                    <strong>오류 내용 : </strong>
+                                                    <span style={{ marginLeft: '10px' }}>
+                                                        {errorText}
+                                                    </span>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 </div>
                             </>
@@ -634,17 +650,37 @@ const Repair = () => {
                         <p><strong>추가 요청사항:</strong> {alarmMsg || '없음'}</p>
                         <h5>선택된 유지보수 내역</h5>
                         <ul>
-                            {selectedMaintsInfo.map((item) => (
-                                <li key={item.maint_idx} style={{ textAlign: 'left' }}>
-                                    <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
-                                    <strong>오류 내용</strong><br />
-                                    <div style={{ marginLeft: '10px' }}>
-                                        {item.maint_qr === '불량' && <div>- QR 상태: <span style={{ color: 'red' }}>{item.maint_qr}</span></div>}
-                                        {item.maint_cable === '불량' && <div>- 케이블 상태: <span style={{ color: 'red' }}>{item.maint_cable}</span></div>}
-                                        {item.maint_power === '불량' && <div>- 전원 공급 상태: <span style={{ color: 'red' }}>{item.maint_power}</span></div>}
-                                    </div>
-                                </li>
-                            ))}
+                            {selectedMaintsInfo.map((item) => {
+                                // 상태 메시지를 배열로 수집
+                                const errorMessages = [];
+                                if (item.maint_qr === '불량') {
+                                    errorMessages.push(<span key="qr">QR 상태( <span style={{ color: 'red' }}>{item.maint_qr}</span> )</span>);
+                                }
+                                if (item.maint_cable === '불량') {
+                                    errorMessages.push(<span key="cable">케이블 상태( <span style={{ color: 'red' }}>{item.maint_cable}</span> )</span>);
+                                }
+                                if (item.maint_power === '불량') {
+                                    errorMessages.push(<span key="power">전원 공급 상태( <span style={{ color: 'red' }}>{item.maint_power}</span> )</span>);
+                                }
+
+                                // 상태 메시지들을 쉼표로 구분하여 문자열로 변환
+                                const errorText = errorMessages.map((msg, index) => (
+                                    <React.Fragment key={index}>
+                                        {msg}
+                                        {index < errorMessages.length - 1 && ', '}
+                                    </React.Fragment>
+                                ));
+
+                                return (
+                                    <li key={item.maint_idx} style={{ textAlign: 'left' }}>
+                                        <strong>케이블 번호 : </strong> {item.cable.cable_idx}<br />
+                                        <strong>오류 내용 : </strong>
+                                        <span style={{ marginLeft: '10px' }}>
+                                            {errorText}
+                                        </span>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </Modal.Body>
                     <Modal.Footer>
