@@ -13,3 +13,20 @@
     margin-bottom: 20px;
 
 }
+
+.modalContent {
+    width: 100%; /* 모달 전체 너비 설정 */
+    max-width: 400px; /* 최대 너비 설정 */
+    padding: 0; /* 패딩 제거 */
+    margin: 0; /* 여백 제거 */
+    border: none; /* 모서리 제거 */
+  }
+  
+
+.modalHeader, .modalFooter {
+  display: none; /* 헤더와 푸터 숨김 */
+}
+
+.modalBody {
+  padding: 20px; /* 내부에만 적당한 패딩 적용 */
+}

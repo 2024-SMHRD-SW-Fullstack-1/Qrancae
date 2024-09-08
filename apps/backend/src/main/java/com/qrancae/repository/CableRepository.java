@@ -18,26 +18,29 @@ public interface CableRepository extends JpaRepository<Cable, Integer> {
 	@Query("SELECT MAX(c.cable_idx) FROM Cable c")
 	Integer findMaxCableIdx();
 
-	@Query("SELECT c FROM Cable c LEFT JOIN FETCH c.qr ORDER BY c.id DESC")
+	@Query("SELECT c FROM Cable c LEFT JOIN FETCH c.qr q ORDER BY "
+			+ "CASE WHEN q.qr_status = 'X' THEN 0 ELSE 1 END, c.id DESC")
 	List<Cable> findAllWithQr();
 
 	@Query("SELECT c FROM Cable c WHERE c.cable_idx = :cableIdx")
 	Cable findByCableIdx(@Param("cableIdx") Integer cableIdx);
 
-	/* 랙 위치당 케이블의 수 */
-	// - source rack location
-	@Query("SELECT c.s_rack_location AS rackLocation, COUNT(c) AS cableCount " + "FROM Cable c "
-			+ "GROUP BY c.s_rack_location")
-	List<Object[]> countCablesBySourceRackLocation();
+	/* 랙 반호당 케이블의 수 */
+	// - source rack number
+	@Query("SELECT c.s_rack_number AS rackNumber, COUNT(c) AS cableCount " +
+	       "FROM Cable c " +
+	       "GROUP BY c.s_rack_number")
+	List<Object[]> countCablesBySourceRackNumber();
 
-	// - destination rack location
-	@Query("SELECT c.d_rack_location AS rackLocation, COUNT(c) AS cableCount " + "FROM Cable c "
-			+ "GROUP BY c.d_rack_location")
-	List<Object[]> countCablesByDestinationRackLocation();
-	
+	// - destination rack number
+	@Query("SELECT c.d_rack_number AS rackNumber, COUNT(c) AS cableCount " +
+	       "FROM Cable c " +
+	       "GROUP BY c.d_rack_number")
+	List<Object[]> countCablesByDestinationRackNumber();
+
 	// 해당 idx의 케이블 삭제
 	@Modifying
-    @Transactional
-    @Query("DELETE FROM Cable c WHERE c.cable_idx IN :cableIdxList")
-    void deleteByCableIdxIn(List<Integer> cableIdxList);
+	@Transactional
+	@Query("DELETE FROM Cable c WHERE c.cable_idx IN :cableIdxList")
+	void deleteByCableIdxIn(List<Integer> cableIdxList);
 }

@@ -21,7 +21,8 @@ public class User {
    private String user_pw;
    @Column(name = "user_name", length = 50)
    private String user_name;
-   
+   @Column(name = "user_email", length = 50)
+   private String user_email;   
    @Column(name = "joined_at")
    private LocalDateTime joined_at;
    @Column(name = "user_type",length = 1)

@@ -7,18 +7,21 @@ import Footer from './Footer';
 import 'datatables.net';
 import * as xlsx from 'xlsx';
 import ModalPopup from './popups/ModalPopup';
+import DeletePopup from './popups/DeletePopup';
 
 const Addqr = () => {
   // 로딩중인지 확인
   const [loading, setLoading] = useState(false);
   // 삭제 기능 팝업 상태
   const [showPopup, setShowPopup] = useState(false);
-  const [popupItemSelected, setPopupItemSelected] = useState(true);
+  const [showNonePopup, setShowNonePopup] = useState(false);
   // qr 코드 등록 완료 팝업 상태
   const [showQrPopup, setShowQrPopup] = useState(false);
+  const [showNoneQrPopup, setShowNoneQrPopup] = useState(false);
   // 테이블에 표시할 json 데이터
   const [jsonData, setJsonData] = useState([]);
   // 케이블 하나 추가할 때
+  const [showNoneCablePopup, setShowNoneCablePopup] = useState(false);
   const [inputs, setInputs] = useState({
     s_rack_number: '',
     s_rack_location: '',
@@ -33,7 +36,6 @@ const Addqr = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-
     if ($.fn.DataTable.isDataTable('#basic-datatables1')) {
       $('#basic-datatables1').DataTable().destroy();
     }
@@ -76,7 +78,6 @@ const Addqr = () => {
         });
       },
     });
-
 
     console.log('jsonData has been updated:', jsonData);
 
@@ -130,7 +131,7 @@ const Addqr = () => {
     e.preventDefault();
     for (const key in inputs) {
       if (inputs[key].trim() === '') {
-        alert('케이블의 모든 정보를 입력해주세요.');
+        setShowNoneCablePopup(true);
         return;
       }
     }
@@ -154,14 +155,14 @@ const Addqr = () => {
   const openPopup = () => {
     const selectedRows = $('#basic-datatables1 .row-select:checked').length;
     if (selectedRows === 0) {
-      setPopupItemSelected(false);
+      setShowNonePopup(true);
     } else {
-      setPopupItemSelected(true);
+      setShowPopup(true);
     }
-    setShowPopup(true);
   };
 
   const closePopup = () => setShowPopup(false);
+  const closeNonePopup = () => setShowNonePopup(false);
 
   // 선택된 케이블 삭제
   const handleDeleteSelected = () => {
@@ -172,15 +173,23 @@ const Addqr = () => {
       selectedIndexes.push(index);
     });
 
-    const updatedData = jsonData.filter((_, index) => !selectedIndexes.includes(index));
+    const updatedData = jsonData.filter(
+      (_, index) => !selectedIndexes.includes(index)
+    );
     setJsonData(updatedData);
   };
 
   // 전체 케이블 QR코드로 등록
   const registerQr = () => {
+    const selectedRows = $('#basic-datatables1 .row-select:checked').length;
+    if (selectedRows === 0) {
+      setShowNoneQrPopup(true); // 선택된 케이블이 없을 때 팝업
+      return;
+    }
+
     setLoading(true);
     axios({
-      url: 'http://localhost:8089/qrancae/registerQr',
+      url: `${process.env.REACT_APP_API_URL}/registerQr`,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -196,6 +205,14 @@ const Addqr = () => {
   const closeQrPopup = () => {
     setShowQrPopup(false); // QR 코드 등록 완료 팝업 닫기
     navigate('/qr'); // 케이블 목록 페이지로 이동
+  };
+
+  const closeNoneQrPopup = () => {
+    setShowNoneQrPopup(false);
+  };
+
+  const closeNoneCablePopup = () => {
+    setShowNoneCablePopup(false);
   };
 
   return (
@@ -221,23 +238,19 @@ const Addqr = () => {
           </div>
         )}
         {showPopup && (
-          <div className="popup-overlay">
-            <div className="popup-content">
-              <div className='popup-body'>
-                {popupItemSelected ? '선택된 케이블을 삭제하시겠습니까?' : '선택된 케이블이 없습니다.'}
-              </div>
-              <div className="popup-buttons">
-                {popupItemSelected ? (
-                  <>
-                    <button onClick={closePopup} className="btn btn-primary btn-border">취소</button>
-                    <button onClick={() => { handleDeleteSelected(); closePopup(); }} className="btn btn-primary">확인</button>
-                  </>
-                ) : (
-                  <button onClick={closePopup} className="btn btn-primary">확인</button>
-                )}
-              </div>
-            </div>
-          </div>
+          <DeletePopup
+            isOpen={showPopup}
+            closePopup={closePopup}
+            handleDeleteSelected={handleDeleteSelected}
+          />
+        )}
+
+        {showNonePopup && (
+          <ModalPopup
+            isOpen={showNonePopup}
+            onClose={closeNonePopup}
+            message="선택된 케이블이 없습니다."
+          />
         )}
 
         {showQrPopup && (
@@ -245,6 +258,20 @@ const Addqr = () => {
             isOpen={showQrPopup}
             onClose={closeQrPopup}
             message="QR 코드 등록이 완료되었습니다."
+          />
+        )}
+        {showNoneQrPopup && (
+          <ModalPopup
+            isOpen={showNoneQrPopup}
+            onClose={closeNoneQrPopup}
+            message="등록할 케이블을 선택해주세요."
+          />
+        )}
+        {showNoneCablePopup && (
+          <ModalPopup
+            isOpen={showNoneCablePopup}
+            onClose={closeNoneCablePopup}
+            message="케이블의 모든 정보를 입력해주세요."
           />
         )}
 
@@ -296,7 +323,7 @@ const Addqr = () => {
                         onClick={registerQr}
                       >
                         <span className="btn-label">
-                          <i className="fas fa-check-circle"></i>
+                          <i className="fas fa-check-circle icon-spacing"></i>
                         </span>
                         전체 등록
                       </label>
@@ -407,7 +434,7 @@ const Addqr = () => {
                               />
                             </th>
                           </tr>
-                          <tr className='input-datas'>
+                          <tr className="input-datas">
                             <th rowSpan="2">
                               <input
                                 type="checkbox"
@@ -417,12 +444,24 @@ const Addqr = () => {
                               />
                             </th>
                             <th colSpan="4">
-                              <i className="fas fa-sign-out-alt" style={{ color: 'red', marginRight: '.5rem' }}></i> 출발점 (Start)
+                              <i
+                                className="fas fa-sign-out-alt"
+                                style={{ color: 'red', marginRight: '.5rem' }}
+                              ></i>{' '}
+                              출발점 (Start)
                             </th>
                             <th colSpan="4">
-                              <i className="fas fa-sign-in-alt" style={{ color: '#1572e8', marginRight: '.5rem' }}></i> 도착점 (End)</th>
+                              <i
+                                className="fas fa-sign-in-alt"
+                                style={{
+                                  color: '#1572e8',
+                                  marginRight: '.5rem',
+                                }}
+                              ></i>{' '}
+                              도착점 (End)
+                            </th>
                           </tr>
-                          <tr className='input-datas'>
+                          <tr className="input-datas">
                             <th>랙 번호</th>
                             <th>랙 위치</th>
                             <th>서버 이름</th>

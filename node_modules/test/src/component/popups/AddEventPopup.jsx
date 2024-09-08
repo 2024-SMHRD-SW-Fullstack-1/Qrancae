@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import styles from '../Login.module.css';
 
 const colors = [
     '#FF6384',
@@ -23,12 +24,14 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
     const [content, setContent] = useState('');
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [allDay, setAllDay] = useState(false);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             const now = getCurrentDateTime();
             setStart(now);
             setEnd(now);
+            setShowError(false); // Reset error when opening popup
         }
     }, [isOpen]);
 
@@ -73,7 +76,13 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
     };
 
     const handleSave = () => {
+        if (title.trim() === '') {
+            setShowError(true);
+            return;
+        }
+
         onSave({ title, start, end, content, color: selectedColor, allDay });
+        onClose(); // Close the modal after saving
     };
 
     return (
@@ -83,12 +92,18 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                     <Modal.Title>일정 추가</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.5rem' }}>
+                        <label>제목</label>
+                        {showError && (
+                            <div className={styles.error} style={{ margin: 0 }}>*제목을 입력해주세요.</div>
+                        )}
+                    </div>
                     <input
                         className="form-control input-full"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="제목"
+                        placeholder="제목을 입력해주세요."
                         style={{ marginBottom: '0.5rem' }}
                     />
                     <div className="check-allday" style={{ marginBottom: '0.5rem' }}>
@@ -126,7 +141,7 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="메모"
+                        placeholder="메모를 입력해주세요."
                         className="form-control"
                         rows="2"
                     />
@@ -145,10 +160,10 @@ const AddEventPopup = ({ isOpen, onClose, onSave }) => {
                         </div>
                     </div>
                     <div>
-                        <label onClick={onClose} className="btn btn-label-primary close-btn" style={{ marginRight: '0.5rem' }}>
+                        <Button variant="secondary" onClick={onClose} style={{ marginRight: '0.5rem' }}>
                             취소
-                        </label>
-                        <Button onClick={handleSave}>
+                        </Button>
+                        <Button variant="primary" onClick={handleSave}>
                             저장
                         </Button>
                     </div>

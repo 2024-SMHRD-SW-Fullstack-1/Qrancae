@@ -4270,7 +4270,7 @@ label {
 }
 
 .form-control:focus {
-  border-color: #3e93ff;
+  border-color: #4574C4;
 }
 
 .form-control-lg,
@@ -5139,7 +5139,7 @@ label.error {
 }
 
 .navbar .navbar-nav .nav-item .nav-link i {
-  font-size: 16px;
+  font-size: 18px;
   vertical-align: middle;
   line-height: 1 !important;
 }
@@ -5191,7 +5191,7 @@ label.error {
 
 .navbar .navbar-nav .notification {
   position: absolute;
-  background-color: #31ce36;
+  background-color: #ffad46;
   text-align: center;
   border-radius: 10px;
   min-width: 17px;
@@ -6328,16 +6328,16 @@ label.error {
 }
 
 .btn-secondary {
-  background: #6861ce !important;
-  border-color: #6861ce !important;
+  background: #4574C4 !important;
+  border-color: #4574C4 !important;
 }
 
 .btn-secondary:disabled,
 .btn-secondary:focus,
 .btn-secondary:hover {
   color: #fff !important;
-  background: #6861ce !important;
-  border-color: #6861ce !important;
+  background: #4574C4 !important;
+  border-color: #4574C4 !important;
 }
 
 .btn-info {
@@ -6546,8 +6546,12 @@ label.error {
 }
 
 .btn-border.btn-primary {
-  /* color: #1D3557 !important; */
+  color: #1D3557 !important;
   border: 1px solid #1D3557 !important;
+}
+
+.btn-border.btn-primary:hover {
+  color: #fff !important;
 }
 
 .btn-border.btn-secondary {
@@ -11094,8 +11098,6 @@ td.destination-data {
   align-items: center;
   border: 1px solid #eee;
   border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
 }
 
 .repair-num {
@@ -11284,7 +11286,6 @@ button.fc-next-button.fc-button.fc-button-primary {
   background: #1D3557 !important;
   color: white !important;
   border: 2px solid #1D3557 !important;
-  padding: 10px 20px !important;
   border-radius: 5px !important;
   font-size: 14px !important;
   font-weight: bold !important;
@@ -11301,7 +11302,6 @@ button.fc-next-button.fc-button.fc-button-primary:hover {
   background-color: transparent !important;
   color: black !important;
   border: 2px solid #1D3557 !important;
-  padding: 10px 20px !important;
   border-radius: 5px !important;
   font-size: 14px !important;
   font-weight: bold !important;
@@ -11311,4 +11311,59 @@ button.fc-next-button.fc-button.fc-button-primary:hover {
   background-color: #1D3557 !important;
   color: white !important;
   border-color: #1D3557 !important;
+}
+
+.project-team {
+  color: #1D3557;
+  font-weight: bold;
+}
+
+button.btn {
+  border-radius: .5rem;
+}
+
+/* 물음표 */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.tooltip-icon {
+  cursor: pointer;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }

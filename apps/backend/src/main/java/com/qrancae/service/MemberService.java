@@ -60,5 +60,10 @@ public class MemberService {
 	public List<User> getUserTypeU() {
 		return userRepository.findUsersByUserType("U");
 	}
+	
+	// 특정 사용자 ID로 User 객체를 찾는 메서드 추가
+    public User findUserByUserId(String userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 
 }

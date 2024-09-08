@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Data
@@ -45,6 +46,7 @@ public class CableApp {
     private String dPortNumber;
     
  // 설치일자 필드 추가 (DB에 저장하지 않고 사용)
+    @Transient
     private LocalDateTime installDate;
 
     // Getter and Setter for installDate

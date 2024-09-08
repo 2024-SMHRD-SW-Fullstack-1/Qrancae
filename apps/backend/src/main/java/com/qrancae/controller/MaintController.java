@@ -2,10 +2,15 @@ package com.qrancae.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -31,75 +36,120 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.qrancae.model.Log;
 import com.qrancae.model.Maint;
 import com.qrancae.model.User;
+import com.qrancae.repository.MaintRepository;
+import com.qrancae.service.CableService;
+import com.qrancae.service.EmailService;
 import com.qrancae.service.MaintService;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class MaintController {
-   
-   @Autowired
-   private MaintService maintService;
-   
-   // 목록 가져오기
-   @GetMapping("/getmaint")
-   public List<Maint> getMaint() {
-      List<Maint> maints = maintService.getMaint();
-      
-      return maints;
-   }
-   // 작업자 가져오기
-   @GetMapping("/maint/getusers")
-   public List<User> getUsers(){
-      return maintService.getAllUsers();
-   }
-   
-   // 확인하기 클릭 시 오늘 날짜로 업데이트
-   @PostMapping("/updatemaint")
-   public ResponseEntity<Void> updateMaint(@RequestParam int maintIdx, @RequestParam String userId) {
-      System.out.println("유지보수 번호:"+maintIdx);
-      //maintService.updateMaint(maintIdx,userId);
-      
-      return ResponseEntity.ok().build();
-   }
-   // 요청한 작업자와 추가 메세지 전달하기
-   @PostMapping("/maint/updateuser")
-   public ResponseEntity<String> updateMaintUser(@RequestBody Map<String, Object> request) {
-      
-      List<Integer> selectedMaints = (List<Integer>) request.get("maintIdxs");
-       String selectedUser = (String) request.get("userId");
-       String alarmMsg = (String) request.get("alarmMsg");
-       
-      if (selectedMaints == null || selectedMaints.isEmpty()) {
-       return ResponseEntity.status(400).body("유효하지 않은 maintIdxs 파라미터");
-      }
-      
-      if (selectedUser == null || selectedUser.isEmpty()) {
-           return ResponseEntity.status(400).body("유효하지 않은 userId 파라미터");
-       }
-      
-      System.out.println("추가 메세지 : " + alarmMsg);
-       try {
-           maintService.updateMaintUser(selectedMaints, selectedUser,alarmMsg);
-           return ResponseEntity.ok("작업자 할당 성공");
-       } catch (Exception e) {
-          return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
-       }
-   }
-   
-// 보고서 다운로드
+
+	@Autowired
+	private MaintService maintService;
+
+	@Autowired
+	private CableService cableService;
+
+	@Autowired
+	private EmailService emailService;
+
+	// 목록 가져오기
+	@GetMapping("/getmaint")
+	public List<Maint> getMaint() {
+		List<Maint> maints = maintService.getMaint();
+
+		return maints;
+	}
+	// 불량인 목록 가져오기
+	@GetMapping("/getmaintreq")
+	public List<Maint> getMaintReq(){
+		List<Maint> maints = maintService.getMaintReq();
+		return maints;
+	}
+
+	// 작업자 가져오기
+	@GetMapping("/maint/getusers")
+	public List<User> getUsers() {
+		return maintService.getAllUsers();
+	}
+
+	// 확인하기 클릭 시 오늘 날짜로 업데이트
+	@PostMapping("/updatemaint")
+	public ResponseEntity<Void> updateMaint(@RequestParam int maintIdx, @RequestParam String userId) {
+		System.out.println("유지보수 번호:" + maintIdx);
+		// maintService.updateMaint(maintIdx,userId);
+
+		return ResponseEntity.ok().build();
+	}
+
+	// 요청한 작업자와 추가 메세지 전달하기
+	@PostMapping("/maint/updateuser")
+	public ResponseEntity<String> updateMaintUser(@RequestBody Map<String, Object> request) {
+
+		List<Integer> selectedMaints = (List<Integer>) request.get("maintIdxs");
+		String selectedUser = (String) request.get("userId");
+		String alarmMsg = (String) request.get("alarmMsg");
+
+		if (selectedMaints == null || selectedMaints.isEmpty()) {
+			return ResponseEntity.status(400).body("유효하지 않은 maintIdxs 파라미터");
+		}
+
+		if (selectedUser == null || selectedUser.isEmpty()) {
+			return ResponseEntity.status(400).body("유효하지 않은 userId 파라미터");
+		}
+
+		System.out.println("추가 메세지 : " + alarmMsg);
+		try {
+			maintService.updateMaintUser(selectedMaints, selectedUser, alarmMsg);
+			
+			// 이메일 보내기
+			if (alarmMsg != null || !alarmMsg.isEmpty()) {
+				String to = "kyshs45@naver.com";
+				String subject = "";
+				String text = "<h1>메일 내용</h1><p>이것은 테스트 메일입니다.<p>";
+				
+				try {
+					emailService.sendEmail(to, subject, text);
+					System.out.println("Email sent successfully!");
+				} catch (MessagingException e) {
+					e.printStackTrace();
+					System.out.println("Failed to send email.");
+				}
+			}
+			
+			return ResponseEntity.ok("작업자 할당 성공");
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body("작업자 할당 오류: " + e.getMessage());
+		}
+		
+		
+
+	}
+
+	// 알림 내역 가져오기
+	@GetMapping("/maint/msg")
+	public List<Maint> getMaintMsg() {
+		List<Maint> maints = maintService.getMaintMsg();
+
+		return maints;
+	}
+
+	// 보고서 다운로드
 	@GetMapping("/reportMaint")
 	public void reportMain(HttpServletResponse response) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
 
 		// 날짜 포맷 설정
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd(EEE)");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 (EEE)", java.util.Locale.KOREAN);
 
 		// 보고서 시트 작성
 		Sheet reportSheet = workbook.createSheet("요약");
@@ -136,6 +186,7 @@ public class MaintController {
 		dataCellStyle.setBorderTop(BorderStyle.THIN);
 		dataCellStyle.setAlignment(HorizontalAlignment.CENTER);
 		dataCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+		dataCellStyle.setWrapText(true);
 
 		// 현황 요약
 		int rowNum = 0;
@@ -168,244 +219,140 @@ public class MaintController {
 		reportSheet.createRow(rowNum++);
 		reportSheet.createRow(rowNum++);
 
-		// 점검 현황 (오늘)
-		/*
-		 * Row statusTitleRow = reportSheet.createRow(rowNum++); String statusTitle =
-		 * "케이블 점검 현황 "; Cell statusTitleCell = statusTitleRow.createCell(0);
-		 * statusTitleCell.setCellValue(statusTitle);
-		 * statusTitleCell.setCellStyle(titleCellStyle);
-		 * statusTitleRow.setHeightInPoints(30);
-		 * 
-		 * String statusSubtitle = LocalDate.now().format(dateFormatter); Cell
-		 * statusSubtitleCell = statusTitleRow.createCell(1);
-		 * statusSubtitleCell.setCellValue(statusSubtitle);
-		 * 
-		 * String[] statusHeaders = { "신규 점검", "진행 중인 점검", "완료된 점검", "총 점검" }; Row
-		 * statusHeaderMergeRow = reportSheet.createRow(rowNum++);
-		 * statusHeaderMergeRow.setHeightInPoints(22);
-		 * 
-		 * Cell statusMergeCell1 = statusHeaderMergeRow.createCell(0);
-		 * statusMergeCell1.setCellValue("점검 현황");
-		 * statusMergeCell1.setCellStyle(headerCellStyle);
-		 * reportSheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0,
-		 * 3)); // 0 - 3 컬럼 병합 CellRangeAddress statusMergedRegion1 = new
-		 * CellRangeAddress(rowNum - 1, rowNum - 1, 0, 3); setCellBorders(reportSheet,
-		 * statusMergedRegion1, headerCellStyle);
-		 * 
-		 * Row statusHeaderRow = reportSheet.createRow(rowNum++);
-		 * statusHeaderRow.setHeightInPoints(22);
-		 * 
-		 * for (int i = 0; i < statusHeaders.length; i++) { Cell cell =
-		 * statusHeaderRow.createCell(i); cell.setCellValue(statusHeaders[i]);
-		 * cell.setCellStyle(headerCellStyle); }
-		 * 
-		 * Cell statusMergeCell2 = statusHeaderMergeRow.createCell(4);
-		 * statusMergeCell2.setCellValue("점검을 수행한 작업자");
-		 * statusMergeCell2.setCellStyle(headerCellStyle);
-		 * reportSheet.addMergedRegion(new CellRangeAddress(rowNum - 2, rowNum - 1, 4,
-		 * 4)); // rowNum부터 rowNum + 1까지의 행을 4번 열로 병합 CellRangeAddress
-		 * statusMergedRegion2 = new CellRangeAddress(rowNum - 2, rowNum - 1, 4, 4);
-		 * setCellBorders(reportSheet, statusMergedRegion2, headerCellStyle);
-		 * 
-		 * int newRepairCnt = maintService.cntNewRepair(); // 신규 점검 int
-		 * inProgressRepairCnt = maintService.cntInProgressRepair(); // 진행 중인 점검 int
-		 * completeRepairCnt = maintService.cntCompleteRepair(); // 완료된 점검 int
-		 * sumRepairCnt = newRepairCnt + inProgressRepairCnt + completeRepairCnt; // 총
-		 * 점검 int completeUserCnt = maintService.cntCompleteUser(); // 점검을 수행한 작업자 int[]
-		 * statusData = {newRepairCnt, inProgressRepairCnt, completeRepairCnt,
-		 * sumRepairCnt, completeUserCnt};
-		 * 
-		 * Row statusDataRow = reportSheet.createRow(rowNum++);
-		 * statusDataRow.setHeightInPoints(22);
-		 * 
-		 * for (int i = 0; i < statusData.length; i++) { Cell cell =
-		 * statusDataRow.createCell(i); cell.setCellValue(statusData[i]);
-		 * cell.setCellStyle(dataCellStyle); }
-		 * 
-		 * reportSheet.createRow(rowNum++); reportSheet.createRow(rowNum++);
-		 * 
-		 * // 점검 예정이 없는 케이블 Row noInspectionTitleRow = reportSheet.createRow(rowNum++);
-		 * String noInspectionTitle = "점검 예정이 없는 케이블"; Cell noInspectionTitleCell =
-		 * noInspectionTitleRow.createCell(0);
-		 * noInspectionTitleCell.setCellValue(noInspectionTitle);
-		 * noInspectionTitleCell.setCellStyle(titleCellStyle);
-		 * noInspectionTitleRow.setHeightInPoints(30);
-		 * 
-		 * LocalDate today = LocalDate.now(); DateTimeFormatter yearMonthFormatter =
-		 * DateTimeFormatter.ofPattern("yyyy년 M월"); String formattedYearMonth =
-		 * today.format(yearMonthFormatter); Cell noInspectionSubtitleCell =
-		 * noInspectionTitleRow.createCell(1);
-		 * noInspectionSubtitleCell.setCellValue(formattedYearMonth);
-		 * 
-		 * String[] noInspectionHeaders = {"점검 예정이 없는 케이블", "점검된 케이블", "점검 완료 비율"};
-		 * 
-		 * Row noInspectionHeaderMergeRow = reportSheet.createRow(rowNum++);
-		 * noInspectionHeaderMergeRow.setHeightInPoints(22);
-		 * 
-		 * Cell noInspectionMergeCell1 = noInspectionHeaderMergeRow.createCell(0);
-		 * noInspectionMergeCell1.setCellValue("케이블 현황");
-		 * noInspectionMergeCell1.setCellStyle(headerCellStyle);
-		 * reportSheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0,
-		 * 2)); // 0 - 2 컬럼 병합 CellRangeAddress noInspectionMergedRegion1 = new
-		 * CellRangeAddress(rowNum - 1, rowNum - 1, 0, 2); setCellBorders(reportSheet,
-		 * noInspectionMergedRegion1, headerCellStyle);
-		 * 
-		 * Row noInspectionHeaderRow = reportSheet.createRow(rowNum++);
-		 * noInspectionHeaderRow.setHeightInPoints(22);
-		 * 
-		 * for (int i = 0; i < noInspectionHeaders.length; i++) { Cell cell =
-		 * noInspectionHeaderRow.createCell(i);
-		 * cell.setCellValue(noInspectionHeaders[i]);
-		 * cell.setCellStyle(headerCellStyle); }
-		 * 
-		 * Cell noInspectionMergeCell2 = noInspectionHeaderMergeRow.createCell(3);
-		 * noInspectionMergeCell2.setCellValue("점검을 수행한 작업자");
-		 * noInspectionMergeCell2.setCellStyle(headerCellStyle);
-		 * reportSheet.addMergedRegion(new CellRangeAddress(rowNum - 2, rowNum - 1, 3,
-		 * 3)); // rowNum부터 rowNum + 1까지의 행을 3번 열로 병합 CellRangeAddress
-		 * noInspectionMergedRegion2 = new CellRangeAddress(rowNum - 2, rowNum - 1, 3,
-		 * 3); setCellBorders(reportSheet, noInspectionMergedRegion2, headerCellStyle);
-		 * 
-		 * int allCableCnt = cableService.count(); // 전체 케이블의 수 int allInspectCableCnt =
-		 * maintService.countMaintThisMonth(); // 이번달 전체 유지보수 수 int inspectCableCnt =
-		 * maintService.countCablesCompletedThisMonth(); // 이번달 점검된 케이블 double
-		 * completionRate = (allCableCnt > 0) ? (double) inspectCableCnt /
-		 * allInspectCableCnt * 100 : 0; // 점검 완료 비율 계산 String formattedCompletionRate =
-		 * String.format("%.1f%%", completionRate); // 소수점 한 자리까지 포맷팅 int
-		 * insepctCompleteUserCnt =
-		 * maintService.countDistinctMaintUserIdsForCompletedMaintenanceThisMonth(); //
-		 * 이달의 점검을 수행한 작업자
-		 * 
-		 * Object[] noInspectionData = {allCableCnt-inspectCableCnt, inspectCableCnt,
-		 * formattedCompletionRate, insepctCompleteUserCnt};
-		 * 
-		 * Row noInspectionDataRow = reportSheet.createRow(rowNum++);
-		 * noInspectionDataRow.setHeightInPoints(22);
-		 * 
-		 * for (int i = 0; i < noInspectionData.length; i++) { Cell cell =
-		 * noInspectionDataRow.createCell(i); if (noInspectionData[i] instanceof
-		 * Integer) { cell.setCellValue((Integer) noInspectionData[i]); } else if
-		 * (noInspectionData[i] instanceof Double) { cell.setCellValue((Double)
-		 * noInspectionData[i]); } else if (noInspectionData[i] instanceof String) {
-		 * cell.setCellValue((String) noInspectionData[i]); }
-		 * cell.setCellStyle(dataCellStyle); }
-		 * 
-		 * reportSheet.createRow(rowNum++); reportSheet.createRow(rowNum++);
-		 * 
-		 * // 사용자별 점검 현황 시트 작성 Sheet userDetailSheet = workbook.createSheet("작업자 상세");
-		 * 
-		 * int rowUserNum = 0; Row summaryUserTitleRow =
-		 * userDetailSheet.createRow(rowUserNum++); String summaryUserTitle = "작업자 상세";
-		 * Cell summaryUserTitleCell = summaryUserTitleRow.createCell(0);
-		 * summaryUserTitleCell.setCellValue(summaryUserTitle);
-		 * summaryUserTitleCell.setCellStyle(titleCellStyle);
-		 * summaryUserTitleRow.setHeightInPoints(30);
-		 * 
-		 * Row summaryUserHeaderRow = userDetailSheet.createRow(rowUserNum++);
-		 * summaryUserHeaderRow.setHeightInPoints(22); String[] summaryUserHeaders = {
-		 * "점검표", "점검 빈도", "대상 시설", "날짜" }; String[] summaryUserValues = { "케이블 점검",
-		 * "매일마다 | 1회", "서버실 전체", LocalDate.now().format(dateFormatter) };
-		 * 
-		 * for (int i = 0; i < summaryUserHeaders.length; i++) { Cell cell =
-		 * summaryUserHeaderRow.createCell(i); cell.setCellValue(summaryUserHeaders[i]);
-		 * cell.setCellStyle(headerCellStyle); }
-		 * 
-		 * Row summaryUserDataRow = userDetailSheet.createRow(rowUserNum++);
-		 * summaryUserDataRow.setHeightInPoints(22); for (int i = 0; i <
-		 * summaryUserValues.length; i++) { Cell cell =
-		 * summaryUserDataRow.createCell(i); cell.setCellValue(summaryUserValues[i]);
-		 * cell.setCellStyle(dataCellStyle); }
-		 * 
-		 * userDetailSheet.createRow(rowUserNum++);
-		 * userDetailSheet.createRow(rowUserNum++);
-		 * 
-		 * // 작업자별 점검 현황 Row userTitleRow = userDetailSheet.createRow(rowUserNum++);
-		 * String userTitle = "작업자별 점검 현황"; Cell userTitleCell =
-		 * userTitleRow.createCell(0); userTitleCell.setCellValue(userTitle);
-		 * userTitleCell.setCellStyle(titleCellStyle);
-		 * userTitleRow.setHeightInPoints(30);
-		 * 
-		 * Cell userSubtitleCell = userTitleRow.createCell(1);
-		 * userSubtitleCell.setCellValue(formattedYearMonth);
-		 * 
-		 * List<User> userList = memberService.getUserTypeU(); for(User user: userList)
-		 * { String[] userHeaders = { "작업자명", "총 점검", "상세", "점검 완료"}; Row userHeaderRow
-		 * = userDetailSheet.createRow(rowUserNum++);
-		 * userHeaderRow.setHeightInPoints(22);
-		 * 
-		 * for (int i=0; i<userHeaders.length; i++) { Cell userHeaderCell =
-		 * userHeaderRow.createCell(i); userHeaderCell.setCellValue(userHeaders[i]);
-		 * userHeaderCell.setCellStyle(headerCellStyle); }
-		 * 
-		 * int userNewRepair = maintService.userRepairThisMonth(user.getUser_id(),
-		 * "신규접수"); int userInProgressRepair =
-		 * maintService.userRepairThisMonth(user.getUser_id(), "진행중"); int
-		 * userCompleteRepair = maintService.userRepairThisMonth(user.getUser_id(),
-		 * "보수완료"); int sum = userNewRepair + userInProgressRepair + userCompleteRepair;
-		 * 
-		 * // 첫 번째 데이터 행 Row firstDataRow = userDetailSheet.createRow(rowUserNum++);
-		 * firstDataRow.setHeightInPoints(22);
-		 * 
-		 * Cell workerNameCell = firstDataRow.createCell(0); // 관리자명
-		 * workerNameCell.setCellValue(user.getUser_name()+" ("+user.getUser_id()+")");
-		 * workerNameCell.setCellStyle(dataCellStyle);
-		 * 
-		 * Cell totalInspectCell = firstDataRow.createCell(1);
-		 * totalInspectCell.setCellValue(sum);
-		 * totalInspectCell.setCellStyle(dataCellStyle);
-		 * 
-		 * Cell detailNewCell = firstDataRow.createCell(2);
-		 * detailNewCell.setCellValue("신규 접수");
-		 * detailNewCell.setCellStyle(dataCellStyle);
-		 * 
-		 * Cell cntNewCell = firstDataRow.createCell(3);
-		 * cntNewCell.setCellValue(userNewRepair);
-		 * cntNewCell.setCellStyle(dataCellStyle);
-		 * 
-		 * // 두 번째 데이터 행 Row secondDataRow = userDetailSheet.createRow(rowUserNum++);
-		 * secondDataRow.setHeightInPoints(22);
-		 * 
-		 * Cell detailInProgressCell = secondDataRow.createCell(2);
-		 * detailInProgressCell.setCellValue("진행 중");
-		 * detailInProgressCell.setCellStyle(dataCellStyle);
-		 * 
-		 * Cell cntInProgressCell = secondDataRow.createCell(3);
-		 * cntInProgressCell.setCellValue(userInProgressRepair);
-		 * cntInProgressCell.setCellStyle(dataCellStyle);
-		 * 
-		 * // 세 번째 데이터 행 Row thirdDataRow = userDetailSheet.createRow(rowUserNum++);
-		 * thirdDataRow.setHeightInPoints(22);
-		 * 
-		 * Cell detailCompleteCell = thirdDataRow.createCell(2);
-		 * detailCompleteCell.setCellValue("보수 완료");
-		 * detailCompleteCell.setCellStyle(dataCellStyle);
-		 * 
-		 * Cell cntCompleteCell = thirdDataRow.createCell(3);
-		 * cntCompleteCell.setCellValue(userCompleteRepair);
-		 * cntCompleteCell.setCellStyle(dataCellStyle);
-		 * 
-		 * // 셀 병합 userDetailSheet.addMergedRegion(new CellRangeAddress(rowUserNum - 3,
-		 * rowUserNum - 1, 0, 0)); CellRangeAddress region1 = new
-		 * CellRangeAddress(rowUserNum - 3, rowUserNum - 1, 0, 0);
-		 * setCellBorders(userDetailSheet, region1, headerCellStyle);
-		 * 
-		 * userDetailSheet.addMergedRegion(new CellRangeAddress(rowUserNum - 3,
-		 * rowUserNum - 1, 1, 1)); CellRangeAddress region2 = new
-		 * CellRangeAddress(rowUserNum - 3, rowUserNum - 1, 1, 1);
-		 * setCellBorders(userDetailSheet, region2, headerCellStyle);
-		 * 
-		 * userDetailSheet.createRow(rowUserNum++);
-		 * userDetailSheet.createRow(rowUserNum++); }
-		 * 
-		 * // 점검 상세 시트 <- 나중에 추가 고려
-		 */
-		// 시트의 모든 열 너비를 174로 설정
-		int[] sheetIndices = { 0 }; // 0 - 요약 시트, 1 - 케이블별 점검 현황 시트
+		// 상태별 요청 개수
+		Row statusTitleRow = reportSheet.createRow(rowNum++);
+		String statusTitle = "상태별 요청 개수";
+		Cell statusTitleCell = statusTitleRow.createCell(0);
+		statusTitleCell.setCellValue(statusTitle);
+		statusTitleCell.setCellStyle(titleCellStyle);
+		statusTitleRow.setHeightInPoints(30);
+
+		Cell statusSubtitleCell = statusTitleRow.createCell(1);
+		statusSubtitleCell.setCellValue(LocalDate.now().format(dateFormatter));
+
+		Row statusHeaderRow = reportSheet.createRow(rowNum++);
+		statusHeaderRow.setHeightInPoints(22);
+
+		String[] statusHeaders = { "신규 접수", "진행 중", "보수 완료" };
+		for (int i = 0; i < statusHeaders.length; i++) {
+			Cell cell = statusHeaderRow.createCell(i);
+			cell.setCellValue(statusHeaders[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
+
+		Row statusDataRow = reportSheet.createRow(rowNum++);
+		statusDataRow.setHeightInPoints(22);
+
+		int cntNewRepair = maintService.cntNewRepair();
+		int cntInProgressRepair = maintService.cntInProgressRepair();
+		int cntCompleteRepair = maintService.cntCompleteRepair();
+		int[] statusValues = { cntNewRepair, cntInProgressRepair, cntCompleteRepair };
+
+		for (int i = 0; i < statusValues.length; i++) {
+			Cell cell = statusDataRow.createCell(i);
+			cell.setCellValue(statusValues[i]);
+			cell.setCellStyle(dataCellStyle);
+		}
+
+		// 주간 불량률
+		Row weekTitleRow = reportSheet.createRow(rowNum++);
+		String weekTitle = "주간 불량 현황";
+		Cell weekTitleCell = weekTitleRow.createCell(0);
+		weekTitleCell.setCellValue(weekTitle);
+		weekTitleCell.setCellStyle(titleCellStyle);
+		weekTitleRow.setHeightInPoints(30);
+
+		String week = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).format(dateFormatter)
+				+ " ~ " + LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).format(dateFormatter);
+		Cell weekSubtitleCell = weekTitleRow.createCell(1);
+		weekSubtitleCell.setCellValue(week);
+
+		Row weekHeaderRow = reportSheet.createRow(rowNum++);
+		weekHeaderRow.setHeightInPoints(22);
+
+		String[] weekHeaders = { "QR 불량", "케이블 불량", "전원 공급 불량" };
+		for (int i = 0; i < weekHeaders.length; i++) {
+			Cell cell = weekHeaderRow.createCell(i);
+			cell.setCellValue(weekHeaders[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
+
+		Row weekDataRow = reportSheet.createRow(rowNum++);
+		weekDataRow.setHeightInPoints(22);
+
+		int cntQrDefect = maintService.cntQrDefect();
+		int cntCableDefect = maintService.cntCableDefect();
+		int cntPowerDefect = maintService.cntPowerDefect();
+
+		System.out.println("불량 개수" + cntQrDefect + cntCableDefect + cntPowerDefect);
+
+		String[] weekValues = { cntQrDefect + "개", cntCableDefect + "개", cntPowerDefect + "개" };
+
+		for (int i = 0; i < weekValues.length; i++) {
+			Cell cell = weekDataRow.createCell(i);
+			cell.setCellValue(weekValues[i]);
+			cell.setCellStyle(dataCellStyle);
+		}
+
+		// 오늘의 유지보수 시트
+		Sheet todayMaintSheet = workbook.createSheet("유지보수 상세");
+
+		int rowTodayNum = 0;
+		Row todayMaintTitleRow = todayMaintSheet.createRow(rowTodayNum++);
+		String todayMaintTitle = "유지보수 내역";
+
+		Cell todayMaintTitleCell = todayMaintTitleRow.createCell(0);
+		todayMaintTitleCell.setCellValue(todayMaintTitle);
+		todayMaintTitleCell.setCellStyle(titleCellStyle);
+		todayMaintTitleRow.setHeightInPoints(30);
+
+		Cell todayMaintSubtitleCell = todayMaintTitleRow.createCell(1);
+		todayMaintSubtitleCell.setCellValue(LocalDate.now().format(dateFormatter));
+
+		Row todayMaintHeaderRow = todayMaintSheet.createRow(rowTodayNum++);
+		todayMaintHeaderRow.setHeightInPoints(22);
+		String[] todayMaintHeaders = { "작업자", "케이블", "QR 상태", "케이블 상태", "전원 공급 상태", "상태" };
+
+		for (int i = 0; i < todayMaintHeaders.length; i++) {
+			Cell cell = todayMaintHeaderRow.createCell(i);
+			cell.setCellValue(todayMaintHeaders[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
+
+		List<Maint> maintList = maintService.todayMaintList();
+
+		for (Maint maint : maintList) {
+			Row todayDataRow = todayMaintSheet.createRow(rowTodayNum++);
+			todayDataRow.setHeightInPoints(22);
+
+			String user = maint.getUser().getUser_name() + " (" + maint.getUser().getUser_id() + ")";
+			String cable = Integer.toString(maint.getCable().getCable_idx());
+			String statusQr = maint.getMaint_qr();
+			String statusCable = maint.getMaint_cable();
+			String statusPower = maint.getMaint_power();
+			String status = maint.getMaint_status();
+			if (maint.getMaint_update() != null) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy년 MM월 dd일 a h시 mm분 ss초", Locale.KOREAN);
+				status += " (" + maint.getMaintUser().getUser_name() + ")";
+				status += "\n" + maint.getMaint_update().format(formatter);
+				todayDataRow.setHeightInPoints(38);
+			}
+
+			String[] todayMaintValues = { user, cable, statusQr, statusCable, statusPower, status };
+
+			for (int i = 0; i < todayMaintValues.length; i++) {
+				Cell cell = todayDataRow.createCell(i);
+				cell.setCellValue(todayMaintValues[i]);
+				cell.setCellStyle(dataCellStyle);
+			}
+		}
+
+		int[] sheetIndices = { 0, 1 };
 		for (int sheetIndex : sheetIndices) {
 			Sheet sheet = workbook.getSheetAt(sheetIndex);
 			int numCols = 8;
 			for (int i = 0; i < numCols; i++) {
-				sheet.setColumnWidth(i, 40 * 256); // 너비를 174로 설정
+				sheet.setColumnWidth(i, 35 * 256);
 			}
 		}
 
@@ -421,22 +368,12 @@ public class MaintController {
 
 		response.getOutputStream().write(excelContent);
 	}
-	
-	// 병합된 셀 스타일
-	private void setCellBorders(Sheet sheet, CellRangeAddress region, CellStyle style) {
-	    for (int i = region.getFirstRow(); i <= region.getLastRow(); i++) {
-	        Row row = sheet.getRow(i);
-	        if (row == null) {
-	            row = sheet.createRow(i);
-	        }
-	        for (int j = region.getFirstColumn(); j <= region.getLastColumn(); j++) {
-	            Cell cell = row.getCell(j);
-	            if (cell == null) {
-	                cell = row.createCell(j);
-	            }
-	            cell.setCellStyle(style);
-	        }
-	    }
+
+	// 특정 사용자(user_id)의 보수 완료 내역 수를 반환하는 API
+	@GetMapping("/api/maint/count/{userId}")
+	public ResponseEntity<Integer> getCompletedMaintenanceCountByUser(@PathVariable String userId) {
+		int completedCount = maintService.countCompletedMaintenanceByUser(userId);
+		return ResponseEntity.ok(completedCount);
 	}
 
 }

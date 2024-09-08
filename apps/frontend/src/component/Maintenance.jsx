@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import DatePicker from "react-datepicker";
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -11,19 +11,25 @@ import { ko } from 'date-fns/locale';
 // 날짜 포맷팅 함수
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleString('ko-KR', {
+  let formattedDate = date.toLocaleString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-  }).replace(',', '');
+  });
+
+  // 연도를 두 자리로 변환
+  const yearTwoDigit = formattedDate.slice(0, 4).slice(-2);
+  formattedDate = formattedDate.replace(/^\d{4}/, yearTwoDigit);
+
+  return formattedDate.replace(',', '');
 };
 
 // 유지보수 작업자 옵션 생성
 const generateUserOptions = (users) => {
-  return users.map(user => (
+  return users.map((user) => (
     <option key={user.user_id} value={user.user_id}>
       {user.user_name} ({user.user_id})
     </option>
@@ -56,14 +62,17 @@ const Maintenance = () => {
 
   useEffect(() => {
     setUsers(
-      [...new Set(maints.map(item => item.user.user_id))]
-        .map(userId => maints.find(item => item.user.user_id === userId).user)
+      [...new Set(maints.map((item) => item.user.user_id))]
+        .map(
+          (userId) => maints.find((item) => item.user.user_id === userId).user
+        )
         .sort((a, b) => a.user_name.localeCompare(b.user_name))
     );
   }, [maints]);
 
   function getData() {
-    axios.get('http://localhost:8089/qrancae/getmaint')
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/getmaint`)
       .then((res) => {
         setMaints(res.data);
         setFilteredData(res.data); // 초기 데이터 설정
@@ -78,7 +87,11 @@ const Maintenance = () => {
       data: filteredData,
       autoWidth: true,
       columns: [
-        { title: '작업자', data: null, render: (data) => `${data.user.user_name} (${data.user.user_id})` },
+        {
+          title: '작업자',
+          data: null,
+          render: (data) => `${data.user.user_name} (${data.user.user_id})`,
+        },
         { title: '케이블', data: 'cable.cable_idx' },
         { title: '랙 위치', data: 'cable.s_rack_location' },
         { title: '랙 번호', data: 'cable.s_rack_number' },
@@ -88,7 +101,7 @@ const Maintenance = () => {
           render: (data) => {
             const color = data === '불량' ? 'red' : 'green';
             return `<span style="color:${color}">${data}</span>`;
-          }
+          },
         },
         {
           title: '케이블 상태',
@@ -96,7 +109,7 @@ const Maintenance = () => {
           render: (data) => {
             const color = data === '불량' ? 'red' : 'green';
             return `<span style="color:${color}">${data}</span>`;
-          }
+          },
         },
         {
           title: '전원 공급 상태',
@@ -104,35 +117,42 @@ const Maintenance = () => {
           render: (data) => {
             const color = data === '불량' ? 'red' : 'green';
             return `<span style="color:${color}">${data}</span>`;
-          }
+          },
         },
-        { title: '날짜', data: 'maint_date', render: data => formatDate(data) },
+        {
+          title: '날짜',
+          data: 'maint_date',
+          render: (data) => formatDate(data),
+        },
         {
           title: '상태',
           data: null,
           render: (data) => {
             const maintUser = data.maintUser;
             const maintUpdate = data.maint_update;
-            const allGood = data.maint_qr === '양호' && data.maint_cable === '양호' && data.maint_power === '양호';
+            const allGood =
+              data.maint_qr === '양호' &&
+              data.maint_cable === '양호' &&
+              data.maint_power === '양호';
 
             if (allGood) {
-              return '정기 점검 완료';
+              return '점검 완료';
             } else if (!maintUser && !maintUpdate) {
               return '접수 대기중';
             } else if (maintUser && !maintUpdate) {
               return `진행중 (${maintUser.user_name})`;
             } else if (maintUser && maintUpdate) {
-              return `${formatDate(maintUpdate)} (${maintUser.user_name}) 완료`;
+              return `완료 (${maintUser.user_name})<br/>${formatDate(maintUpdate)}`;
             }
-          }
-        }
+          },
+        },
       ],
       columnDefs: [
         { targets: 7, width: '15%' }, // 날짜 컬럼 너비 설정
-        { targets: 8, width: '18%' } // 상태 컬럼 너비 설정
+        { targets: 8, width: '18%' }, // 상태 컬럼 너비 설정
       ],
       order: [[7, 'desc']], // 날짜 기준으로 내림차순 정렬
-      destroy: true
+      destroy: true,
     });
 
     setTableInstance(table);
@@ -142,15 +162,19 @@ const Maintenance = () => {
     let filtered = maints;
 
     if (dateRange[0] && dateRange[1]) {
-      const [startDate, endDate] = [new Date(dateRange[0]), new Date(dateRange[1])];
+      const [startDate, endDate] = [
+        new Date(dateRange[0]),
+        new Date(dateRange[1]),
+      ];
       endDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(item => {
+      filtered = filtered.filter((item) => {
         const maintDate = new Date(item.maint_date);
         return maintDate >= startDate && maintDate <= endDate;
       });
     }
 
-    if (selectedUser !== 'All') filtered = filtered.filter(item => item.user.user_id === selectedUser);
+    if (selectedUser !== 'All')
+      filtered = filtered.filter((item) => item.user.user_id === selectedUser);
 
     // 날짜 최신순으로 정렬
     filtered.sort((a, b) => new Date(b.maint_date) - new Date(a.maint_date));
@@ -165,7 +189,7 @@ const Maintenance = () => {
 
   const handleReportDownload = () => {
     axios({
-      url: 'http://localhost:8089/qrancae/reportMaint',
+      url: `${process.env.REACT_APP_API_URL}/reportMaint`,
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
@@ -192,7 +216,7 @@ const Maintenance = () => {
       // 클릭 후 링크 제거
       document.body.removeChild(link);
     });
-  }
+  };
 
   return (
     <div className="wrapper">
@@ -216,37 +240,60 @@ const Maintenance = () => {
                 <div className="card">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <h4 className="card-title">유지보수 내역</h4>
-                    <div className="common-labels" style={{ display: 'flex', alignItems: 'center' }}>
-                      <div style={{ display: 'inline-block', marginRight: '20px' }}>
+                    <div
+                      className="common-labels"
+                      style={{ display: 'flex', alignItems: 'center' }}
+                    >
+                      <div
+                        style={{ display: 'inline-block', marginRight: '20px' }}
+                      >
                         <label style={{ marginRight: '5px' }}>조회 일자</label>
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
-                          onChange={dates => { setDateRange(dates); }}
+                          onChange={(dates) => {
+                            setDateRange(dates);
+                          }}
                           startDate={dateRange[0]}
                           endDate={dateRange[1]}
                           selectsRange
                           dateFormat="yyyy/MM/dd"
                           placeholderText="날짜 범위를 선택하세요."
-                          className='date-picker'
+                          className="date-picker"
                         />
                       </div>
                       <div style={{ display: 'inline-block' }}>
                         <label style={{ marginRight: '5px' }}>작업자</label>
                         <select
                           value={selectedUser}
-                          onChange={e => {
+                          onChange={(e) => {
                             setSelectedUser(e.target.value);
                             filterData();
                           }}
-                          style={{ display: 'inline-block', width: '200px', padding: '5px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
+                          style={{
+                            display: 'inline-block',
+                            width: '200px',
+                            padding: '5px',
+                            fontSize: '14px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                          }}
                         >
                           <option value="All">전체</option>
                           {generateUserOptions(users)}
                         </select>
-                        <label className='btn btn-label-primary btn-round btn-sm' onClick={handleReset} style={{ marginLeft: '10px' }}>선택 초기화</label>
+                        <label
+                          className="btn btn-label-primary btn-round btn-sm"
+                          onClick={handleReset}
+                          style={{ marginLeft: '10px' }}
+                        >
+                          선택 초기화
+                        </label>
                       </div>
-                      <label className="btn btn-label-primary btn-round btn-sm" onClick={handleReportDownload}>
+                      <label
+                        className="btn btn-label-primary btn-round btn-sm"
+                        onClick={handleReportDownload}
+                      >
                         <span className="btn-label">
                           <i className="fas fa-file-excel icon-spacing"></i>
                         </span>

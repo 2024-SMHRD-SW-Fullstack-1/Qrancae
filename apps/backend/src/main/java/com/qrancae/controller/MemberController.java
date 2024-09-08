@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")  // React 개발 서버 주소
+@CrossOrigin(origins = "http://3.37.10.193")  // 배포된 React 서버 주소
 public class MemberController {
 
     @Autowired
@@ -68,6 +68,7 @@ public class MemberController {
         if (existingMember != null) {
             existingMember.setUserPw(updatedMember.getUserPw());
             existingMember.setUserName(updatedMember.getUserName());
+            existingMember.setUserEmail(updatedMember.getUserEmail());
             memberService.updateUser(existingMember);  // updateUser는 기존 save 메소드를 사용할 수 있습니다.
             return ResponseEntity.ok("사용자 정보가 수정되었습니다.");
         } else {

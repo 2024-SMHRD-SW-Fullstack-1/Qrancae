@@ -49,13 +49,10 @@ public class Cable {
 	@Column(name = "d_port_number", length = 50)
 	private String d_port_number;
 
-	@Column(name = "cable_date")
-	private LocalDateTime cable_date;
-	
-	@Column(name = "cable_remove_date")
-	private LocalDateTime cable_remove_date;
-
 	@OneToOne
 	@JoinColumn(name = "cable_idx", referencedColumnName = "cable_idx")
 	private Qr qr;
+	
+	@OneToMany(mappedBy = "cable_idx", cascade = CascadeType.ALL)
+    private List<History> histories;
 }

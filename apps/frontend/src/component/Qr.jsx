@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import ReactToPrint from "react-to-print";
+import ReactToPrint from 'react-to-print';
 import axios from 'axios';
+import ModalPopup from './popups/ModalPopup';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
@@ -17,36 +18,49 @@ const Qr = () => {
   const [modalMessage, setModalMessage] = useState(''); // 모달 메시지
   const [deleteConfirmed, setDeleteConfirmed] = useState(false); // 삭제 확인 여부
   const printRef = useRef(null); // 프린트 참조
-
-
+  const [showNonePopup, setShowNonePopup] = useState(false);
+  // 로딩중인지 확인
+  const [loading, setLoading] = useState(false);
 
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
+    setLoading(true);
     getData();
   }, []);
 
   // 선택된 케이블 ID가 변경될 때 QR 코드 리스트 업데이트
   useEffect(() => {
     console.log('selected', selectedCableIds);
-    axios.post('http://localhost:8089/qrancae/printQr', Array.from(selectedCableIds), {
-      headers: { 'Content-Type': 'application/json' }
-    }).then((res) => {
-      console.log('qr 이미지 리스트', res);
-      setQrList(res.data);
-    });
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/printQr`,
+        Array.from(selectedCableIds),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      .then((res) => {
+        console.log('qr 이미지 리스트', res);
+        setQrList(res.data);
+      });
   }, [selectedCableIds]);
 
   // jsonData가 업데이트될 때 DataTable 초기화
   useEffect(() => {
     if (jsonData.length > 0) {
       initializeDataTable();
+      setLoading(false);
     }
   }, [jsonData]);
 
   // 데이터 가져오기
   const getData = () => {
-    axios.get('http://localhost:8089/qrancae/cablelist')
-      .then((res) => setJsonData(res.data))
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/cablelist`)
+      .then((res) => {
+        console.log('받아온 케이블 리스트', res.data);
+        setJsonData(res.data);
+      })
       .catch((error) => console.error('Error fetching data: ', error));
   };
 
@@ -85,38 +99,49 @@ const Qr = () => {
       ],
       initComplete: function () {
         const updateSelectedCableIds = () => {
-          const ids = $('input.row-select:checked').map(function () {
-            return $(this).data('id');
-          }).get();
+          const ids = $('input.row-select:checked')
+            .map(function () {
+              return $(this).data('id');
+            })
+            .get();
           setSelectedCableIds(new Set(ids));
         };
 
         // '전체 선택' 체크박스 클릭 시
         $('#select-all').on('click', function () {
           const isChecked = this.checked;
-          $('input.row-select', table.rows({ search: 'applied' }).nodes()).prop('checked', isChecked);
+          $('input.row-select', table.rows({ search: 'applied' }).nodes()).prop(
+            'checked',
+            isChecked
+          );
           updateSelectedCableIds();
         });
 
         // 개별 체크박스 변경 시
-        $('#basic-datatables tbody').on('change', 'input.row-select', function () {
-          updateSelectedCableIds();
-        });
+        $('#basic-datatables tbody').on(
+          'change',
+          'input.row-select',
+          function () {
+            updateSelectedCableIds();
+          }
+        );
 
         // 데이터 로드 후 기본적으로 체크박스 선택
         setTimeout(() => {
           $('input.row-select').prop('checked', true);
           updateSelectedCableIds();
-        }, 0)
+        }, 0);
       },
       destroy: true,
     });
 
     // 테이블 그리기 후 선택된 ID 업데이트
     table.on('draw', function () {
-      const ids = $('input.row-select:checked').map(function () {
-        return $(this).data('id');
-      }).get();
+      const ids = $('input.row-select:checked')
+        .map(function () {
+          return $(this).data('id');
+        })
+        .get();
       setSelectedCableIds(new Set(ids));
     });
 
@@ -129,8 +154,7 @@ const Qr = () => {
   // 선택된 항목 삭제 버튼 클릭 핸들러
   const handleDeleteSelected = () => {
     if (selectedCableIds.size === 0) {
-      setModalMessage('케이블을 선택해주세요.');
-      setShowModal(true);
+      setShowNonePopup(true);
       return;
     }
 
@@ -141,15 +165,22 @@ const Qr = () => {
 
   // 삭제 확인 후 서버에 삭제 요청
   const confirmDelete = () => {
-    axios.post('http://localhost:8089/qrancae/deleteQr', Array.from(selectedCableIds), {
-      headers: { 'Content-Type': 'application/json' }
-    }).then((res) => {
-      console.log("선택 삭제", res.data);
-      setShowModal(false);
-      window.location.reload();
-    }).catch((error) => {
-      console.error('Error deleting data: ', error);
-    });
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/deleteQr`,
+        Array.from(selectedCableIds),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      .then((res) => {
+        console.log('선택 삭제', res.data);
+        setShowModal(false);
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('Error deleting data: ', error);
+      });
   };
 
   // 모달 닫기 핸들러
@@ -157,7 +188,7 @@ const Qr = () => {
     setShowModal(false);
   };
 
-  const arrow = "<->"; // 화살표 문자
+  const arrow = '<->'; // 화살표 문자
 
   // 날짜 포맷팅 함수
   const formatDate = (dateString) => {
@@ -165,23 +196,68 @@ const Qr = () => {
     const year = date.getFullYear().toString().slice(-2); // 두 자리 연도
     const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (01, 02, ...)
     const day = String(date.getDate()).padStart(2, '0'); // 일 (01, 02, ...)
-    const hours = String(date.getHours()).padStart(2, '0'); // 시간 (00, 01, ...)
+
+    // 12시간 형식과 AM/PM 구분
+    let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0'); // 분 (00, 01, ...)
+    const ampm = hours >= 12 ? '오후' : '오전'; // 오전/오후 구분
+    hours = hours % 12 || 12; // 12시간 형식으로 변환 (0시는 12시로)
 
     return (
       <>
-        <div>연결 완료</div>
-        <div>({year}.{month}.{day} {hours}시 {minutes}분)</div>
+        {year}.{month}.{day} {ampm} {String(hours).padStart(2, '0')}시 {minutes}
+        분
       </>
     );
   };
 
   const handlePrintComplete = () => {
-    axios.post('http://localhost:8089/qrancae/printComplete', Array.from(selectedCableIds), {
-      headers: { 'Content-Type': 'application/json' }
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/printComplete`,
+        Array.from(selectedCableIds),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+      .then((res) => {
+        console.log('프린트 완료 시 상태 변환', res);
+        window.location.reload();
+      });
+  };
+
+  const closeNonePopup = () => {
+    setShowNonePopup(false);
+  };
+
+  const handleReportDownload = () => {
+    axios({
+      url: `${process.env.REACT_APP_API_URL}/reportCable`,
+      method: 'get',
+      responseType: 'blob',
     }).then((res) => {
-      console.log("프린트 완료 시 상태 변환", res);
-      window.location.reload();
+      // 날짜 포맷
+      const getFormattedDate = () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+
+        return `${year}${month}${day}`;
+      };
+
+      const filename = `cable_history_${getFormattedDate()}.xlsx`;
+
+      // Blob을 사용하여 파일 다운로드 처리
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename); // 파일 이름 지정
+      document.body.appendChild(link);
+      link.click();
+
+      // 클릭 후 링크 제거
+      document.body.removeChild(link);
     });
   };
 
@@ -208,6 +284,22 @@ const Qr = () => {
 
       <div className="main-panel">
         <Header />
+        {loading && (
+          <div className="overlay">
+            <img
+              src="assets/img/spinner.svg"
+              alt="Loading..."
+              className="spinner"
+            />
+          </div>
+        )}
+        {showNonePopup && (
+          <ModalPopup
+            isOpen={showNonePopup}
+            onClose={closeNonePopup}
+            message="케이블을 선택해주세요."
+          />
+        )}
 
         <div className="container">
           <div className="page-inner">
@@ -217,7 +309,10 @@ const Qr = () => {
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <h4 className="card-title">QR 코드 관리 / 케이블 목록</h4>
                     <div className="common-labels">
-                      <label className="btn btn-label-primary btn-round btn-sm" onClick={handleDeleteSelected}>
+                      <label
+                        className="btn btn-label-primary btn-round btn-sm"
+                        onClick={handleDeleteSelected}
+                      >
                         <span className="btn-label">
                           <i className="fas fa-times icon-spacing"></i>
                         </span>
@@ -243,6 +338,21 @@ const Qr = () => {
                         content={() => printRef.current}
                         onAfterPrint={handlePrintComplete}
                       />
+                      <label
+                        className="btn btn-label-primary btn-round btn-sm"
+                        onClick={handleReportDownload}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px',
+                        }}
+                      >
+                        <span className="btn-label">
+                          <i className="fas fa-file-excel icon-spacing"></i>
+                        </span>
+                        보고서 다운로드
+                      </label>
                     </div>
                   </div>
                   <div className="card-body">
@@ -263,10 +373,22 @@ const Qr = () => {
                             </th>
                             <th rowSpan="2">케이블</th>
                             <th colSpan="4">
-                              <i className="fas fa-sign-out-alt" style={{ color: 'red', marginRight: '.5rem' }}></i> 출발점 (Start)
+                              <i
+                                className="fas fa-sign-out-alt"
+                                style={{ color: 'red', marginRight: '.5rem' }}
+                              ></i>{' '}
+                              출발점 (Start)
                             </th>
                             <th colSpan="4">
-                              <i className="fas fa-sign-in-alt" style={{ color: '#1572e8', marginRight: '.5rem' }}></i> 도착점 (End)</th>
+                              <i
+                                className="fas fa-sign-in-alt"
+                                style={{
+                                  color: '#1572e8',
+                                  marginRight: '.5rem',
+                                }}
+                              ></i>{' '}
+                              도착점 (End)
+                            </th>
                             <th rowSpan="2">케이블 연결</th>
                             <th rowSpan="2">출력 상태</th>
                           </tr>
@@ -282,35 +404,108 @@ const Qr = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {jsonData.map((item, index) => (
-                            <tr key={index}>
-                              <td>
-                                <input
-                                  type="checkbox"
-                                  className="row-select"
-                                  defaultChecked={true}
-                                  data-id={item.cable_idx}
-                                />
-                              </td>
-                              <td>{item.cable_idx}</td>
-                              <td>{item.s_rack_number}</td>
-                              <td>{item.s_rack_location}</td>
-                              <td>{item.s_server_name}</td>
-                              <td>{item.s_port_number}</td>
-                              <td>{item.d_rack_number}</td>
-                              <td>{item.d_rack_location}</td>
-                              <td>{item.d_server_name}</td>
-                              <td>{item.d_port_number}</td>
-                              <td>{item.cable_date ? formatDate(item.cable_date) : '-'}</td>
-                              <td>
-                                {item.qr.qr_status !== 'X' ? (
-                                  <span className="badge badge-success">출력</span>
-                                ) : (
-                                  <span className="badge badge-warning">미출력</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
+                          {jsonData.map((item, index) => {
+                            if (item.histories.length === 0) {
+                              return (
+                                <tr key={index}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      className="row-select"
+                                      defaultChecked={true}
+                                      data-id={item.cable_idx}
+                                    />
+                                  </td>
+                                  <td>{item.cable_idx}</td>
+                                  <td>{item.s_rack_number}</td>
+                                  <td>{item.s_rack_location}</td>
+                                  <td>{item.s_server_name}</td>
+                                  <td>{item.s_port_number}</td>
+                                  <td>{item.d_rack_number}</td>
+                                  <td>{item.d_rack_location}</td>
+                                  <td>{item.d_server_name}</td>
+                                  <td>{item.d_port_number}</td>
+                                  <td>-</td>
+                                  <td>
+                                    {item.qr.qr_status !== 'X' ? (
+                                      <span className="badge badge-success">
+                                        출력
+                                      </span>
+                                    ) : (
+                                      <span className="badge badge-warning">
+                                        미출력
+                                      </span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            } else {
+                              const sortedHistories = [...item.histories].sort(
+                                (a, b) => b.history_idx - a.history_idx
+                              );
+                              const latestHistory = sortedHistories[0];
+
+                              return (
+                                <tr key={index}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      className="row-select"
+                                      defaultChecked={true}
+                                      data-id={item.cable_idx}
+                                    />
+                                  </td>
+                                  <td>{item.cable_idx}</td>
+                                  <td>{item.s_rack_number}</td>
+                                  <td>{item.s_rack_location}</td>
+                                  <td>{item.s_server_name}</td>
+                                  <td>{item.s_port_number}</td>
+                                  <td>{item.d_rack_number}</td>
+                                  <td>{item.d_rack_location}</td>
+                                  <td>{item.d_server_name}</td>
+                                  <td>{item.d_port_number}</td>
+                                  <td>
+                                    {latestHistory.remove_date ? (
+                                      <>
+                                        <div style={{ color: 'red' }}>
+                                          제거됨
+                                        </div>
+                                        <div>
+                                          {formatDate(
+                                            latestHistory.remove_date
+                                          )}
+                                        </div>
+                                      </>
+                                    ) : latestHistory.connect_date ? (
+                                      <>
+                                        <div style={{ color: 'green' }}>
+                                          연결 완료
+                                        </div>
+                                        <div>
+                                          {formatDate(
+                                            latestHistory.connect_date
+                                          )}
+                                        </div>
+                                      </>
+                                    ) : (
+                                      '-'
+                                    )}
+                                  </td>
+                                  <td>
+                                    {item.qr.qr_status !== 'X' ? (
+                                      <span className="badge badge-success">
+                                        출력
+                                      </span>
+                                    ) : (
+                                      <span className="badge badge-warning">
+                                        미출력
+                                      </span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            }
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -324,73 +519,121 @@ const Qr = () => {
         <Footer />
 
         {/* QR 코드 인쇄용 콘텐츠 */}
-        <div ref={printRef} style={{ display: 'none' }} className='printable-content col-md-12'>
-          <table className='QR-print-table'>
+        <div
+          ref={printRef}
+          style={{ display: 'none' }}
+          className="printable-content col-md-12"
+        >
+          <table className="QR-print-table">
             {qrList.length > 0 ? (
               qrList.map((item, index) => (
                 <React.Fragment key={index}>
-                  <tbody className='QR-print-body'>
+                  <tbody className="QR-print-body">
                     <tr>
-                      <td rowSpan="2" className='cell-s'>S</td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-s">
+                        S
                       </td>
-                      <td className='cell-start'>
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
+                      </td>
+                      <td className="cell-start">
                         <b>Start</b> {item.source}
                       </td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
                       </td>
-                      <td rowSpan="2" className='cell-arrow'>{arrow}</td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-arrow">
+                        {arrow}
                       </td>
-                      <td className='cell-start'>
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
+                      </td>
+                      <td className="cell-start">
                         <b>Start</b> {item.source}
                       </td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
                       </td>
-                      <td rowSpan="2" className='cell-e'>E</td>
+                      <td rowSpan="2" className="cell-e">
+                        E
+                      </td>
                     </tr>
                     <tr>
-                      <td className='cell-end'>
+                      <td className="cell-end">
                         <b>End</b> {item.destination}
                       </td>
-                      <td className='cell-end'>
+                      <td className="cell-end">
                         <b>End</b> {item.destination}
                       </td>
                     </tr>
                   </tbody>
-                  <tbody className='QR-print-body'>
+                  <tbody className="QR-print-body">
                     <tr>
-                      <td rowSpan="2" className='cell-s'>S</td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-s">
+                        S
                       </td>
-                      <td className='cell-start'>
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
+                      </td>
+                      <td className="cell-start">
                         <b>Start</b> {item.source}
                       </td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
                       </td>
-                      <td rowSpan="2" className='cell-arrow'>{arrow}</td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-arrow">
+                        {arrow}
                       </td>
-                      <td className='cell-start'>
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
+                      </td>
+                      <td className="cell-start">
                         <b>Start</b> {item.source}
                       </td>
-                      <td rowSpan="2" className='cell-img'>
-                        <img className='QR-img' src={`data:image/png;base64,${item.img}`} alt="QR Code" />
+                      <td rowSpan="2" className="cell-img">
+                        <img
+                          className="QR-img"
+                          src={`data:image/png;base64,${item.img}`}
+                          alt="QR Code"
+                        />
                       </td>
-                      <td rowSpan="2" className='cell-e'>E</td>
+                      <td rowSpan="2" className="cell-e">
+                        E
+                      </td>
                     </tr>
                     <tr>
-                      <td className='cell-end'>
+                      <td className="cell-end">
                         <b>End</b> {item.destination}
                       </td>
-                      <td className='cell-end'>
+                      <td className="cell-end">
                         <b>End</b> {item.destination}
                       </td>
                     </tr>

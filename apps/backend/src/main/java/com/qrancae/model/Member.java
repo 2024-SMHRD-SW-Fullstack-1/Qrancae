@@ -22,6 +22,9 @@ public class Member {
 
     @Column(name = "user_name", nullable = false, length = 50)
     private String userName;
+    
+    @Column(name = "user_email", nullable = false, length = 50)
+    private String userEmail;
 
     @Column(name = "joined_at", nullable = false)
     private LocalDateTime joinedAt;
