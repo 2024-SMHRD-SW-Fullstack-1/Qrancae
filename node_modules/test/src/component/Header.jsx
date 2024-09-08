@@ -51,6 +51,10 @@ const Header = () => {
   }, [navigate]);
   // 알림 내역 가져오기
   useEffect(() => {
+    const savedCountMsg = localStorage.getItem('countMsg');
+    if (savedCountMsg) {
+      setCountMsg(parseInt(savedCountMsg, 10));
+    }
     getTodayRepair();
 
     const socket = new SockJS('http://localhost:8089/qrancae/ws');

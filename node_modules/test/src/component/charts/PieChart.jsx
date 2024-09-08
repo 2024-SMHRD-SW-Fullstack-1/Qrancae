@@ -96,7 +96,7 @@ const PieChart = ({ year, month, range }) => {
                 <thead>
                     <tr>
                         <th scope="col">순위</th>
-                        <th scope="col">랙 위치</th>
+                        <th scope="col">랙 번호</th>
                         <th scope="col">불량률</th>
                     </tr>
                 </thead>
