@@ -631,13 +631,13 @@ const Repair = () => {
                                 // 상태 메시지를 배열로 수집
                                 const errorMessages = [];
                                 if (item.maint_qr === '불량') {
-                                    errorMessages.push(<span key="qr">QR 상태( <span style={{ color: 'red' }}>{item.maint_qr}</span> )</span>);
+                                    errorMessages.push(<span key="qr">QR 상태(<span style={{ color: 'red' }}>{item.maint_qr}</span>)</span>);
                                 }
                                 if (item.maint_cable === '불량') {
-                                    errorMessages.push(<span key="cable">케이블 상태( <span style={{ color: 'red' }}>{item.maint_cable}</span> )</span>);
+                                    errorMessages.push(<span key="cable">케이블 상태(<span style={{ color: 'red' }}>{item.maint_cable}</span>)</span>);
                                 }
                                 if (item.maint_power === '불량') {
-                                    errorMessages.push(<span key="power">전원 공급 상태( <span style={{ color: 'red' }}>{item.maint_power}</span> )</span>);
+                                    errorMessages.push(<span key="power">전원 공급 상태(<span style={{ color: 'red' }}>{item.maint_power}</span>)</span>);
                                 }
 
                                 // 상태 메시지들을 쉼표로 구분하여 문자열로 변환

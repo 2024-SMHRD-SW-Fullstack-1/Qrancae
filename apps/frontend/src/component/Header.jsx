@@ -56,7 +56,7 @@ const Header = () => {
       setCountMsg(parseInt(savedCountMsg, 10));
     }
     getTodayRepair();
-
+    // 실시간 알림
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
       webSocketFactory: () => socket,

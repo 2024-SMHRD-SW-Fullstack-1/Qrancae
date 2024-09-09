@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qrancae.model.Log;
@@ -55,10 +56,14 @@ public class LogController {
 	private MemberService memberService;
 
 	@GetMapping("/getlog")
-	public List<Log> getLog() {
+	public List<Log> getLog(@RequestParam(required = false) String startDate,@RequestParam(required = false) String endDate) {
+		
+		// 날짜 파싱
+	    LocalDateTime start = startDate != null ? LocalDateTime.parse(startDate) : null;
+	    LocalDateTime end = endDate != null ? LocalDateTime.parse(endDate) : null;
 
-		List<Log> logs = logService.getLogResult();
-		//System.out.println("로그데이터"+logs.toString());
+		List<Log> logs = logService.getLogResultWithinDateRange(start, end);
+		
 
 		return logs;
 	}
