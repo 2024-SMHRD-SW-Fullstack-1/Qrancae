@@ -14,6 +14,10 @@ const AIButton = () => {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:5000/runMaintenanceAdvisor');
+      
+      // 서버에서 받아온 데이터를 출력해 확인
+      console.log('받아온 데이터:', response.data);
+      
       setRecommendations(response.data);
       setModalIsOpen(true);
     } catch (error) {
