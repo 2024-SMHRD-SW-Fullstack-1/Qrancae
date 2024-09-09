@@ -28,6 +28,7 @@ const Log = () => {
   const [selectedUser, setSelectedUser] = useState('All');
   const [loading, setLoading] = useState(false); // 로딩중인지 확인
 
+  // 데이터 가져오기 (날짜 범위가 변경될 때마다)
   useEffect(() => {
     setLoading(true);
     // 오늘 날짜로 초기 날짜 범위 설정
@@ -35,8 +36,14 @@ const Log = () => {
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));  // 오늘 0시
     const endOfDay = new Date(today.setHours(23, 59, 59, 999));  // 오늘 23시 59분
     setDateRange([startOfDay, endOfDay]);
-    getData();
+    getData([startOfDay, endOfDay]);
   }, []);
+
+  useEffect(() => {
+    if (dateRange[0] && dateRange[1]) {
+      getData(dateRange);
+    }
+  }, [dateRange, selectedUser]);
 
   useEffect(() => {
     const uniqueUsers = [...new Set(logdata.map(item => item.user.user_id))]
@@ -58,12 +65,19 @@ const Log = () => {
 
   }, [filteredData]);
 
+  // 로그 내역 가져오기
   const getData = async () => {
     try {
-      const response = await axios.get('http://localhost:8089/qrancae/api/getlog');
-      setLogdata(response.data);
-      setFilteredData(response.data);
-      setLoading(false);
+      const [startDate, endDate] = dateRange;
+      const response = await axios.get('http://localhost:8089/qrancae/api/getlog', {
+        params: {
+          startDate: startDate ? startDate.toISOString() : null,
+          endDate: endDate ? endDate.toISOString() : null,
+        }
+      });
+      setLogdata(response.data); // 로그 데이터 저장
+      setFilteredData(response.data); // 필터링된 데이터 저장
+      setLoading(false); // 로딩 상태 종료
     } catch (error) {
       console.error('로그 데이터 오류:', error);
     }
