@@ -26,11 +26,9 @@ const Log = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All');
-  const [loading, setLoading] = useState(false); // 로딩중인지 확인
 
   // 데이터 가져오기 (날짜 범위가 변경될 때마다)
   useEffect(() => {
-    setLoading(true);
     // 오늘 날짜로 초기 날짜 범위 설정
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));  // 오늘 0시
@@ -77,7 +75,6 @@ const Log = () => {
       });
       setLogdata(response.data); // 로그 데이터 저장
       setFilteredData(response.data); // 필터링된 데이터 저장
-      setLoading(false); // 로딩 상태 종료
     } catch (error) {
       console.error('로그 데이터 오류:', error);
 
@@ -196,15 +193,6 @@ const Log = () => {
 
       <div className="main-panel">
         <Header />
-        {loading && (
-          <div className="overlay">
-            <img
-              src="assets/img/spinner.svg"
-              alt="Loading..."
-              className="spinner"
-            />
-          </div>
-        )}
 
         <div className="container">
           <div className="page-inner">
