@@ -132,5 +132,9 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	@Query("SELECT COUNT(m) FROM Maint m " + "WHERE m.maintUser.user_id = :userId " + "AND m.maint_status = '보수완료' "
 			+ "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
 	int countCompletedMaintenanceByUserWithDefectiveItems(@Param("userId") String userId);
+	
+	// maintIdxs로 해당 cable_idx 가져오기
+	@Query("SELECT DISTINCT m.cable.cable_idx FROM Maint m WHERE m.maint_idx IN :maintIdxs")
+    List<Integer> findCableIdxsByMaintIdxs(@Param("maintIdxs") List<Integer> maintIdxs);
 
 }

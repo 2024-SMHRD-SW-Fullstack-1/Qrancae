@@ -261,5 +261,10 @@ public class MaintService {
 	public int countCompletedMaintenanceByUser(String userId) {
 		return maintRepository.countCompletedMaintenanceByUserWithDefectiveItems(userId);
 	}
+	
+	// maintIdxs를 기반으로 cable_idx를 조회하고 반환
+	public List<Integer> getCableIdxsByMaintIdxs(List<Integer> maintIdxs) {
+	    return maintRepository.findCableIdxsByMaintIdxs(maintIdxs);
+	}
 
 }

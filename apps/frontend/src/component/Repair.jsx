@@ -8,6 +8,7 @@ import axios from 'axios';
 import ModalPopup from './popups/ModalPopup';
 import { Modal, Button, Form } from 'react-bootstrap';
 import styles from './Login.module.css';
+import Cookies from 'js-cookie';
 
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
@@ -46,6 +47,8 @@ const Repair = () => {
     // 팝업
     const [showNonePopup, setShowNonePopup] = useState(false); // 작업자 선택한게 없을 때
     const [showCompletePopup, setShowCompletePopup] = useState(false); // 유지보수 업데이트 완료
+
+    const userId = Cookies.get('userId');
 
     useEffect(() => {
         getData();
@@ -96,7 +99,7 @@ const Repair = () => {
 
     // 유지 보수 내역 가져오기
     function getData() {
-        axios.get('http://localhost:8089/qrancae/getmaint')
+        axios.get('http://localhost:8089/qrancae/getmaintreq')
             .then((res) => {
                 setMaints(res.data);
             })
@@ -373,38 +376,12 @@ const Repair = () => {
         axios.post('http://localhost:8089/qrancae/maint/updateuser', {
             maintIdxs: selectedMaintIdxs,
             userId: selectedUser,
-            alarmMsg: alarmMsg
+            alarmMsg: alarmMsg,
+            adminId: userId,
         })
             .then(() => {
                 setConfirmModalIsOpen(false); // 최종 확인 모달 닫기
                 setShowCompletePopup(true);
-                // 유지보수 내역 업데이트
-                const updatedData = maints.map(item => {
-                    if (selectedMaintIdxs.includes(item.maint_idx)) {
-                        return { ...item, maintUser: { user_id: selectedUser }, user_note: alarmMsg };
-                    }
-                    return item;
-                });
-                setMaints(updatedData);
-                setRackLocationInfo('');
-                // 점검 현황 케이블 테이블 갱신
-                const filterFaultyMaints = (data) => {
-                    return data.filter(item =>
-                        item.maint_qr === '불량' ||
-                        item.maint_cable === '불량' ||
-                        item.maint_power === '불량'
-                    );
-                };
-                const updatedRepairingData = filterFaultyMaints(updatedData).filter(item => item.maintUser !== null);
-
-                // 테이블 인스턴스가 존재하는 경우
-                if (tableInstance) {
-                    // 비동기적으로 테이블을 새로고침
-                    setTimeout(() => {
-                        tableInstance.repairingTable.clear().rows.add(updatedRepairingData).draw();
-                    }, 100); // 100ms의 지연 후 테이블 갱신
-                }
-
             })
             .catch((err) => {
                 console.log('처리 작업자 선택 오류:', err);
@@ -447,7 +424,7 @@ const Repair = () => {
                     <ModalPopup
                         isOpen={showNonePopup}
                         onClose={closeNonePopup}
-                        message="선택된 작업자가 없습니다."
+                        message="선택된 내역이 없습니다."
                     />
                 )}
                 {showCompletePopup && (
@@ -590,7 +567,7 @@ const Repair = () => {
                                         as="textarea"
                                         value={alarmMsg}
                                         onChange={handleAlarmMsgChange}
-                                        placeholder="추가 요청사항을 입력해주세요"
+                                        placeholder="추가 요청사항을 입력해주세요. 입력 시 메일도 함께 전송됩니다."
                                     />
                                 </Form.Group>
 
@@ -601,13 +578,13 @@ const Repair = () => {
                                             // 상태 메시지를 배열로 수집
                                             const errorMessages = [];
                                             if (item.maint_qr === '불량') {
-                                                errorMessages.push(<span key="qr">QR 상태( <span style={{ color: 'red' }}>{item.maint_qr}</span> )</span>);
+                                                errorMessages.push(<span key="qr">QR 상태(<span style={{ color: 'red' }}>{item.maint_qr}</span>)</span>);
                                             }
                                             if (item.maint_cable === '불량') {
-                                                errorMessages.push(<span key="cable">케이블 상태( <span style={{ color: 'red' }}>{item.maint_cable}</span> )</span>);
+                                                errorMessages.push(<span key="cable">케이블 상태(<span style={{ color: 'red' }}>{item.maint_cable}</span>)</span>);
                                             }
                                             if (item.maint_power === '불량') {
-                                                errorMessages.push(<span key="power">전원 공급 상태( <span style={{ color: 'red' }}>{item.maint_power}</span> )</span>);
+                                                errorMessages.push(<span key="power">전원 공급 상태(<span style={{ color: 'red' }}>{item.maint_power}</span>)</span>);
                                             }
 
                                             // 상태 메시지들을 쉼표로 구분하여 문자열로 변환
@@ -654,13 +631,13 @@ const Repair = () => {
                                 // 상태 메시지를 배열로 수집
                                 const errorMessages = [];
                                 if (item.maint_qr === '불량') {
-                                    errorMessages.push(<span key="qr">QR 상태( <span style={{ color: 'red' }}>{item.maint_qr}</span> )</span>);
+                                    errorMessages.push(<span key="qr">QR 상태(<span style={{ color: 'red' }}>{item.maint_qr}</span>)</span>);
                                 }
                                 if (item.maint_cable === '불량') {
-                                    errorMessages.push(<span key="cable">케이블 상태( <span style={{ color: 'red' }}>{item.maint_cable}</span> )</span>);
+                                    errorMessages.push(<span key="cable">케이블 상태(<span style={{ color: 'red' }}>{item.maint_cable}</span>)</span>);
                                 }
                                 if (item.maint_power === '불량') {
-                                    errorMessages.push(<span key="power">전원 공급 상태( <span style={{ color: 'red' }}>{item.maint_power}</span> )</span>);
+                                    errorMessages.push(<span key="power">전원 공급 상태(<span style={{ color: 'red' }}>{item.maint_power}</span>)</span>);
                                 }
 
                                 // 상태 메시지들을 쉼표로 구분하여 문자열로 변환

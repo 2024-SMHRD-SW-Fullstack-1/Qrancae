@@ -1,6 +1,7 @@
 package com.qrancae.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,11 +25,13 @@ public class LogService {
    public Log findByCable(Cable cable) {
        return logRepository.findByCable(cable);
    }
-   
-   public List<Log> getLogResult(){
-      List<Log> results = logRepository.findAllWithUserAndCable();
-      
-      return results;
+   // 날짜 범위에 맞는 로그내역
+   public List<Log> getLogResultWithinDateRange(LocalDateTime start, LocalDateTime end){
+	   if (start != null && end != null) {
+	        return logRepository.findAllWithUserAndCableWithinDateRange(start, end);
+	    } else {
+	        return logRepository.findAllWithUserAndCable();
+	    }
    }
    
    public Map<String, Integer> getMonthLogCnt(Integer year) {
