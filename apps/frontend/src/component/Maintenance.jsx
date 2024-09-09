@@ -79,8 +79,8 @@ const Maintenance = () => {
 
   function getData(startDate, endDate) {
     // 날짜를 쿼리 파라미터로 추가
-    const start = startDate.toISOString();
-    const end = endDate.toISOString();
+    const start = startDate ? startDate.toISOString() : null;
+    const end = endDate ? endDate.toISOString() : null;
 
     axios.get('http://localhost:8089/qrancae/getmaint', {
       params: { startDate: start, endDate: end }
@@ -183,6 +183,8 @@ const Maintenance = () => {
     setDateRange([null, null]);
     setSelectedUser('All');
     setFilteredData(maints);
+    // 전체 데이터 요청
+    getData(null, null);
   };
 
   const handleReportDownload = () => {
