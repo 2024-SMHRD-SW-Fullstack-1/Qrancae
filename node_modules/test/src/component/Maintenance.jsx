@@ -44,10 +44,8 @@ const Maintenance = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [selectedUser, setSelectedUser] = useState('All');
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false); // 로딩중인지 확인
 
   useEffect(() => {
-    setLoading(true);
     // 오늘 포함 일주일 범위 설정
     const today = new Date();
     const oneWeekAgo = new Date();
@@ -88,7 +86,6 @@ const Maintenance = () => {
       .then((res) => {
         setMaints(res.data);
         setFilteredData(res.data); // 초기 데이터 설정
-        setLoading(false);
       })
       .catch((err) => {
         console.log('maintData 오류:', err);
@@ -232,15 +229,6 @@ const Maintenance = () => {
 
       <div className="main-panel">
         <Header />
-        {loading && (
-          <div className="overlay">
-            <img
-              src="assets/img/spinner.svg"
-              alt="Loading..."
-              className="spinner"
-            />
-          </div>
-        )}
 
         <div className="container">
           <div className="page-inner">
