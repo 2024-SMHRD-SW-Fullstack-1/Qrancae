@@ -80,6 +80,7 @@ const Log = () => {
       setLoading(false); // 로딩 상태 종료
     } catch (error) {
       console.error('로그 데이터 오류:', error);
+
     }
   };
 
