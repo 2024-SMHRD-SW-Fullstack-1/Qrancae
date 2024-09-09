@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAdjusters;
@@ -68,8 +69,15 @@ public class MaintController {
 
 	// 목록 가져오기
 	@GetMapping("/getmaint")
-	public List<Maint> getMaint() {
-		List<Maint> maints = maintService.getMaint();
+	public List<Maint> getMaint(@RequestParam(required = false) String startDate,@RequestParam(required = false) String endDate) {
+		
+		// DateTimeFormatter를 사용하여 날짜 포맷을 명시적으로 지정 (UTC 시간대 포함)
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+	    // null 처리: startDate가 null이면 1년 전, endDate가 null이면 현재 시각으로 설정
+	    LocalDateTime start = (startDate != null) ? OffsetDateTime.parse(startDate, formatter).toLocalDateTime() : LocalDateTime.now().minusMonths(12);
+	    LocalDateTime end = (endDate != null) ? OffsetDateTime.parse(endDate, formatter).toLocalDateTime() : LocalDateTime.now();
+	    
+	    List<Maint> maints = maintService.getMaintWithinDateRange(start, end);
 
 		return maints;
 	}
