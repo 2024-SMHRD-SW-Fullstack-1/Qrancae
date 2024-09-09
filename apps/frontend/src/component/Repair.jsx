@@ -379,31 +379,31 @@ const Repair = () => {
                 setConfirmModalIsOpen(false); // 최종 확인 모달 닫기
                 setShowCompletePopup(true);
                 // 유지보수 내역 업데이트
-                const updatedData = maints.map(item => {
-                    if (selectedMaintIdxs.includes(item.maint_idx)) {
-                        return { ...item, maintUser: { user_id: selectedUser }, user_note: alarmMsg };
-                    }
-                    return item;
-                });
-                setMaints(updatedData);
-                setRackLocationInfo('');
-                // 점검 현황 케이블 테이블 갱신
-                const filterFaultyMaints = (data) => {
-                    return data.filter(item =>
-                        item.maint_qr === '불량' ||
-                        item.maint_cable === '불량' ||
-                        item.maint_power === '불량'
-                    );
-                };
-                const updatedRepairingData = filterFaultyMaints(updatedData).filter(item => item.maintUser !== null);
-
-                // 테이블 인스턴스가 존재하는 경우
-                if (tableInstance) {
-                    // 비동기적으로 테이블을 새로고침
-                    setTimeout(() => {
-                        tableInstance.repairingTable.clear().rows.add(updatedRepairingData).draw();
-                    }, 100); // 100ms의 지연 후 테이블 갱신
-                }
+                /*  const updatedData = maints.map(item => {
+                     if (selectedMaintIdxs.includes(item.maint_idx)) {
+                         return { ...item, maintUser: { user_id: selectedUser }, user_note: alarmMsg };
+                     }
+                     return item;
+                 });
+                 setMaints(updatedData);
+                 setRackLocationInfo('');
+                 // 점검 현황 케이블 테이블 갱신
+                 const filterFaultyMaints = (data) => {
+                     return data.filter(item =>
+                         item.maint_qr === '불량' ||
+                         item.maint_cable === '불량' ||
+                         item.maint_power === '불량'
+                     );
+                 };
+                 const updatedRepairingData = filterFaultyMaints(updatedData).filter(item => item.maintUser !== null);
+ 
+                 // 테이블 인스턴스가 존재하는 경우
+                 if (tableInstance) {
+                     // 비동기적으로 테이블을 새로고침
+                     setTimeout(() => {
+                         tableInstance.repairingTable.clear().rows.add(updatedRepairingData).draw();
+                     }, 100); // 100ms의 지연 후 테이블 갱신
+                 } */
 
             })
             .catch((err) => {
