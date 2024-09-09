@@ -166,6 +166,7 @@ const Header = () => {
       if (newOpen && countMsg > 0) {
 
         setCountMsg(0);
+        setNotifications([]);
         localStorage.setItem('countMsg', '0');
         localStorage.setItem('notifications', JSON.stringify([]));
       }
