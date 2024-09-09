@@ -193,9 +193,6 @@ const Header = () => {
             <button className="btn btn-toggle toggle-sidebar">
               <i className="gg-menu-right"></i>
             </button>
-            <button className="btn btn-toggle sidenav-toggler">
-              <i className="gg-menu-left"></i>
-            </button>
           </div>
           <button className="topbar-toggler more"
             onClick={toggleMenu}
