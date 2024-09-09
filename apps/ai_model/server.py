@@ -23,7 +23,8 @@ def run_maintenance_advisor():
         # 유지보수 추천 생성
         recommendations = []
         for index, row in data_manager.data.iterrows():
-            if predictions[index] == 1 and row['recommend']:  # recommend가 True인 데이터만 추천 리스트에 포함
+            # predictions[index]가 1이고 recommend가 True인 경우에만 추가
+            if row['recommend']: 
                 recommendation = {
                     "cable_idx": row['cable_idx'],
                     "s_rack_number": row['s_rack_number'],
@@ -33,14 +34,12 @@ def run_maintenance_advisor():
                 }
                 recommendations.append(recommendation)
 
-        # 서버에서 제대로 두 개의 추천 항목이 반환되는지 확인
-        print("추천된 케이블 목록:", recommendations)
+        print("추천된 케이블 목록:", recommendations)  # 서버에서 제대로 추천이 생성되는지 확인
 
         # 결과 반환
         return jsonify(recommendations), 200
 
     except Exception as e:
-        # 오류 메시지 출력
         print(f"Error: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 

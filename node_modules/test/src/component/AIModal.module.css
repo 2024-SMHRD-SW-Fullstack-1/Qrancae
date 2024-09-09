@@ -9,10 +9,10 @@
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   max-width: 800px; /* 기존 400px에서 800px로 증가 */
-  width: 80%; /* 화면의 80%로 설정 */
+  width: 33%; /* 화면의 80%로 설정 */
   max-height: 90%; /* 최대 높이를 90%로 설정하여 화면을 넘지 않도록 제한 */
   height: auto; /* 높이를 자동으로 설정 (내용에 따라 크기 조정) */
-  text-align: center;
+  text-align: center; /* 텍스트 왼쪽 정렬 */
   overflow-y: auto; /* 내용이 많을 경우 스크롤 활성화 */
 }
 
@@ -37,8 +37,12 @@
 }
 
 .listItem {
-  margin: 10px 0;
+  display: flex;
+  justify-content: space-between; /* 텍스트와 버튼 사이를 균일하게 배치 */
+  align-items: center; /* 텍스트와 버튼을 동일한 높이에 맞춤 */
+  margin: 10px 0; /* 항목 간의 간격 */
   font-size: 1.2em;
+  width: 100%; /* 리스트 아이템이 모달 너비에 맞게 차지하게 설정 */
 }
 
 .noRecommendation {
@@ -47,23 +51,24 @@
 }
 
 .confirmButton {
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: #28a745; /* 녹색 */
+  margin-left: 20px;
+  padding: 5px 15px;
+  background-color: #1D3557;;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-right: 0; /* 오른쪽 여백 제거 */
 }
 
 .confirmButton:hover {
-  background-color: #218838;
+  background-color: #4574C4;
 }
 
 .closeButton {
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: #dc3545; /* 빨간색 */
+  background-color: #1D3557; /* 빨간색 */
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -71,5 +76,5 @@
 }
 
 .closeButton:hover {
-  background-color: #c82333;
+  background-color: #4574C4;
 }
