@@ -49,7 +49,7 @@ const Maintenance = () => {
     // 오늘 포함 일주일 범위 설정
     const today = new Date();
     const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(today.getDate() - 7);
+    oneWeekAgo.setDate(today.getDate() - 6);
 
     setDateRange([oneWeekAgo, today]);
     getData(oneWeekAgo, today); // 일주일 범위로 데이터 요청
