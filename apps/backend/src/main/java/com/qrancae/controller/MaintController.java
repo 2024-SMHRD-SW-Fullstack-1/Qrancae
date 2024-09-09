@@ -43,6 +43,7 @@ import com.qrancae.repository.MaintRepository;
 import com.qrancae.service.CableService;
 import com.qrancae.service.EmailService;
 import com.qrancae.service.MaintService;
+import com.qrancae.service.MemberService;
 
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -61,6 +62,9 @@ public class MaintController {
 
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private MemberService memberService;
 
 	// 목록 가져오기
 	@GetMapping("/getmaint")
@@ -98,6 +102,7 @@ public class MaintController {
 		List<Integer> selectedMaints = (List<Integer>) request.get("maintIdxs");
 		String selectedUser = (String) request.get("userId");
 		String alarmMsg = (String) request.get("alarmMsg");
+		String adminId = (String) request.get("adminId");
 
 		if (selectedMaints == null || selectedMaints.isEmpty()) {
 			return ResponseEntity.status(400).body("유효하지 않은 maintIdxs 파라미터");
@@ -112,18 +117,52 @@ public class MaintController {
 			maintService.updateMaintUser(selectedMaints, selectedUser, alarmMsg);
 			
 			// 이메일 보내기
-			if (alarmMsg != null || !alarmMsg.isEmpty()) {
-				String to = "kyshs45@naver.com";
-				String subject = "";
-				String text = "<h1>메일 내용</h1><p>이것은 테스트 메일입니다.<p>";
+			if (alarmMsg != null && !alarmMsg.isEmpty()) {
+				List<Integer> cableIdxs = maintService.getCableIdxsByMaintIdxs(selectedMaints);
+		        String cableIdxsStr = cableIdxs.stream()
+		                                        .map(String::valueOf)
+		                                        .collect(Collectors.joining(", "));
+		        String adminName = memberService.getUserNameByAdminId(adminId);
 				
-				try {
-					emailService.sendEmail(to, subject, text);
-					System.out.println("Email sent successfully!");
-				} catch (MessagingException e) {
-					e.printStackTrace();
-					System.out.println("Failed to send email.");
-				}
+			    String to = memberService.getUserEmailById(selectedUser); // 받는 분 이메일
+			    String subject = "[큐랑께] 케이블 점검 지침 사항 안내"; // 제목
+			    String text = "<div style='max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc;'>"
+			            + "<div style='text-align: left; margin-bottom: 20px;'>"
+			            + "<img src='cid:logo' alt='큐랑께 로고' style='width: 120px; margin: 0;' />"
+			            + "<hr style='margin-bottom: 40px;' />"
+			            + "<div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;'>"
+			            + "<div>"
+			            + "<h2 style='margin: 0;'>큐랑께</h2>"
+			            + "<h1 style='margin: 0;'>케이블 <span style='color: #1D3557;'>점검 지침 사항</span> 안내</h1>"
+			            + "</div>"
+			            + "<div>"
+			            + "<img src='cid:adminQr' alt='관리자 이메일' style='width: 100px;' />"
+			            + "</div>"
+			            + "</div>"
+			            + "</div>"
+			            + "<div style='line-height: 1.6;'>"
+			            + "<p>안녕하세요. 큐랑께(QRanCae)입니다.</p>"
+			            + "<p><span style='color: #1D3557; font-weight: bold;'>케이블 " + cableIdxsStr + "</span>에 대한 지침 사항 안내드립니다.</p>"
+			            + "<div style='background-color: #1D3557; color: white; padding: 20px; border-radius: 5px; margin-top: 20px;'>"
+			            + "<p style='text-align: center; margin: 0;'>" + alarmMsg + "</p>"
+			            + "<p style='text-align: right; margin: 10px 0 0 0;'>- <span style='font-weight: bold;'>" + adminName + "</span> 관리자님</p>"
+			            + "</div>"
+			            + "<hr style='margin-top: 40px;' />"
+			            + "<p style='font-size: 10px; text-align: center;'>"
+			            + "본 메일은 공지 목적으로 발송되는 발신 전용 메일입니다. 문의사항은 관리자 메일로 요청 부탁드립니다."
+			            + "</p>"
+			            + "</div>"
+			            + "<div style='text-align: center; font-size: 0.9em; color: #666;'>"
+			            + "<p>Copyright © 큐랑께. All rights reserved.</p>"
+			            + "</div>"
+			            + "</div>";
+			    try {
+			        emailService.sendEmail(to, subject, text);
+			        System.out.println("Email sent successfully!");
+			    } catch (MessagingException e) {
+			        e.printStackTrace();
+			        System.out.println("Failed to send email.");
+			    }
 			}
 			
 			return ResponseEntity.ok("작업자 할당 성공");

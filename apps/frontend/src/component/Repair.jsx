@@ -8,6 +8,7 @@ import axios from 'axios';
 import ModalPopup from './popups/ModalPopup';
 import { Modal, Button, Form } from 'react-bootstrap';
 import styles from './Login.module.css';
+import Cookies from 'js-cookie';
 
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {
@@ -46,6 +47,8 @@ const Repair = () => {
     // 팝업
     const [showNonePopup, setShowNonePopup] = useState(false); // 작업자 선택한게 없을 때
     const [showCompletePopup, setShowCompletePopup] = useState(false); // 유지보수 업데이트 완료
+
+    const userId = Cookies.get('userId');
 
     useEffect(() => {
         getData();
@@ -373,7 +376,8 @@ const Repair = () => {
         axios.post('http://localhost:8089/qrancae/maint/updateuser', {
             maintIdxs: selectedMaintIdxs,
             userId: selectedUser,
-            alarmMsg: alarmMsg
+            alarmMsg: alarmMsg,
+            adminId: userId,
         })
             .then(() => {
                 setConfirmModalIsOpen(false); // 최종 확인 모달 닫기
