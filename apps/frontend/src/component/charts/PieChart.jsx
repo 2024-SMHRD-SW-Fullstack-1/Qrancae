@@ -18,7 +18,7 @@ const PieChart = ({ year, month, range }) => {
 
     // 데이터 가져오기
     axios({
-      url: `${process.env.REACT_APP_API_URL}/defectChart`,
+      url: `${process.env.REACT_APP_API_URL}/api/defectChart`,
       method: 'get',
       params: { year, month, range },
     })

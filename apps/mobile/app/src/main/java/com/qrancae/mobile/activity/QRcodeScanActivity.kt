@@ -10,6 +10,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -75,7 +76,7 @@ class QRCodeScanActivity : AppCompatActivity() {
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             val imageAnalysis = ImageAnalysis.Builder()
-                .setTargetResolution(android.util.Size(1280, 720))
+                .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
@@ -95,15 +96,14 @@ class QRCodeScanActivity : AppCompatActivity() {
     }
 
     private fun calculateBoxRect(): Rect {
-        // PreviewView의 크기를 가져옴
         val previewWidth = fullPreviewView.width
         val previewHeight = fullPreviewView.height
 
         // 중앙 영역의 크기와 위치를 비율로 계산
-        val left = (previewWidth * 0.45).toInt()
-        val top = (previewHeight * 0.30).toInt()
-        val right = (previewWidth * 0.55).toInt()
-        val bottom = (previewHeight * 0.35).toInt()
+        val left = (previewWidth * 0.25).toInt()
+        val top = (previewHeight * 0.25).toInt()
+        val right = (previewWidth * 0.75).toInt()
+        val bottom = (previewHeight * 0.75).toInt()
 
         return Rect(left, top, right, bottom)
     }

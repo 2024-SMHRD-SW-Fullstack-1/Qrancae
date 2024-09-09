@@ -74,7 +74,7 @@ const Maintenance = () => {
 
   function getData() {
     axios
-      .get(`${process.env.REACT_APP_API_URL}/getmaint`)
+      .get(`${process.env.REACT_APP_API_URL}/api/getmaint`)
       .then((res) => {
         setMaints(res.data);
         setFilteredData(res.data); // 초기 데이터 설정
@@ -192,7 +192,7 @@ const Maintenance = () => {
 
   const handleReportDownload = () => {
     axios({
-      url: `${process.env.REACT_APP_API_URL}/reportMaint`,
+      url: `${process.env.REACT_APP_API_URL}/api/reportMaint`,
       method: 'get',
       responseType: 'blob',
     }).then((res) => {

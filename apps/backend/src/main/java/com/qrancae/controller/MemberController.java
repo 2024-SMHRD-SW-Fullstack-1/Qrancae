@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://3.37.10.193")  // 배포된 React 서버 주소
+@CrossOrigin(origins = "https://qrancae.site", allowCredentials = "true")
 public class MemberController {
 
     @Autowired

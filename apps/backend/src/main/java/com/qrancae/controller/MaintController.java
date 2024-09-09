@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qrancae.model.Log;
@@ -50,7 +51,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api") 
+@CrossOrigin(origins = "https://qrancae.site", allowCredentials = "true")
 public class MaintController {
 
 	@Autowired
@@ -370,7 +372,7 @@ public class MaintController {
 	}
 
 	// 특정 사용자(user_id)의 보수 완료 내역 수를 반환하는 API
-	@GetMapping("/api/maint/count/{userId}")
+	@GetMapping("/maint/count/{userId}")
 	public ResponseEntity<Integer> getCompletedMaintenanceCountByUser(@PathVariable String userId) {
 		int completedCount = maintService.countCompletedMaintenanceByUser(userId);
 		return ResponseEntity.ok(completedCount);

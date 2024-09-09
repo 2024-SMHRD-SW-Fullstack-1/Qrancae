@@ -50,7 +50,7 @@ class MaintListActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        recyclerView.addItemDecoration(SpaceItemDecoration(-50)) // 16dp 간격을 추가
+        recyclerView.addItemDecoration(SpaceItemDecoration(-40)) // 16dp 간격을 추가
 
         maintenanceViewModel.maintenanceTasks.observe(this, Observer { tasks ->
             tasks?.let {

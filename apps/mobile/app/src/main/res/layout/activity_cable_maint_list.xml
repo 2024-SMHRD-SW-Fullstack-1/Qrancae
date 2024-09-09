@@ -26,7 +26,6 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
         android:shadowColor="#9E9E9E"
         android:shadowDx="1"
         android:shadowDy="1"
@@ -74,8 +73,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/maint_list_recyclerview"
-        android:layout_width="358dp"
-        android:layout_height="549dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

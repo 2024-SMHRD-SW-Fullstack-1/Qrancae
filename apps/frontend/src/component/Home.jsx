@@ -55,7 +55,7 @@ const Home = () => {
 
   const handleReportDownload = () => {
     axios({
-      url: `${process.env.REACT_APP_API_URL}/reportMain`,
+      url: `${process.env.REACT_APP_API_URL}/api/reportMain`,
       method: 'get',
       responseType: 'blob',
     }).then((res) => {
@@ -86,7 +86,7 @@ const Home = () => {
 
   const getCalendarList = () => {
     axios({
-      url: `${process.env.REACT_APP_API_URL}/calendar`,
+      url: `${process.env.REACT_APP_API_URL}/api/calendar`,
       method: 'post',
     }).then((res) => {
       console.log('캘린더 리스트', res.data);
@@ -118,7 +118,7 @@ const Home = () => {
     console.log(info.event);
 
     axios({
-      url: `${process.env.REACT_APP_API_URL}/findCalendar/${info.event.id}`,
+      url: `${process.env.REACT_APP_API_URL}/api/findCalendar/${info.event.id}`,
       method: 'get',
     }).then((res) => {
       console.log('캘린더 리스트', res.data);
@@ -161,7 +161,7 @@ const Home = () => {
     };
 
     axios({
-      url: `${process.env.REACT_APP_API_URL}/addCalendar`,
+      url: `${process.env.REACT_APP_API_URL}/api/addCalendar`,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ const Home = () => {
     };
 
     axios({
-      url: `${process.env.REACT_APP_API_URL}/updateCalendar`,
+      url: `${process.env.REACT_APP_API_URL}/api/updateCalendar`,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',

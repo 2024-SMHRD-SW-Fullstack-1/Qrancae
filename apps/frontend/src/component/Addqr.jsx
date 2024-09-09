@@ -189,7 +189,7 @@ const Addqr = () => {
 
     setLoading(true);
     axios({
-      url: `${process.env.REACT_APP_API_URL}/registerQr`,
+      url: `${process.env.REACT_APP_API_URL}/api/registerQr`,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',

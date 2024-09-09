@@ -14,6 +14,7 @@ const AdminDetail = () => {
   const [confirmPw, setConfirmPw] = useState('');
   const [userId, setUserId] = useState('');
   const [errors, setErrors] = useState({});
+  const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const AdminDetail = () => {
         const admin = response.data;
         setUserName(admin.userName);
         setUserId(admin.userId); // 아이디는 변경 불가
+        setUserEmail(admin.userEmail);
       })
       .catch((error) => {
         console.error('관리자 정보 가져오기 실패!', error);
@@ -47,6 +49,7 @@ const AdminDetail = () => {
     if (!userPw) newErrors.userPw = '*비밀번호를 입력해주세요.';
     if (userPw !== confirmPw)
       newErrors.confirmPw = '*비밀번호가 일치하지 않습니다.';
+    if (!userEmail) newErrors.userEmail = '*이메일을 입력해주세요.';
 
     setErrors(newErrors);
 
@@ -57,11 +60,12 @@ const AdminDetail = () => {
     const updatedAdminData = {
       userPw: userPw,
       userName: userName,
+      userEmail: userEmail,
     };
 
     axios
       .put(
-        `http://localhost:8089/qrancae/api/users/${userId}`,
+        `${process.env.REACT_APP_API_URL}/api/users/${userId}`,
         updatedAdminData,
         {
           withCredentials: true,
@@ -172,6 +176,26 @@ const AdminDetail = () => {
                       className="form-control"
                       value={confirmPw}
                       onChange={(e) => setConfirmPw(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <label>이메일</label>
+                      {errors.userEmail && (
+                        <div style={{ color: 'red' }}>{errors.userEmail}</div>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
                     />
                   </div>
                   <div style={{ textAlign: 'right', margin: '2rem 1rem' }}>

@@ -53,7 +53,7 @@ const EditEventPopup = ({
 
   const handleDelete = () => {
     axios({
-      url: `${process.env.REACT_APP_API_URL}/deleteCalendar/${event.id}`,
+      url: `${process.env.REACT_APP_API_URL}/api/deleteCalendar/${event.id}`,
       method: 'get',
     }).then(() => {
       getCalendarList();

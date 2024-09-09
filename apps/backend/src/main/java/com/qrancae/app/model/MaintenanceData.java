@@ -44,7 +44,7 @@ public class MaintenanceData {
     @Column(name = "maint_msg",length = 100)
     private String maintMsg;
 
-    @Column(name = "maint_status", nullable = false)
+    @Column(name = "maint_status", nullable = false, length = 20)
     private String maintStatus;
 }
 

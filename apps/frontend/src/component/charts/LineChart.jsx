@@ -18,7 +18,7 @@ const LineChart = ({ year }) => {
 
     // 데이터 가져오기
     axios({
-      url: `${process.env.REACT_APP_API_URL}/logChart/${year}`,
+      url: `${process.env.REACT_APP_API_URL}/api/logChart/${year}`,
       method: 'get',
     })
       .then((res) => {

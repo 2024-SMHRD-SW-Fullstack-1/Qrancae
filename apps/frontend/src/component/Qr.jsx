@@ -33,7 +33,7 @@ const Qr = () => {
     console.log('selected', selectedCableIds);
     axios
       .post(
-        `${process.env.REACT_APP_API_URL}/printQr`,
+        `${process.env.REACT_APP_API_URL}/api/printQr`,
         Array.from(selectedCableIds),
         {
           headers: { 'Content-Type': 'application/json' },
@@ -56,7 +56,7 @@ const Qr = () => {
   // 데이터 가져오기
   const getData = () => {
     axios
-      .get(`${process.env.REACT_APP_API_URL}/cablelist`)
+      .get(`${process.env.REACT_APP_API_URL}/api/cablelist`)
       .then((res) => {
         console.log('받아온 케이블 리스트', res.data);
         setJsonData(res.data);
@@ -167,7 +167,7 @@ const Qr = () => {
   const confirmDelete = () => {
     axios
       .post(
-        `${process.env.REACT_APP_API_URL}/deleteQr`,
+        `${process.env.REACT_APP_API_URL}/api/deleteQr`,
         Array.from(selectedCableIds),
         {
           headers: { 'Content-Type': 'application/json' },
@@ -214,7 +214,7 @@ const Qr = () => {
   const handlePrintComplete = () => {
     axios
       .post(
-        `${process.env.REACT_APP_API_URL}/printComplete`,
+        `${process.env.REACT_APP_API_URL}/api/printComplete`,
         Array.from(selectedCableIds),
         {
           headers: { 'Content-Type': 'application/json' },
@@ -232,7 +232,7 @@ const Qr = () => {
 
   const handleReportDownload = () => {
     axios({
-      url: `${process.env.REACT_APP_API_URL}/reportCable`,
+      url: `${process.env.REACT_APP_API_URL}/api/reportCable`,
       method: 'get',
       responseType: 'blob',
     }).then((res) => {

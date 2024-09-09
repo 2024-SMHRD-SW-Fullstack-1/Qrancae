@@ -58,7 +58,7 @@ const Header = () => {
     }
     getTodayRepair();
 
-    const socket = new SockJS('${process.env.REACT_APP_API_URL}/ws');
+    const socket = new SockJS(`${process.env.REACT_APP_API_URL}/api/ws`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {
@@ -140,7 +140,7 @@ const Header = () => {
 
   const getTodayRepair = () => {
     axios({
-      url: '${process.env.REACT_APP_API_URL}/todayRepair',
+      url: `${process.env.REACT_APP_API_URL}/api/todayRepair`,
       method: 'get',
     }).then((res) => {
       //console.log('오늘의 점검', res.data);

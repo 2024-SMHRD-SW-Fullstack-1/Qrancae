@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.QrancaeMobile" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- 앱의 기본 테마 정의 -->
+    <style name="Theme.QrancaeMobile" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- 여기에 추가적인 테마 속성을 정의할 수 있습니다 -->
+    </style>
+
+
 </resources>
+

@@ -81,15 +81,6 @@ class CableMaintAddActivity : AppCompatActivity() {
         maintIdx = intent.getLongExtra("MAINT_IDX", 0L)
         Log.d(TAG, "MaintIdx: $maintIdx, CreateMaintIdx: ${intent.getBooleanExtra("CREATE_MAINT_IDX", false)}")
 
-//        // 유지보수 인덱스를 확인하고 알림 메시지를 가져오는 로직
-//        if (maintIdx != 0L) {
-//            // 유지보수 항목이 있을 경우 알림 메시지를 가져옴
-//            fetchAlarmMessageForInspection(maintIdx)
-//        } else {
-//            // 알림 메시지를 초기화
-//            clearNotice()
-//        }
-
         // 글자수 업데이트하는 TextWatcher 추가
         editTextMemo.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -106,14 +97,31 @@ class CableMaintAddActivity : AppCompatActivity() {
                 // 텍스트 변경 후 동작을 정의할 필요가 없으므로 비워둡니다.
             }
         })
-        // 버튼 클릭 리스너 설정
+
         btnCable = findViewById(R.id.btn_cable)
         btnPower = findViewById(R.id.btn_power)
         btnQr = findViewById(R.id.btn_qr)
         btnNoIssues = findViewById(R.id.btn_no_issues)
-        editTextMemo = findViewById(R.id.tv_report)
         btnSubmit = findViewById(R.id.btn_submit)
 
+        // 버튼 클릭 리스너 설정
+        ButtonAnimationUtil.applyButtonAnimation(btnCable, this) {
+            toggleButtonState(btnCable)
+        }
+        ButtonAnimationUtil.applyButtonAnimation(btnPower, this) {
+            toggleButtonState(btnPower)
+        }
+        ButtonAnimationUtil.applyButtonAnimation(btnQr, this) {
+            toggleButtonState(btnQr)
+        }
+        ButtonAnimationUtil.applyButtonAnimation(btnNoIssues, this) {
+            toggleNoIssuesState()
+        }
+        editTextMemo = findViewById(R.id.tv_report)
+
+        ButtonAnimationUtil.applyButtonAnimation(btnSubmit, this) {
+            submitMaintenance()
+        }
         btnCable.setOnClickListener { toggleButtonState(btnCable) }
         btnPower.setOnClickListener { toggleButtonState(btnPower) }
         btnQr.setOnClickListener { toggleButtonState(btnQr) }
@@ -121,31 +129,6 @@ class CableMaintAddActivity : AppCompatActivity() {
 
         btnSubmit.setOnClickListener { submitMaintenance() }
     }
-
-//    // 유지보수 상태와 알림 메시지를 가져오는 함수
-//    private fun fetchAlarmMessageForInspection(maintIdx: Long) {
-//        RetrofitClient.apiService.getAlarmByMaintIdx(maintIdx, getUserId())
-//            .enqueue(object : Callback<Map<String, String>> {
-//                override fun onResponse(
-//                    call: Call<Map<String, String>>,
-//                    response: Response<Map<String, String>>
-//                ) {
-//                    if (response.isSuccessful) {
-//                        val message = response.body()?.get("message") ?: "전달 사항이 없습니다."
-//                        tvNotice.text = message // 알림 메시지를 UI에 표시
-//                    } else {
-//                        Log.e(TAG, "Failed to fetch Alarm Message: ${response.errorBody()?.string()}")
-//                        tvNotice.text = "알림 메시지를 가져오지 못했습니다."
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
-//                    Log.e(TAG, "Error in fetching Alarm Message", t)
-//                    tvNotice.text = "알림 메시지를 가져오는 중 오류가 발생했습니다."
-//                }
-//            })
-//    }
-
 
     // 현재 날짜를 텍스트뷰에 설정하는 함수
     @RequiresApi(Build.VERSION_CODES.O)
@@ -158,8 +141,6 @@ class CableMaintAddActivity : AppCompatActivity() {
         // 텍스트뷰에 오늘 날짜를 설정합니다.
         findViewById<TextView>(R.id.tv_date).text = formattedDate
     }
-
-
 
     // 뒤로 가기 메서드
     private fun openback() {
@@ -316,33 +297,6 @@ class CableMaintAddActivity : AppCompatActivity() {
                 }
             })
     }
-
-
-
-//    // 유지보수 인덱스를 가져오고 알림 메시지를 불러오는 함수 추가
-//    private fun fetchMaintIdx() {
-//        val userId = getUserId()  // 사용자의 ID를 가져옴
-//        val cableIdx = getCableIdx()  // 케이블 인덱스를 가져옴
-//
-//        // maintIdx 값을 가져오는 요청
-//        RetrofitClient.apiService.getMaintIdx(userId, cableIdx.toInt(), forceCreate = true)
-//            .enqueue(object : Callback<Map<String, Int>> {
-//                override fun onResponse(call: Call<Map<String, Int>>, response: Response<Map<String, Int>>) {
-//                    if (response.isSuccessful) {
-//                        maintIdx = response.body()?.get("maintIdx")?.toLong() ?: 0L
-//                        Log.d(TAG, "Fetched maintIdx: $maintIdx")
-//                        // maintIdx를 가져온 후 점검 중 알림 메시지 가져오기
-//                        fetchAlarmMessageForInspection(maintIdx)
-//                    } else {
-//                        Log.e(TAG, "Failed to fetch maintIdx")
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<Map<String, Int>>, t: Throwable) {
-//                    Log.e(TAG, "Error fetching maintIdx", t)
-//                }
-//            })
-//    }
 
     // 알림 메시지를 초기화하는 함수
     private fun clearNotice() {

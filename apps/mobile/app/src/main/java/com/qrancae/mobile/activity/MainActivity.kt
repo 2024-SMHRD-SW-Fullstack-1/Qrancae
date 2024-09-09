@@ -51,12 +51,6 @@ class MainActivity : ComponentActivity() {
             openAlarm()
         }
 
-        // 세팅 버튼 클릭 리스너 설정
-        val settingButton: ImageButton = findViewById(R.id.btn_setting)
-        ButtonAnimationUtil.applyButtonAnimation(settingButton, this) {
-            openSetting()
-        }
-
         // 진행 현황 뷰 클릭 리스너 설정
         val maintButton: CardView = findViewById(R.id.progress_card)
         TouchEffectUtil.applyTouchEffect(maintButton) {

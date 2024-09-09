@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -63,7 +64,8 @@ import com.qrancae.service.QrService;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
-@CrossOrigin(origins = "http://3.37.10.193")  // 배포된 React 서버 주소
+@RequestMapping("/api")  
+@CrossOrigin(origins = "https://qrancae.site", allowCredentials = "true")
 public class QrController {
 	@Autowired
 	private CableService cableService;
@@ -131,7 +133,7 @@ public class QrController {
 				//BitMatrix encode = new MultiFormatWriter().encode(Integer.toString(idx), BarcodeFormat.QR_CODE, width, height);
 				
 				// 파일 경로 지정
-				Path savePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
+	            Path savePath = Paths.get("/home/ec2-user/qrImages", "cable" + idx + ".png");  // 경로 수정
 				File directory = savePath.getParent().toFile();
 				if (!directory.exists()) {
 					directory.mkdirs();
@@ -163,7 +165,7 @@ public class QrController {
 		List<PrintQr> qrImgList = new ArrayList<PrintQr>();
 		
 		for(Integer i : cableIdxList) {
-			String img = Base64Codec.makeStringWithFile("src/main/resources/qrImage/cable"+i+".png");		
+	        String img = Base64Codec.makeStringWithFile("/home/ec2-user/qrImages/cable" + i + ".png");  // 경로 수정
 			Cable cable = cableService.getCableByIdx(i);
 			String source = cable.getS_rack_number() + "-"+ cable.getS_rack_location() + "-"+ cable.getS_port_number();
 			String destination = cable.getD_rack_number() + "-"+ cable.getD_rack_location() + "-"+ cable.getD_port_number();
@@ -186,7 +188,7 @@ public class QrController {
 		
 		// 해당 케이블의 QR 코드 이미지 파일 삭제
 	    for (Integer idx : cableIdxList) {
-	        Path imagePath = Paths.get("src/main/resources/qrImage", "cable" + idx + ".png");
+	        Path imagePath = Paths.get("/home/ec2-user/qrImages", "cable" + idx + ".png");  // 경로 수정
 	        try {
 	            Files.deleteIfExists(imagePath);
 	        } catch (IOException e) {

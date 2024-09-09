@@ -8,15 +8,18 @@
     <!-- Background Section -->
 
     <!-- Progress Section -->
+
     <RelativeLayout
         android:id="@+id/header_section"
         android:layout_width="match_parent"
-        android:layout_height="460dp"
+        android:layout_height="0dp"
         android:background="#004E8E"
+        app:layout_constraintBottom_toTopOf="@+id/guideline68"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <!-- Logo and welcome text -->
 
@@ -34,79 +37,72 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="0dp"
-            android:layout_toStartOf="@+id/btn_setting"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="20dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_notifications"
             android:visibility="visible" />
-
-        <ImageButton
-            android:id="@+id/btn_setting"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="20dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_settings" />
 
         <TextView
             android:id="@+id/welcome_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/logo"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="21dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="38dp"
             android:text="안녕하세요\n000님!"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="258dp"
-            android:layout_marginEnd="139dp"
-            android:src="@drawable/image_shadow" />
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="147dp"
-            android:layout_height="145dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="151dp"
-            android:layout_marginEnd="46dp"
-            android:src="@drawable/image_server" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="263dp"
-            android:layout_marginEnd="12dp"
-            android:src="@drawable/image_qrscan" />
 
         <!-- Server image -->
     </RelativeLayout>
 
+    <!-- QR Code Button -->
+
+    <ImageView
+        android:id="@+id/iv_shadow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/image_shadow"
+        app:layout_constraintStart_toEndOf="@id/guideline86"
+        app:layout_constraintTop_toBottomOf="@id/guideline87" />
+
+    <ImageView
+        android:id="@+id/iv_rack"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="11dp"
+        android:src="@drawable/image_server"
+        app:layout_constraintBottom_toBottomOf="@id/guideline67"
+        app:layout_constraintEnd_toStartOf="@id/guideline69"
+        app:layout_constraintStart_toEndOf="@id/guideline84"
+        app:layout_constraintTop_toTopOf="@id/guideline82" />
+
+    <ImageView
+        android:id="@+id/iv_qrscan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:src="@drawable/image_qrscan"
+        app:layout_constraintBottom_toTopOf="@id/guideline67"
+        app:layout_constraintStart_toEndOf="@id/guideline88"
+        app:layout_constraintTop_toBottomOf="@id/guideline87" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/progress_card"
         android:layout_width="0dp"
-        android:layout_height="220dp"
+        android:layout_height="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="-130dp"
         android:layout_marginEnd="20dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline66"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header_section">
@@ -127,11 +123,11 @@
                 android:paddingLeft="10dp"
                 android:text="진행 현황을 확인하세요                                       "
                 android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="18dp"
+                android:textStyle="normal" />
 
             <LinearLayout
-                android:layout_width="258dp"
+                android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:layout_marginTop="20dp"
                 android:orientation="horizontal">
@@ -157,6 +153,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="60dp"
                     android:layout_marginRight="30dp"
+                    android:gravity="left"
                     android:minWidth="60dp"
                     android:text="0건"
                     android:textColor="#000000"
@@ -165,7 +162,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="259dp"
+                android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
@@ -191,6 +188,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="60dp"
                     android:layout_marginRight="30dp"
+                    android:gravity="left"
                     android:minWidth="60dp"
                     android:text="0건"
                     android:textColor="#000000"
@@ -199,7 +197,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="260dp"
+                android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
@@ -225,6 +223,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="60dp"
                     android:layout_marginRight="30dp"
+                    android:gravity="left"
                     android:minWidth="60dp"
                     android:text="0건"
                     android:textColor="#000000"
@@ -234,13 +233,11 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- QR Code Button -->
     <Button
         android:id="@+id/qr_scan_button"
         android:layout_width="320dp"
         android:layout_height="60dp"
         android:layout_marginStart="38dp"
-        android:layout_marginTop="20dp"
         android:layout_marginEnd="38dp"
         android:background="@drawable/rounded_button"
         android:elevation="20dp"
@@ -248,9 +245,10 @@
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/guideline20"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progress_card" />
+        app:layout_constraintTop_toTopOf="@+id/guideline65" />
 
     <TextView
         android:id="@+id/tv_Logout"
@@ -299,6 +297,90 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="149dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline65"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="137dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline66"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7779349" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline67"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="330dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline68"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6506365" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline69"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="305dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline82"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="149dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline83"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="297dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline84"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="160dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline85"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="397dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline86"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="66dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline87"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="263dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline88"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="276dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
