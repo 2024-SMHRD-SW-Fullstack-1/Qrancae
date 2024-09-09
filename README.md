@@ -97,9 +97,9 @@
 ## 👨‍👩‍👦‍👦 팀원 소개
 <table align="center" style="width: 100%; table-layout: fixed;">
   <tr>
-    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/40d57fb9-5c15-4664-bddf-a9fe24f02eb7" width="100" height="100"/></td>
+    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/ed5a2d90-5de1-4f4b-bc7a-33219051e9b0" width="100" height="100"/></td>
     <td align="center" style="width: 25%;"><img src="https://mb.ntdtv.kr/assets/uploads/2019/01/Screen-Shot-2019-01-08-at-4.31.55-PM-e1546932545978.png" width="100" height="100"/></td>
-    <td align="center" style="width: 25%;"><img src="https://mblogthumb-phinf.pstatic.net/20160127_177/krazymouse_1453865104404DjQIi_PNG/%C4%AB%C4%AB%BF%C0%C7%C1%B7%BB%C1%EE_%B6%F3%C0%CC%BE%F0.png?type=w2" width="100" height="100"/></td>
+    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/d3ae628a-f2c2-4fad-9174-7e0772ba0601" width="100" height="100"/></td>
     <td align="center" style="width: 25%;"><img src="https://i.pinimg.com/236x/ed/bb/53/edbb53d4f6dd710431c1140551404af9.jpg" width="100" height="100"/></td>
   </tr>
   <tr>
