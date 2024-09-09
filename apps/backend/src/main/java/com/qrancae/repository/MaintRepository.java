@@ -136,5 +136,9 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	// maintIdxs로 해당 cable_idx 가져오기
 	@Query("SELECT DISTINCT m.cable.cable_idx FROM Maint m WHERE m.maint_idx IN :maintIdxs")
     List<Integer> findCableIdxsByMaintIdxs(@Param("maintIdxs") List<Integer> maintIdxs);
+	
+	// 날짜 범위에 맞는 유지보수 내역
+	@Query("SELECT m FROM Maint m JOIN FETCH m.user u WHERE m.maint_date BETWEEN :startDate AND :endDate ORDER BY m.maint_date DESC")
+	List<Maint> findAllWithUserAndDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 }

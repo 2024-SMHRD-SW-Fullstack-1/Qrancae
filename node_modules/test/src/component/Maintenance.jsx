@@ -48,7 +48,13 @@ const Maintenance = () => {
 
   useEffect(() => {
     setLoading(true);
-    getData();
+    // 오늘 포함 일주일 범위 설정
+    const today = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(today.getDate() - 7);
+
+    setDateRange([oneWeekAgo, today]);
+    getData(oneWeekAgo, today); // 일주일 범위로 데이터 요청
   }, []);
 
   useEffect(() => {
@@ -71,15 +77,21 @@ const Maintenance = () => {
     );
   }, [maints]);
 
-  function getData() {
-    axios.get('http://localhost:8089/qrancae/getmaint')
+  function getData(startDate, endDate) {
+    // 날짜를 쿼리 파라미터로 추가
+    const start = startDate.toISOString();
+    const end = endDate.toISOString();
+
+    axios.get('http://localhost:8089/qrancae/getmaint', {
+      params: { startDate: start, endDate: end }
+    })
       .then((res) => {
         setMaints(res.data);
         setFilteredData(res.data); // 초기 데이터 설정
         setLoading(false);
       })
       .catch((err) => {
-        console.log('maintData error:', err);
+        console.log('maintData 오류:', err);
       });
   }
 
@@ -128,9 +140,9 @@ const Maintenance = () => {
             if (allGood) {
               return '점검 완료';
             } else if (!maintUser && !maintUpdate) {
-              return '접수 대기중';
+              return '접수 대기 중';
             } else if (maintUser && !maintUpdate) {
-              return `진행중 (${maintUser.user_name})`;
+              return `진행 중 (${maintUser.user_name})`;
             } else if (maintUser && maintUpdate) {
               return `완료 (${maintUser.user_name})<br/>${formatDate(maintUpdate)}`;
             }
@@ -241,7 +253,7 @@ const Maintenance = () => {
                         <DatePicker
                           locale={ko}
                           selected={dateRange[0]}
-                          onChange={dates => { setDateRange(dates); }}
+                          onChange={dates => { setDateRange(dates); filterData(); }}
                           startDate={dateRange[0]}
                           endDate={dateRange[1]}
                           selectsRange

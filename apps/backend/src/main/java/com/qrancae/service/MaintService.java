@@ -103,6 +103,14 @@ public class MaintService {
    public Maint findByCable(Cable cable) {
        return maintRepository.findByCable(cable);
    }
+   // 날짜 범위에 맞는 유지보수 내역
+   public List<Maint> getMaintWithinDateRange(LocalDateTime start, LocalDateTime end){
+	   if (start != null && end != null) {
+	        return maintRepository.findAllWithUserAndDateRange(start, end);
+	    } else {
+	        return maintRepository.findAllWithUser();
+	    }
+   }
    
    // 유지보수 내역 불러오기
    public List<Maint> getMaint(){
