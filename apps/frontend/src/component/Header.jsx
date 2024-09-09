@@ -77,11 +77,23 @@ const Header = () => {
   }, [navigate]);
   // 알림 내역 가져오기
   useEffect(() => {
+    // 로컬 스토리지에서 알림 수와 리스트를 불러옴
     const savedCountMsg = localStorage.getItem('countMsg');
+    const savedNotifications = localStorage.getItem('notifications');
+
     if (savedCountMsg) {
       setCountMsg(parseInt(savedCountMsg, 10));
+    } else {
+      setCountMsg(0); // 알림 수가 없으면 0으로 설정
+    }
+
+    if (savedNotifications) {
+      setNotifications(JSON.parse(savedNotifications));
+    } else {
+      setNotifications([]); // 알림 리스트가 없으면 빈 배열로 설정
     }
     getTodayRepair();
+
     // 실시간 알림
     const socket = new SockJS('http://localhost:8089/qrancae/ws');
     const stompClient = new Client({
