@@ -34,6 +34,7 @@ const AIModal = ({ isOpen, onClose, recommendations }) => {
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} className={styles.modal} overlayClassName={styles.overlay}>
       <h2 className={styles.title}>점검 추천 결과</h2>
+      <hr></hr>
       <ul className={styles.list}>
         {recommendationList.length > 0 ? (
           recommendationList.map((rec, index) => (
