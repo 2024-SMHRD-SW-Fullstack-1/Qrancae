@@ -44,7 +44,21 @@ const AIButton = () => {
         onClick={handleClick}
         style={{ cursor: 'pointer', color: loading ? 'rgb(69, 116, 196)' : '#1D3557', fontSize: '20px' }}
       />
-      {loading && <div className="loading-text" style={{ color: 'rgb(69, 116, 196)' }}>{loadingText}</div>}
+      {loading && (
+        <div
+          className="loading-text"
+          style={{
+            position: 'absolute',
+            top: '20px', // 버튼 바로 밑으로 위치 조정
+            left: '50%',
+            transform: 'translateX(-50%)', // 가운데 정렬
+            color: 'rgb(69, 116, 196)',
+            fontSize: '14px'
+          }}
+        >
+          {loadingText}
+        </div>
+      )}
       <AIModal
         isOpen={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
