@@ -251,7 +251,7 @@ const Header = () => {
               <div>|</div>
               <div style={{ color: '#0DB624' }}>신규 접수</div>
               <div>{repairCnt.cntNewRepair}건</div>
-              <div style={{ color: '#939393' }}>진행 중</div>
+              <div style={{ color: '#939393' }}>점검 중</div>
               <div>{repairCnt.cntInProgressRepair}건</div>
               <div style={{ color: '#EE38AE' }}>보수 완료</div>
               <div>{repairCnt.cntCompleteRepair}건</div>
@@ -329,7 +329,7 @@ const Header = () => {
                 <li>
                   {countMsg > 0 ? (
                     <label onClick={handleRepairClick}>
-                      <a className="see-all" href="javascript:void(0);">
+                      <a className="see-all" href="/repair">
                         자세히 보기
                         <i className="fas fa-chevron-right" style={{ marginLeft: '8px' }}></i>
                       </a>

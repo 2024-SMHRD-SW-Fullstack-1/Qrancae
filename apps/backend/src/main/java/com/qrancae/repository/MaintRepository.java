@@ -37,7 +37,7 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	// 유지보수에 처리 작업자 추가하기
 	@Modifying
 	@Transactional
-	@Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_status = '진행중' WHERE m.maint_idx = :maintIdx")
+	@Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_status = '점검중' WHERE m.maint_idx = :maintIdx")
 	int updateMaintUser(@Param("maintIdx") int maintIdx, @Param("userId") String userId);
 
 	/* 오늘의 점검 */

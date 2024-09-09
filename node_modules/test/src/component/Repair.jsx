@@ -124,9 +124,7 @@ const Repair = () => {
 
     // 처리 작업자와 처리 날짜 필터링
     function filterMaints(data) {
-        return data.filter(item =>
-            (!item.maintUser && !item.maint_update) &&
-            (item.maint_qr === '불량' || item.maint_cable === '불량' || item.maint_power === '불량')
+        return data.filter(item => (!item.maintUser && !item.maint_update)
         );
     }
 
@@ -277,7 +275,7 @@ const Repair = () => {
                             if (data.maint_update) {
                                 return `완료<br>(${formatDate(data.maint_date)})`
                             }
-                            return '진행 중'
+                            return '점검 중'
                         }
                         return '접수 대기 중'
 
@@ -328,7 +326,7 @@ const Repair = () => {
                 item.maintUser !== null && item.maint_update === null
             );
             repairingTable.clear().rows.add(filteredData).draw();
-            setSelectedBtn("진행 중");
+            setSelectedBtn("점검 중");
         });
         // 완료
         $('#tab-completed').on('click', function () {
@@ -508,7 +506,7 @@ const Repair = () => {
                                         <div className="card-title">케이블 점검 현황</div>
                                         <div>
                                             <label id="tab-all" className={`btn btn-label-primary btn-sm ${selectedBtn === "전체" ? 'select-btn-label' : ''}`}>전체</label>
-                                            <label id="tab-in-progress" className={`btn btn-label-primary btn-sm ${selectedBtn === "진행 중" ? 'select-btn-label' : ''}`}>진행 중</label>
+                                            <label id="tab-in-progress" className={`btn btn-label-primary btn-sm ${selectedBtn === "점검 중" ? 'select-btn-label' : ''}`}>점검 중</label>
                                             <label id="tab-completed" className={`btn btn-label-primary btn-sm ${selectedBtn === "완료" ? 'select-btn-label' : ''}`}>완료</label>
                                         </div>
                                     </div>
