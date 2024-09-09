@@ -164,16 +164,23 @@ const Header = () => {
 
       // 드롭다운이 열릴 때 알림 개수를 리셋
       if (newOpen && countMsg > 0) {
-
         setCountMsg(0);
         setNotifications([]);
-        localStorage.setItem('countMsg', '0');
-        localStorage.setItem('notifications', JSON.stringify([]));
       }
 
       return newOpen;
     });
   };
+  // 상태 업데이트가 완료된 후 localStorage 업데이트
+  useEffect(() => {
+    if (countMsg === 0) {
+      localStorage.setItem('countMsg', '0');
+    }
+
+    if (notifications.length === 0) {
+      localStorage.setItem('notifications', JSON.stringify([]));
+    }
+  }, [countMsg, notifications]);
 
   const getTodayRepair = () => {
     axios({
