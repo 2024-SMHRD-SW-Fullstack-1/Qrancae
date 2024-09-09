@@ -139,7 +139,7 @@ const Maintenance = () => {
             } else if (!maintUser && !maintUpdate) {
               return '접수 대기 중';
             } else if (maintUser && !maintUpdate) {
-              return `진행 중 (${maintUser.user_name})`;
+              return `점검 중 (${maintUser.user_name})`;
             } else if (maintUser && maintUpdate) {
               return `완료 (${maintUser.user_name})<br/>${formatDate(maintUpdate)}`;
             }
