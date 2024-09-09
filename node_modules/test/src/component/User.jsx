@@ -93,7 +93,7 @@ const User = () => {
               <h3 className="fw-bold mb-3">사용자 관리</h3>
               <div className="common-labels" style={{ marginBottom: '1rem' }}>
                 <button
-                  className={`btn btn-label-primary btn-round`}
+                  className="btn btn-label-primary btn-round"
                   onClick={handleRegisterClick}>
                   <span className="btn-label">
                     <i className="fas fa-user-plus icon-spacing"></i>
@@ -114,7 +114,7 @@ const User = () => {
                         <div className="desc">{formatDate(user.joinedAt)}</div>
                         <div className="view-profile">
                           <button
-                            className="btn btn-primary btn-border btn-round"
+                            className="btn btn-border btn-primary btn-round"
                             onClick={() => openModal(user.userId)}
                             style={{ marginTop: '30px' }}
                           >
