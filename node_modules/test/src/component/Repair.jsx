@@ -563,7 +563,7 @@ const Repair = () => {
                                         as="textarea"
                                         value={alarmMsg}
                                         onChange={handleAlarmMsgChange}
-                                        placeholder="추가 요청사항을 입력해주세요"
+                                        placeholder="추가 요청사항을 입력해주세요. 입력 시 메일도 함께 전송됩니다."
                                     />
                                 </Form.Group>
 

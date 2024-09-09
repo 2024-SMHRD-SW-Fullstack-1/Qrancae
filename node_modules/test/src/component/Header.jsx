@@ -31,6 +31,32 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]); // 알림 리스트 상태
   const navigate = useNavigate();
   const [hover, setHover] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen); // 모바일 토글 메뉴
+  };
+  const dropdownStyle = {
+    position: 'absolute',
+    top: '100%',
+    right: '0',
+    backgroundColor: '#ffffff',
+    border: '1px solid #ddd',
+    boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)',
+    zIndex: 1000,
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: '160px',
+    padding: '0',
+    margin: '0'
+  };
+
+  const menuItemStyle = {
+    padding: '10px',
+    borderBottom: '1px solid #ddd',
+    textDecoration: 'none',
+    color: '#333'
+  };
 
   useEffect(() => {
     const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
@@ -171,13 +197,43 @@ const Header = () => {
               <i className="gg-menu-left"></i>
             </button>
           </div>
-          <button className="topbar-toggler more">
-            <Link to="/repair">
-              <i className="gg-more-vertical-alt"></i>
-            </Link>
+          <button className="topbar-toggler more"
+            onClick={toggleMenu}
+            style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+          >
+            <i className="gg-more-vertical-alt"></i>
           </button>
         </div>
+        {/* 메뉴토글 */}
+        {menuOpen && (
+          <div style={dropdownStyle}>
+            <ul style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
+              <li style={menuItemStyle}>
+                <a href="/home" style={{ textDecoration: 'none', color: '#333' }}>메인</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/repair" style={{ textDecoration: 'none', color: '#333' }}>점검 관리</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/qr" style={{ textDecoration: 'none', color: '#333' }}>QR 코드</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/log" style={{ textDecoration: 'none', color: '#333' }}>로그 내역</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/maint" style={{ textDecoration: 'none', color: '#333' }}>유지보수 내역</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/user" style={{ textDecoration: 'none', color: '#333' }}>사용자 관리</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/logout" style={{ textDecoration: 'none', color: '#333' }}>로그아웃</a>
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
+
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div className='today-repair' style={{ border: 'none', display: 'flex', alignItems: 'center', width: '70%' }}>
           <label className='btn btn-primary btn-border btn-round' onClick={handleRepairClick}>
@@ -349,90 +405,94 @@ const Header = () => {
         </div>
       </nav>
       {/* 팝업 창 */}
-      {showPopup && (
-        <Modal
-          isOpen={showPopup}
-          onRequestClose={handleClosePopup}
-          contentLabel="점검 추천"
-          className="popup-content"
-          overlayClassName="popup-overlay"
-        >
-          <h2>점검 추천</h2>
-          <p>{advice}</p>
-          <button onClick={handleClosePopup} className="btn btn-secondary">
-            닫기
-          </button>
-        </Modal>
-      )}
-      {showAlert && latestMaint && (
-        <div
-          className="col-10 col-xs-11 col-sm-4 alert alert-secondary animated fadeInUp"
-          role="alert"
-          style={{
-            display: 'inline-block',
-            width: '350px', // 가로 길이 조정
-            margin: '0px auto',
-            paddingLeft: '30px',// 패딩 조정
-            position: 'fixed',
-            transition: '0.8s ease-in-out', // 사라지는 시간
-            zIndex: 1031,
-            bottom: '20px',
-            right: '20px',
-          }}
-        >
-          <button
-            type="button"
-            aria-hidden="true"
-            className="close"
-            style={{
-              position: 'absolute',
-              right: '10px',
-              top: '5px',
-              zIndex: 1033,
-            }}
-            onClick={() => setShowAlert(false)}
+      {
+        showPopup && (
+          <Modal
+            isOpen={showPopup}
+            onRequestClose={handleClosePopup}
+            contentLabel="점검 추천"
+            className="popup-content"
+            overlayClassName="popup-overlay"
           >
-            &times;
-          </button>
-          <div className="alert-header">
-            <h6 className="alert-title">
-              <span style={{ fontWeight: 'bold' }}>{latestMaint.user_name}</span>
-              {' '}
-              ({formatDate(latestMaint.maint_date)})
-            </h6>
-          </div>
-          <div className="alert-body">
-            <div>
-              <span>
-                케이블 <strong>{latestMaint.cable_idx}</strong> 점검 요청
-              </span>
+            <h2>점검 추천</h2>
+            <p>{advice}</p>
+            <button onClick={handleClosePopup} className="btn btn-secondary">
+              닫기
+            </button>
+          </Modal>
+        )
+      }
+      {
+        showAlert && latestMaint && (
+          <div
+            className="col-10 col-xs-11 col-sm-4 alert alert-secondary animated fadeInUp"
+            role="alert"
+            style={{
+              display: 'inline-block',
+              width: '350px', // 가로 길이 조정
+              margin: '0px auto',
+              paddingLeft: '30px',// 패딩 조정
+              position: 'fixed',
+              transition: '0.8s ease-in-out', // 사라지는 시간
+              zIndex: 1031,
+              bottom: '20px',
+              right: '20px',
+            }}
+          >
+            <button
+              type="button"
+              aria-hidden="true"
+              className="close"
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '5px',
+                zIndex: 1033,
+              }}
+              onClick={() => setShowAlert(false)}
+            >
+              &times;
+            </button>
+            <div className="alert-header">
+              <h6 className="alert-title">
+                <span style={{ fontWeight: 'bold' }}>{latestMaint.user_name}</span>
+                {' '}
+                ({formatDate(latestMaint.maint_date)})
+              </h6>
             </div>
-            <div>
-              {[
-                latestMaint.maint_qr === '불량' && 'QR 상태: 불량',
-                latestMaint.maint_cable === '불량' && '케이블 상태: 불량',
-                latestMaint.maint_power === '불량' && '전원 상태: 불량'
-              ]
-                .filter(Boolean) // '불량' 상태만 남기기
-                .map((status, index, array) => {
-                  // 각 상태 메시지에서 '불량'만 빨간색으로 변경
-                  const parts = status.split('불량');
-                  return (
-                    <span key={index}>
-                      {parts[0]}
-                      <span style={{ color: 'red' }}>불량</span>
-                      {parts[1]}
-                      {(index < array.length - 1) && ', '} {/* 마지막 항목에는 쉼표를 추가하지 않음 */}
-                    </span>
-                  );
-                })}
+            <div className="alert-body">
+              <div>
+                <span>
+                  케이블 <strong>{latestMaint.cable_idx}</strong> 점검 요청
+                </span>
+              </div>
+              <div>
+                {[
+                  latestMaint.maint_qr === '불량' && 'QR 상태: 불량',
+                  latestMaint.maint_cable === '불량' && '케이블 상태: 불량',
+                  latestMaint.maint_power === '불량' && '전원 상태: 불량'
+                ]
+                  .filter(Boolean) // '불량' 상태만 남기기
+                  .map((status, index, array) => {
+                    // 각 상태 메시지에서 '불량'만 빨간색으로 변경
+                    const parts = status.split('불량');
+                    return (
+                      <span key={index}>
+                        {parts[0]}
+                        <span style={{ color: 'red' }}>불량</span>
+                        {parts[1]}
+                        {(index < array.length - 1) && ', '} {/* 마지막 항목에는 쉼표를 추가하지 않음 */}
+                      </span>
+                    );
+                  })}
+              </div>
             </div>
+            <a href="#" target="_blank" rel="noopener noreferrer"></a>
           </div>
-          <a href="#" target="_blank" rel="noopener noreferrer"></a>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 };
 
