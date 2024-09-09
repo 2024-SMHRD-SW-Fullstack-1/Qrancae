@@ -62,7 +62,7 @@ public class LogController {
 		// DateTimeFormatter를 사용하여 날짜 포맷을 명시적으로 지정 (UTC 시간대 포함)
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-	    // null 처리: startDate가 null이면 2달 전, endDate가 null이면 현재 시각으로 설정
+	    // null 처리: startDate가 null이면 12달 전, endDate가 null이면 현재 시각으로 설정
 	    LocalDateTime start = (startDate != null) ? OffsetDateTime.parse(startDate, formatter).toLocalDateTime() : LocalDateTime.now().minusMonths(12);
 	    LocalDateTime end = (endDate != null) ? OffsetDateTime.parse(endDate, formatter).toLocalDateTime() : LocalDateTime.now();
 

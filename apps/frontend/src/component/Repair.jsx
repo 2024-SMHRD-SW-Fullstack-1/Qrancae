@@ -43,6 +43,7 @@ const Repair = () => {
     const [selectedMaintsInfo, setSelectedMaintsInfo] = useState([]); // 선택된 유지보수 내역 정보
     const [selectedBtn, setSelectedBtn] = useState("전체");
     const [showError, setShowError] = useState(false); // 작업자 선택 안함
+    const [loading, setLoading] = useState(false); // 로딩중인지 확인
 
     // 팝업
     const [showNonePopup, setShowNonePopup] = useState(false); // 작업자 선택한게 없을 때
@@ -51,6 +52,7 @@ const Repair = () => {
     const userId = Cookies.get('userId');
 
     useEffect(() => {
+        setLoading(true);
         getData();
         getUsers();
     }, []);
@@ -102,6 +104,7 @@ const Repair = () => {
         axios.get('http://localhost:8089/qrancae/getmaintreq')
             .then((res) => {
                 setMaints(res.data);
+                setLoading(false); // 로딩 상태 종료
             })
             .catch((err) => {
                 console.log('maintData error:', err);
@@ -420,6 +423,15 @@ const Repair = () => {
             <Sidebar />
             <div className="main-panel">
                 <Header />
+                {loading && (
+                    <div className="overlay">
+                        <img
+                            src="assets/img/spinner.svg"
+                            alt="Loading..."
+                            className="spinner"
+                        />
+                    </div>
+                )}
                 {showNonePopup && (
                     <ModalPopup
                         isOpen={showNonePopup}
