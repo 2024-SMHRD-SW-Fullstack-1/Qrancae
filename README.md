@@ -141,9 +141,9 @@
 <table align="center" style="width: 100%; table-layout: fixed;">
   <tr>
     <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/ed5a2d90-5de1-4f4b-bc7a-33219051e9b0" width="100" height="100"/></td>
-    <td align="center" style="width: 25%;"><img src="https://mb.ntdtv.kr/assets/uploads/2019/01/Screen-Shot-2019-01-08-at-4.31.55-PM-e1546932545978.png" width="100" height="100"/></td>
-    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/d3ae628a-f2c2-4fad-9174-7e0772ba0601" width="100" height="100"/></td>
-    <td align="center" style="width: 25%;"><img src="https://i.pinimg.com/236x/ed/bb/53/edbb53d4f6dd710431c1140551404af9.jpg" width="100" height="100"/></td>
+    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/34dd62d7-d775-47b6-a8fa-fc8947db8cf9" width="100" height="100"/></td>
+    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/db769a31-63c9-4dc8-8a39-3a815dbba19b" width="70" height="70"/></td>
+    <td align="center" style="width: 25%;"><img src="https://github.com/user-attachments/assets/09c7a121-e80e-401f-b864-0424adc06327" width="100" height="100"/></td>
   </tr>
   <tr>
     <td align="center"><strong>곽효정</strong></td>
@@ -192,8 +192,40 @@
 </table>
 
 ## 🤾‍♂️ 트러블슈팅
-* 문제1<br>
- 문제점 설명 및 해결방안
- 
-* 문제2<br>
- 문제점 설명 및 해결방안
+<details>
+    <summary>
+        랜더링 시 <b>데이터 테이블 초기화 오류</b>
+    </summary>
+    <div align="center">
+        <img width=650 src="https://github.com/user-attachments/assets/4057ec07-56af-4a8c-ad2c-39b28523772c"/><br>
+        필터 적용 시에만 <b>테이블을 초기화</b>하여 해결
+    </div>
+</details>
+<details>
+    <summary>
+        시뮬레이터에서 가능하던 <b>QR 인식이 배포 후 실제 핸드폰</b>에서 인식 오류
+    </summary>
+    <div align="center">
+        <img width=650 src="https://github.com/user-attachments/assets/6f2a1399-9ace-40af-89fb-99b4d9e0279a"/><br>
+        <b>정확한 영역을 지정</b>해서 인식을 높임
+    </div>
+</details>
+<details>
+    <summary>
+        답변 중 <b>할루시네이션</b> 오류
+    </summary>
+    <div align="center">
+        <img width=650 src="https://github.com/user-attachments/assets/1cf125c4-14b0-405f-aa26-c49c74b220e0"/><br>
+        프롬프트 엔지니어링을 위해<b>더 정확한 응답 생성</b>
+    </div>
+</details>
+<details>
+    <summary>
+        HTTPS 전환 과정에서 <b>403 Forbidden</b> 오류 및 CORS 문제 발생
+    </summary>
+    <div align="center">
+        <img width=650 src="https://github.com/user-attachments/assets/c77ba2fe-edb3-4388-9d8e-8fb73d709b69"/><br>
+        CORS 설정을 <b>구체적</b>으로 지정<br>
+        <b>백엔드</b> -> @CrossOrigin 수정, <b>Nginx</b> -> CORS 추가
+    </div>
+</details>
