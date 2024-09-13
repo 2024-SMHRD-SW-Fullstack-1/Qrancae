@@ -7,7 +7,7 @@
 <br>
 
 ## 📅 프로젝트 기간
-2022.08.02 ~ 2022.09.12 (6주)
+2024.08.02 ~ 2024.09.12 (6주)
 <br>
 
 ## ⭐ 주요 기능
@@ -93,6 +93,49 @@
 <br>
 
 ## 🖥 화면 구성
+#### 관리자 웹
+<details><summary>로그인 화면</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/ca1d7259-28a2-45aa-928b-2e246a30609f"/>
+</div></details>
+<details><summary>메인 대시보드</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/4a14b5ec-bc3a-490d-ad1f-d89f8334cd78"/>
+<img width=650 src="https://github.com/user-attachments/assets/614e955c-9704-47d4-9ffb-906ae803ee5a"/>
+</div></details>
+<details><summary>점검 관리</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/bbd90be7-7bf6-465f-820c-5a482dd281b5"/>
+<img width=650 src="https://github.com/user-attachments/assets/e99dc230-165f-4fca-b32c-c3449498f7a8"/>
+<img width=650 src="https://github.com/user-attachments/assets/e038e0d8-10ed-4232-918e-55230c4d8dc0"/>
+<img width=650 src="https://github.com/user-attachments/assets/144c2d50-7ad5-4be1-920b-6022554d5cd2"/>
+</div></details>
+<details><summary>QR 코드</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/4d8b627e-b252-4c64-bc60-abd0b5a63e50"/>
+    <img width=650 src="https://github.com/user-attachments/assets/0311c2b0-6ea4-4264-8d25-6e3882e5f565"/>
+    <img width=650 src="https://github.com/user-attachments/assets/4b991fd6-9703-465d-8210-5130f1f3fa51"/>
+     <img width=650 src="https://github.com/user-attachments/assets/3a9addf3-d26e-4616-8f88-8b20268ee49d"/>
+</div></details>
+<details><summary>로그 내역</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/40bf1b63-1a05-4b05-af27-4d243daad103"/>
+</div></details>
+<details><summary>유지보수 내역</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/ff38981a-507f-467c-82c4-dc23bcaf7eac"/>
+</div></details>
+<details><summary>사용자 관리</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/1cfd79dc-5af0-43d3-b451-d15b97b5aae2"/>
+    <img width=650 src="https://github.com/user-attachments/assets/bd2dc8bb-f5d4-4df2-85d1-cbc61f6b20e5"/>
+    <img width=650 src="https://github.com/user-attachments/assets/8ee5138d-f55d-4a62-ad4e-ce8e6f76af1d"/>
+     <img width=650 src="https://github.com/user-attachments/assets/fb5e8ed9-c326-41e6-b5d7-a909de7951e6"/>
+</div></details>
+
+#### 작업자 앱
+<details><summary>메인</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/44ae0ba1-04be-455f-ac41-34e0c9407edd"/>
+</div></details>
+<details><summary>QR인식 후 케이블 정보</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/28ad23e0-fc6d-4ff5-a189-f26d49a63120"/>
+</div></details>
+<details><summary>점검</summary><div align="center">
+<img width=650 src="https://github.com/user-attachments/assets/f7bb3e8a-3593-4e58-a35a-8f182940757e"/>
+</div></details>
 
 ## 👨‍👩‍👦‍👦 팀원 소개
 <table align="center" style="width: 100%; table-layout: fixed;">
