@@ -65,5 +65,15 @@ public class MemberService {
     public User findUserByUserId(String userId) {
         return userRepository.findById(userId).orElse(null);
     }
+    
+    // 해당 관리자의 이름
+    public String getUserNameByAdminId(String adminId) {
+        return userRepository.findUserNameByAdminId(adminId);
+    }
+    
+    // 해당 작업자의 이메일
+    public String getUserEmailById(String userId) {
+        return userRepository.findUserEmailByUserId(userId);
+    }
 
 }

@@ -8,6 +8,7 @@ import axios from 'axios';
 import ModalPopup from './popups/ModalPopup';
 import { Modal, Button, Form } from 'react-bootstrap';
 import styles from './Login.module.css';
+import Cookies from 'js-cookie';
 
 //날짜 및 시간 포맷팅
 const formatDate = (dateString) => {

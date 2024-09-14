@@ -37,7 +37,7 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	// 유지보수에 처리 작업자 추가하기
 	@Modifying
 	@Transactional
-	@Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_status = '진행중' WHERE m.maint_idx = :maintIdx")
+	@Query("UPDATE Maint m SET m.maintUser.user_id = :userId, m.maint_status = '점검중' WHERE m.maint_idx = :maintIdx")
 	int updateMaintUser(@Param("maintIdx") int maintIdx, @Param("userId") String userId);
 
 	/* 오늘의 점검 */
@@ -132,5 +132,13 @@ public interface MaintRepository extends JpaRepository<Maint, Integer> {
 	@Query("SELECT COUNT(m) FROM Maint m " + "WHERE m.maintUser.user_id = :userId " + "AND m.maint_status = '보수완료' "
 			+ "AND (m.maint_qr = '불량' OR m.maint_cable = '불량' OR m.maint_power = '불량')")
 	int countCompletedMaintenanceByUserWithDefectiveItems(@Param("userId") String userId);
+	
+	// maintIdxs로 해당 cable_idx 가져오기
+	@Query("SELECT DISTINCT m.cable.cable_idx FROM Maint m WHERE m.maint_idx IN :maintIdxs")
+    List<Integer> findCableIdxsByMaintIdxs(@Param("maintIdxs") List<Integer> maintIdxs);
+	
+	// 날짜 범위에 맞는 유지보수 내역
+	@Query("SELECT m FROM Maint m JOIN FETCH m.user u WHERE m.maint_date BETWEEN :startDate AND :endDate ORDER BY m.maint_date DESC")
+	List<Maint> findAllWithUserAndDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 }

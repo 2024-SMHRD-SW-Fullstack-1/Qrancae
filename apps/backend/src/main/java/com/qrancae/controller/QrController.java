@@ -167,8 +167,8 @@ public class QrController {
 		for(Integer i : cableIdxList) {
 	        String img = Base64Codec.makeStringWithFile("/home/ec2-user/qrImages/cable" + i + ".png");  // 경로 수정
 			Cable cable = cableService.getCableByIdx(i);
-			String source = cable.getS_rack_number() + "-"+ cable.getS_rack_location() + "-"+ cable.getS_port_number();
-			String destination = cable.getD_rack_number() + "-"+ cable.getD_rack_location() + "-"+ cable.getD_port_number();
+			String source = cable.getS_rack_number() + "-"+ cable.getS_rack_location() + "-"+ "***";
+			String destination = cable.getD_rack_number() + "-"+ cable.getD_rack_location() + "-"+ "***";
 			qrImgList.add(new PrintQr(img, source, destination));
 		}
 		

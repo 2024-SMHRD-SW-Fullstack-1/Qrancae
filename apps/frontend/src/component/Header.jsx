@@ -31,6 +31,32 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]); // 알림 리스트 상태
   const navigate = useNavigate();
   const [hover, setHover] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen); // 모바일 토글 메뉴
+  };
+  const dropdownStyle = {
+    position: 'absolute',
+    top: '100%',
+    right: '0',
+    backgroundColor: '#ffffff',
+    border: '1px solid #ddd',
+    boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)',
+    zIndex: 1000,
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: '160px',
+    padding: '0',
+    margin: '0'
+  };
+
+  const menuItemStyle = {
+    padding: '10px',
+    borderBottom: '1px solid #ddd',
+    textDecoration: 'none',
+    color: '#333'
+  };
 
   useEffect(() => {
     const storedUserId = Cookies.get('userId'); // userId를 쿠키에서 가져옴
@@ -52,9 +78,20 @@ const Header = () => {
   }, [navigate]);
   // 알림 내역 가져오기
   useEffect(() => {
+    // 로컬 스토리지에서 알림 수와 리스트를 불러옴
     const savedCountMsg = localStorage.getItem('countMsg');
+    const savedNotifications = localStorage.getItem('notifications');
+
     if (savedCountMsg) {
       setCountMsg(parseInt(savedCountMsg, 10));
+    } else {
+      setCountMsg(0); // 알림 수가 없으면 0으로 설정
+    }
+
+    if (savedNotifications) {
+      setNotifications(JSON.parse(savedNotifications));
+    } else {
+      setNotifications([]); // 알림 리스트가 없으면 빈 배열로 설정
     }
     getTodayRepair();
 
@@ -131,12 +168,22 @@ const Header = () => {
       // 드롭다운이 열릴 때 알림 개수를 리셋
       if (newOpen && countMsg > 0) {
         setCountMsg(0);
-        localStorage.setItem('countMsg', '0');
+        setNotifications([]);
       }
 
       return newOpen;
     });
   };
+  // 상태 업데이트가 완료된 후 localStorage 업데이트
+  useEffect(() => {
+    if (countMsg === 0) {
+      localStorage.setItem('countMsg', '0');
+    }
+
+    if (notifications.length === 0) {
+      localStorage.setItem('notifications', JSON.stringify([]));
+    }
+  }, [countMsg, notifications]);
 
   const getTodayRepair = () => {
     axios({
@@ -169,17 +216,44 @@ const Header = () => {
             <button className="btn btn-toggle toggle-sidebar">
               <i className="gg-menu-right"></i>
             </button>
-            <button className="btn btn-toggle sidenav-toggler">
-              <i className="gg-menu-left"></i>
-            </button>
           </div>
-          <button className="topbar-toggler more">
-            <Link to="/repair">
-              <i className="gg-more-vertical-alt"></i>
-            </Link>
+          <button className="topbar-toggler more"
+            onClick={toggleMenu}
+            style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+          >
+            <i className="gg-more-vertical-alt"></i>
           </button>
         </div>
+        {/* 메뉴토글 */}
+        {menuOpen && (
+          <div style={dropdownStyle}>
+            <ul style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
+              <li style={menuItemStyle}>
+                <a href="/home" style={{ textDecoration: 'none', color: '#333' }}>메인</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/repair" style={{ textDecoration: 'none', color: '#333' }}>점검 관리</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/qr" style={{ textDecoration: 'none', color: '#333' }}>QR 코드</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/log" style={{ textDecoration: 'none', color: '#333' }}>로그 내역</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/maint" style={{ textDecoration: 'none', color: '#333' }}>유지보수 내역</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/user" style={{ textDecoration: 'none', color: '#333' }}>사용자 관리</a>
+              </li>
+              <li style={menuItemStyle}>
+                <a href="/logout" style={{ textDecoration: 'none', color: '#333' }}>로그아웃</a>
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
+
       <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
         <div
           className="today-repair"
@@ -206,7 +280,7 @@ const Header = () => {
               <div>|</div>
               <div style={{ color: '#0DB624' }}>신규 접수</div>
               <div>{repairCnt.cntNewRepair}건</div>
-              <div style={{ color: '#939393' }}>진행 중</div>
+              <div style={{ color: '#939393' }}>점검 중</div>
               <div>{repairCnt.cntInProgressRepair}건</div>
               <div style={{ color: '#EE38AE' }}>보수 완료</div>
               <div>{repairCnt.cntCompleteRepair}건</div>
@@ -306,7 +380,7 @@ const Header = () => {
                 <li>
                   {countMsg > 0 ? (
                     <label onClick={handleRepairClick}>
-                      <a className="see-all" href="javascript:void(0);">
+                      <a className="see-all" href="/repair">
                         자세히 보기
                         <i
                           className="fas fa-chevron-right"
@@ -481,6 +555,7 @@ const Header = () => {
                   );
                 })}
             </div>
+            <a href="#" target="_blank" rel="noopener noreferrer"></a>
           </div>
           <a href="#" target="_blank" rel="noopener noreferrer"></a>
         </div>

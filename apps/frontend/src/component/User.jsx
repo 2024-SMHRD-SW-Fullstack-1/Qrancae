@@ -119,7 +119,7 @@ const User = () => {
                         <div className="desc">{formatDate(user.joinedAt)}</div>
                         <div className="view-profile">
                           <button
-                            className="btn btn-primary btn-border btn-round"
+                            className="btn btn-border btn-primary btn-round"
                             onClick={() => openModal(user.userId)}
                             style={{ marginTop: '30px' }}
                           >

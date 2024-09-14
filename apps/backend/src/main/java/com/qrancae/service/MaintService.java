@@ -103,6 +103,14 @@ public class MaintService {
    public Maint findByCable(Cable cable) {
        return maintRepository.findByCable(cable);
    }
+   // 날짜 범위에 맞는 유지보수 내역
+   public List<Maint> getMaintWithinDateRange(LocalDateTime start, LocalDateTime end){
+	   if (start != null && end != null) {
+	        return maintRepository.findAllWithUserAndDateRange(start, end);
+	    } else {
+	        return maintRepository.findAllWithUser();
+	    }
+   }
    
    // 유지보수 내역 불러오기
    public List<Maint> getMaint(){
@@ -260,6 +268,11 @@ public class MaintService {
     // 보수 완료 내역을 사용자 ID로 카운트
 	public int countCompletedMaintenanceByUser(String userId) {
 		return maintRepository.countCompletedMaintenanceByUserWithDefectiveItems(userId);
+	}
+	
+	// maintIdxs를 기반으로 cable_idx를 조회하고 반환
+	public List<Integer> getCableIdxsByMaintIdxs(List<Integer> maintIdxs) {
+	    return maintRepository.findCableIdxsByMaintIdxs(maintIdxs);
 	}
 
 }

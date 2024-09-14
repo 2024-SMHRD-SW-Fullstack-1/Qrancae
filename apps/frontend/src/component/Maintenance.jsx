@@ -43,11 +43,15 @@ const Maintenance = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [selectedUser, setSelectedUser] = useState('All');
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false); // 로딩중인지 확인
 
   useEffect(() => {
-    setLoading(true);
-    getData();
+    // 오늘 포함 일주일 범위 설정
+    const today = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(today.getDate() - 6);
+
+    setDateRange([oneWeekAgo, today]);
+    getData(oneWeekAgo, today); // 일주일 범위로 데이터 요청
   }, []);
 
   useEffect(() => {
@@ -78,10 +82,9 @@ const Maintenance = () => {
       .then((res) => {
         setMaints(res.data);
         setFilteredData(res.data); // 초기 데이터 설정
-        setLoading(false);
       })
       .catch((err) => {
-        console.log('maintData error:', err);
+        console.log('maintData 오류:', err);
       });
   }
 
@@ -141,9 +144,9 @@ const Maintenance = () => {
             if (allGood) {
               return '점검 완료';
             } else if (!maintUser && !maintUpdate) {
-              return '접수 대기중';
+              return '접수 대기 중';
             } else if (maintUser && !maintUpdate) {
-              return `진행중 (${maintUser.user_name})`;
+              return `점검 중 (${maintUser.user_name})`;
             } else if (maintUser && maintUpdate) {
               return `완료 (${maintUser.user_name})<br/>${formatDate(maintUpdate)}`;
             }
@@ -188,6 +191,8 @@ const Maintenance = () => {
     setDateRange([null, null]);
     setSelectedUser('All');
     setFilteredData(maints);
+    // 전체 데이터 요청
+    getData(null, null);
   };
 
   const handleReportDownload = () => {
@@ -235,15 +240,6 @@ const Maintenance = () => {
 
       <div className="main-panel">
         <Header />
-        {loading && (
-          <div className="overlay">
-            <img
-              src="assets/img/spinner.svg"
-              alt="Loading..."
-              className="spinner"
-            />
-          </div>
-        )}
 
         <div className="container">
           <div className="page-inner">

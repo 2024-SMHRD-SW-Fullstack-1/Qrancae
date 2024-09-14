@@ -1,5 +1,6 @@
 package com.qrancae.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,6 +50,13 @@ public interface LogRepository extends JpaRepository<Log, Integer> {
 	List<Log> findAllLogsToday();
 
 	// 사용자 객체로 로그 수를 계산하는 쿼리
-	   @Query("SELECT COUNT(l) FROM Log l WHERE l.user = :user")
-	   int countLogsByUser(@Param("user") User user);
+	@Query("SELECT COUNT(l) FROM Log l WHERE l.user = :user")
+	int countLogsByUser(@Param("user") User user);
+	
+	// 날짜 범위에 맞는 로그 내역
+	@Query("SELECT l FROM Log l JOIN FETCH l.user u JOIN FETCH l.cable c " +
+		       "WHERE (:start IS NULL OR l.log_date >= :start) AND (:end IS NULL OR l.log_date <= :end) " +
+		       "ORDER BY l.log_date DESC")
+	List<Log> findAllWithUserAndCableWithinDateRange(@Param("start") LocalDateTime start, 
+		                                                 @Param("end") LocalDateTime end);
 }

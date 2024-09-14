@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAdjusters;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qrancae.model.Log;
@@ -55,10 +57,17 @@ public class LogController {
 	private MemberService memberService;
 
 	@GetMapping("/getlog")
-	public List<Log> getLog() {
+	public List<Log> getLog(@RequestParam(required = false) String startDate,@RequestParam(required = false) String endDate) {
+		
+		// DateTimeFormatter를 사용하여 날짜 포맷을 명시적으로 지정 (UTC 시간대 포함)
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-		List<Log> logs = logService.getLogResult();
-		//System.out.println("로그데이터"+logs.toString());
+	    // null 처리: startDate가 null이면 12달 전, endDate가 null이면 현재 시각으로 설정
+	    LocalDateTime start = (startDate != null) ? OffsetDateTime.parse(startDate, formatter).toLocalDateTime() : LocalDateTime.now().minusMonths(12);
+	    LocalDateTime end = (endDate != null) ? OffsetDateTime.parse(endDate, formatter).toLocalDateTime() : LocalDateTime.now();
+
+		List<Log> logs = logService.getLogResultWithinDateRange(start, end);
+		
 
 		return logs;
 	}
