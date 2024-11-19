@@ -216,7 +216,7 @@
     </summary>
     <div align="center">
         <img width=650 src="https://github.com/user-attachments/assets/1cf125c4-14b0-405f-aa26-c49c74b220e0"/><br>
-        프롬프트 엔지니어링을 위해<b>더 정확한 응답 생성</b>
+        프롬프트 엔지니어링을 통해 <b>더 정확한 응답 생성</b>
     </div>
 </details>
 <details>
