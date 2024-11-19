@@ -128,13 +128,13 @@
 
 #### 작업자 앱
 <details><summary>메인</summary><div align="center">
-<img width=650 src="https://github.com/user-attachments/assets/44ae0ba1-04be-455f-ac41-34e0c9407edd"/>
+<img width=300 src="https://github.com/user-attachments/assets/44ae0ba1-04be-455f-ac41-34e0c9407edd"/>
 </div></details>
 <details><summary>QR인식 후 케이블 정보</summary><div align="center">
-<img width=650 src="https://github.com/user-attachments/assets/28ad23e0-fc6d-4ff5-a189-f26d49a63120"/>
+<img width=300 src="https://github.com/user-attachments/assets/28ad23e0-fc6d-4ff5-a189-f26d49a63120"/>
 </div></details>
 <details><summary>점검</summary><div align="center">
-<img width=650 src="https://github.com/user-attachments/assets/f7bb3e8a-3593-4e58-a35a-8f182940757e"/>
+<img width=300 src="https://github.com/user-attachments/assets/f7bb3e8a-3593-4e58-a35a-8f182940757e"/>
 </div></details>
 
 ## 👨‍👩‍👦‍👦 팀원 소개
